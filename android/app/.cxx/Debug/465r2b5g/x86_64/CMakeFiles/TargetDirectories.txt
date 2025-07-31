@@ -1,0 +1,2 @@
+/Users/ratchanon.k/Desktop/ihealth_plus_2025_mobile/android/app/.cxx/Debug/465r2b5g/x86_64/CMakeFiles/edit_cache.dir
+/Users/ratchanon.k/Desktop/ihealth_plus_2025_mobile/android/app/.cxx/Debug/465r2b5g/x86_64/CMakeFiles/rebuild_cache.dir
