@@ -2587,7 +2587,11 @@ class _HomePageState extends State<HomePage> {
       "location": "กรุงเทพฯ",
       "salary": "12,000 - 18,000 บาท",
       "working_hours": "10.00 - 20.00 น.",
-      "postedDate": "25/07/2025",
+      "Date": "25/07/2025",
+      "welfare": "มีที่พักฟรี, อาหารกลางวัน, ประกันสังคม",
+      "count": "3",
+      "maincategories": "นวดเพื่อสุขภาพ",
+      "subcategories": "การแช่น้ำสมุนไพร",
     },
     {
       "id": 2,
@@ -2599,7 +2603,11 @@ class _HomePageState extends State<HomePage> {
       "location": "เชียงใหม่",
       "salary": "15,000 - 22,000 บาท",
       "working_hours": "09.00 - 19.00 น.",
-      "postedDate": "25/07/2025",
+      "Date": "25/07/2025",
+      "welfare": "ประกันชีวิต, โบนัสรายเดือน, วันหยุดประจำ",
+      "count": "5",
+      "maincategories": "นวดเพื่อสุขภาพ",
+      "subcategories": "คอ / บ่า / ไหล่",
     },
   ];
 }

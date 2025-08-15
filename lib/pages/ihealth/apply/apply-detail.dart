@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
+import 'package:ihealth_2025_mobile/widget/dialog.dart';
 
 class ApplyDetail extends StatefulWidget {
   const ApplyDetail({super.key, required this.job});
@@ -37,6 +38,7 @@ class _ApplyDetailState extends State<ApplyDetail> {
               color: Colors.white,
               padding: EdgeInsets.all(20),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -122,6 +124,14 @@ class _ApplyDetailState extends State<ApplyDetail> {
                     ],
                   ),
                   SizedBox(height: 20),
+                  _buildTextRow(
+                      title: 'ประเภทหลัก', sub: widget.job['maincategories']),
+                  SizedBox(height: 8),
+                  _buildTextRow(
+                      title: 'ประเภทย่อย', sub: widget.job['subcategories']),
+                  SizedBox(height: 8),
+                  _buildTextRow(title: 'สวัสดิการ', sub: widget.job['welfare']),
+                  SizedBox(height: 20),
                   Container(
                     padding: EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -132,7 +142,7 @@ class _ApplyDetailState extends State<ApplyDetail> {
                       children: [
                         _buildInfoRow(
                           icon: Icons.attach_money,
-                          title: 'เงินเดือน',
+                          title: 'ค่าตอบแทน',
                           value: widget.job['salary'],
                           valueColor: Color(0XFF224B45),
                         ),
@@ -145,6 +155,7 @@ class _ApplyDetailState extends State<ApplyDetail> {
                       ],
                     ),
                   ),
+                  SizedBox(height: 20),
                 ],
               ),
             ),
@@ -152,7 +163,7 @@ class _ApplyDetailState extends State<ApplyDetail> {
         ),
       ),
       bottomNavigationBar: Container(
-        padding: EdgeInsets.all(16),
+        padding: EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: Colors.white,
           boxShadow: [
@@ -165,7 +176,9 @@ class _ApplyDetailState extends State<ApplyDetail> {
         ),
         child: ElevatedButton(
           onPressed: () {
-            // _launchUrl(job['url']);
+            print('------------>>สมัครงาน<<----------------');
+
+            dialogApply();
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,
@@ -184,6 +197,322 @@ class _ApplyDetailState extends State<ApplyDetail> {
           ),
         ),
       ),
+    );
+  }
+
+  dialogApply() {
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        insetPadding:
+            EdgeInsets.symmetric(horizontal: 20), // ลดระยะห่างจากขอบจอ
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        backgroundColor: Colors.white,
+        child: Container(
+          width: MediaQuery.of(context).size.width * 0.9, // กว้าง 90% ของหน้าจอ
+          child: Stack(
+            children: [
+              SingleChildScrollView(
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 35, horizontal: 25),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Center(
+                        child: Text(
+                          'สมัครงาน: ร้านนวดสบายใจ',
+                          style: TextStyle(
+                              color: AppColors.primary,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      SizedBox(height: 12),
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: AppColors.grayligh,
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Center(
+                                child: Text(
+                                  'ข้อมูลผู้สมัคร',
+                                  style: TextStyle(
+                                    color: AppColors.primary,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                              _buildTextRowPrimary(
+                                  title: 'ชื่อนามสกุล', sub: "วรรณิภา สุขใจ"),
+                              SizedBox(height: 8),
+                              _buildTextRowPrimary(
+                                  title: 'เลขใบอนุญาต', sub: "กอ-12345-50"),
+                              SizedBox(height: 8),
+                              _buildTextRowPrimary(
+                                  title: 'สัญชาติ', sub: "ไทย"),
+                              _buildTextRowPrimary(title: 'เพศ', sub: "หญิง"),
+                              SizedBox(height: 8),
+                              _buildTextRowPrimary(
+                                  title: 'วันเกิด', sub: "1997-09-20"),
+                              SizedBox(height: 8),
+                              _buildTextRowPrimary(
+                                  title: 'ทักษะนวด',
+                                  sub: "หลัง / เอว / สะบัก, ศีรษะ / หน้า"),
+                              SizedBox(height: 8),
+                              _buildTextRowPrimary(
+                                  title: 'ทักษะภาษา', sub: "ไทย, อังกฤษ"),
+                              SizedBox(height: 8),
+                              _buildTextRowPrimary(
+                                  title: 'เบอร์โทรศัพท์', sub: "091-234-6789"),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 12),
+                      Center(
+                        child: Text(
+                          'ข้อความเพิ่มเติม',
+                          style: TextStyle(
+                            color: AppColors.primary,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 12),
+                      TextFormField(
+                        controller: null,
+                        maxLines: null, // ไม่จำกัดจำนวนบรรทัด
+                        keyboardType: TextInputType.multiline,
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.all(16),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: AppColors.grayligh,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 12),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: GestureDetector(
+                          onTap: () {
+                            print('============>> success  <<===========');
+                            Navigator.of(context).pop();
+                            dialogSuccess();
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: AppColors.primary,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 12),
+                              child: Text(
+                                'ส่งใบสมัคร',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              // ปุ่ม X ที่มุมขวาบน
+              Positioned(
+                top: 4,
+                right: 4,
+                child: IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // ปิด dialog
+                  },
+                  icon: Icon(
+                    Icons.close,
+                    color: Colors.grey[600],
+                    size: 24,
+                  ),
+                  padding: EdgeInsets.all(4),
+                  constraints: BoxConstraints(),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  dialogSuccess() {
+    return showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            color: Colors.white,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Icon with background
+              Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  color: Colors.green.shade100,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.check_circle,
+                  size: 100,
+                  color: AppColors.primary,
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Success title
+              Text(
+                'สำเร็จ!',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary,
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // Success message
+              Text(
+                'ส่งใบสมัครเรียบร้อยแล้ว',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: AppColors.textdark,
+                  height: 1.4,
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Close button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: const Text(
+                    'ตกลง',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextRow({
+    required String title,
+    required String sub,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "$title : ",
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            sub,
+            style: TextStyle(
+              fontSize: 16,
+
+              // fontWeight: FontWeight.w600,
+            ),
+            maxLines: 5,
+            overflow: TextOverflow.ellipsis,
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget _buildTextRowPrimary({
+    required String title,
+    required String sub,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "$title : ",
+          style: TextStyle(
+            color: AppColors.primary,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            sub,
+            style: TextStyle(
+              fontSize: 16,
+
+              // fontWeight: FontWeight.w600,
+            ),
+            maxLines: 5,
+            overflow: TextOverflow.ellipsis,
+          ),
+        )
+      ],
     );
   }
 

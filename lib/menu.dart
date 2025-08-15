@@ -174,22 +174,14 @@ class _MenuState extends State<Menu> {
             _buildTap(
               1,
               '',
-              icon: 'assets/logo/icons/calendar_icon.png',
-              iconActive: 'assets/logo/icons/calendar_active_icon.png',
+              icon: 'assets/ihealth/calendar_icon.png',
+              iconActive: 'assets/ihealth/calendar_icon_active.png',
             ),
-            // _buildTap(
-            //   2,
-            //   '',
-            //   isLicense: true,
-            //   icon: 'assets/logo/icons/icon_license.png',
-            //   iconActive: 'assets/logo/icons/icon_license.png',
-            // ),
             _buildTap(
               3,
               '',
               icon: 'assets/ihealth/icon/noti.png',
-              iconActive:
-                  'assets/ihealth/icon/noti_active.png', // ✅ แก้ไข path icon ผิด
+              iconActive: 'assets/ihealth/icon/noti_active.png',
               isNoti: true,
             ),
             _buildTap(
