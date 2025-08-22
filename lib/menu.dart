@@ -279,13 +279,13 @@ class _MenuState extends State<Menu> {
                       width: 30,
                     ),
                   const SizedBox(height: 5), // ✅ เพิ่มระยะห่างจากไอคอน
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: color,
-                    ),
-                  ),
+                  // Text(
+                  //   title,
+                  //   style: TextStyle(
+                  //     fontSize: 12,
+                  //     color: color,
+                  //   ),
+                  // ),
                 ],
               ),
             ),

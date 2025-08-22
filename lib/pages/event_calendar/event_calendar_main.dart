@@ -338,7 +338,7 @@ class _EventCalendarMain extends State<EventCalendarMain> {
 
               // ตารางเวลา
               Container(
-                height: MediaQuery.of(context).size.height * 0.5,
+                height: MediaQuery.of(context).size.height * 0.6,
                 child: ListView.builder(
                   itemCount: schedule.length,
                   itemBuilder: (context, index) {
