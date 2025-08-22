@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
 
 class ComingSoon extends StatefulWidget {
   ComingSoon({Key? key, this.model}) : super(key: key);
@@ -61,7 +62,7 @@ class _ComingSoon extends State<ComingSoon> {
                   // alignment: Alignment.center,
                   width: 35,
                   decoration: BoxDecoration(
-                    color: Color(0XFF224B45),
+                    color: AppColors.primary,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Center(
@@ -126,7 +127,7 @@ class _ComingSoon extends State<ComingSoon> {
                   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                   width: 250,
                   decoration: BoxDecoration(
-                    color: Color(0XFF224B45),
+                    color: AppColors.primary,
                     borderRadius: BorderRadius.circular(47),
                   ),
                   child: Text(

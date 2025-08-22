@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
-import 'package:ihealth_2025_mobile/widget/dialog.dart';
 
 class ApplyDetail extends StatefulWidget {
   const ApplyDetail({super.key, required this.job});
@@ -176,8 +175,6 @@ class _ApplyDetailState extends State<ApplyDetail> {
         ),
         child: ElevatedButton(
           onPressed: () {
-            print('------------>>สมัครงาน<<----------------');
-
             dialogApply();
           },
           style: ElevatedButton.styleFrom(
@@ -255,27 +252,26 @@ class _ApplyDetailState extends State<ApplyDetail> {
                                 ),
                               ),
                               SizedBox(height: 8),
-                              _buildTextRowPrimary(
+                              _buildTextRowDetail(
                                   title: 'ชื่อนามสกุล', sub: "วรรณิภา สุขใจ"),
                               SizedBox(height: 8),
-                              _buildTextRowPrimary(
+                              _buildTextRowDetail(
                                   title: 'เลขใบอนุญาต', sub: "กอ-12345-50"),
                               SizedBox(height: 8),
-                              _buildTextRowPrimary(
-                                  title: 'สัญชาติ', sub: "ไทย"),
-                              _buildTextRowPrimary(title: 'เพศ', sub: "หญิง"),
+                              _buildTextRowDetail(title: 'สัญชาติ', sub: "ไทย"),
+                              _buildTextRowDetail(title: 'เพศ', sub: "หญิง"),
                               SizedBox(height: 8),
-                              _buildTextRowPrimary(
+                              _buildTextRowDetail(
                                   title: 'วันเกิด', sub: "1997-09-20"),
                               SizedBox(height: 8),
-                              _buildTextRowPrimary(
+                              _buildTextRowDetail(
                                   title: 'ทักษะนวด',
                                   sub: "หลัง / เอว / สะบัก, ศีรษะ / หน้า"),
                               SizedBox(height: 8),
-                              _buildTextRowPrimary(
+                              _buildTextRowDetail(
                                   title: 'ทักษะภาษา', sub: "ไทย, อังกฤษ"),
                               SizedBox(height: 8),
-                              _buildTextRowPrimary(
+                              _buildTextRowDetail(
                                   title: 'เบอร์โทรศัพท์', sub: "091-234-6789"),
                             ],
                           ),
@@ -316,7 +312,6 @@ class _ApplyDetailState extends State<ApplyDetail> {
                         alignment: Alignment.centerRight,
                         child: GestureDetector(
                           onTap: () {
-                            print('============>> success  <<===========');
                             Navigator.of(context).pop();
                             dialogSuccess();
                           },
@@ -384,12 +379,11 @@ class _ApplyDetailState extends State<ApplyDetail> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Icon with background
               Container(
                 width: 100,
                 height: 100,
                 decoration: BoxDecoration(
-                  color: Colors.green.shade100,
+                  color: AppColors.lightgreen,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -399,8 +393,6 @@ class _ApplyDetailState extends State<ApplyDetail> {
                 ),
               ),
               const SizedBox(height: 20),
-
-              // Success title
               Text(
                 'สำเร็จ!',
                 style: TextStyle(
@@ -410,8 +402,6 @@ class _ApplyDetailState extends State<ApplyDetail> {
                 ),
               ),
               const SizedBox(height: 12),
-
-              // Success message
               Text(
                 'ส่งใบสมัครเรียบร้อยแล้ว',
                 textAlign: TextAlign.center,
@@ -422,8 +412,6 @@ class _ApplyDetailState extends State<ApplyDetail> {
                 ),
               ),
               const SizedBox(height: 24),
-
-              // Close button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -484,7 +472,7 @@ class _ApplyDetailState extends State<ApplyDetail> {
     );
   }
 
-  Widget _buildTextRowPrimary({
+  Widget _buildTextRowDetail({
     required String title,
     required String sub,
   }) {
@@ -505,8 +493,6 @@ class _ApplyDetailState extends State<ApplyDetail> {
             sub,
             style: TextStyle(
               fontSize: 16,
-
-              // fontWeight: FontWeight.w600,
             ),
             maxLines: 5,
             overflow: TextOverflow.ellipsis,

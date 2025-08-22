@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:ihealth_2025_mobile/pages/my_qr_code.dart';
+// import 'package:ihealth_2025_mobile/pages/my_qr_code.dart';
 import 'home.dart';
 import 'pages/event_calendar/event_calendar_main.dart';
 
 import 'pages/notification/notification_list.dart';
-import 'pages/profile/user_information.dart';
+import 'pages/profile/ihealth/user_information.dart';
 import 'shared/api_provider.dart';
 
 class Menu extends StatefulWidget {
@@ -21,12 +21,12 @@ class _MenuState extends State<Menu> {
   dynamic futureNotificationTire;
   int notiCount = 0;
   int _currentPage = 0;
-  String _profileCode = '';
-  String _imageProfile = '';
+  // String _profileCode = '';
+  // String _imageProfile = '';
   bool hiddenMainPopUp = false;
   List<Widget> pages = <Widget>[];
   bool notShowOnDay = false;
-  int _currentBanner = 0;
+  // int _currentBanner = 0;
   List<dynamic> _ListNotiModel = [];
 
   var loadingModel = {
@@ -41,9 +41,8 @@ class _MenuState extends State<Menu> {
     pages = <Widget>[
       HomePage(changePage: _changePage),
       EventCalendarMain(
-        title: 'ปฏิทินกิจกรรม',
+        title: 'ตารางงาน',
       ),
-      MyQrCode(),
       NotificationList(
         title: 'แจ้งเตือน',
       ),
@@ -52,6 +51,7 @@ class _MenuState extends State<Menu> {
     super.initState();
   }
 
+  // MyQrCode(),
   @override
   void dispose() {
     super.dispose();
@@ -178,14 +178,14 @@ class _MenuState extends State<Menu> {
               iconActive: 'assets/ihealth/calendar_icon_active.png',
             ),
             _buildTap(
-              3,
+              2,
               '',
               icon: 'assets/ihealth/icon/noti.png',
               iconActive: 'assets/ihealth/icon/noti_active.png',
               isNoti: true,
             ),
             _buildTap(
-              4,
+              3,
               '',
               icon: 'assets/ihealth/icon/profile.png',
               iconActive: 'assets/ihealth/icon/profile_active.png',

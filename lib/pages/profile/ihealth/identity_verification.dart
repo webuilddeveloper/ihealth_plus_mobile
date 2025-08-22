@@ -6,9 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart'
     as dt_picker;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
 import 'package:intl/intl.dart';
 import 'package:ihealth_2025_mobile/pages/blank_page/dialog_fail.dart';
-import 'package:ihealth_2025_mobile/pages/profile/policy_identity_verification.dart';
+import 'package:ihealth_2025_mobile/pages/profile/ihealth/policy_identity_verification.dart';
 import 'package:ihealth_2025_mobile/shared/api_provider.dart';
 import 'package:ihealth_2025_mobile/widget/text_form_field.dart';
 
@@ -111,7 +112,6 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
 
   @override
   void dispose() {
-    // Clean up the controller when the widget is disposed.
     txtEmail.dispose();
     txtPassword.dispose();
     txtConPassword.dispose();
@@ -2103,14 +2103,14 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
                 child: TextFormField(
                   controller: txtDate,
                   style: TextStyle(
-                    // color: Color(0xFF9A1120),
+                    color: Color(0xFF9A1120),
                     fontWeight: FontWeight.normal,
                     fontFamily: 'Sarabun',
                     fontSize: 15.0,
                   ),
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: Color(0xFFC5DAFC),
+                    fillColor: AppColors.grayligh,
                     contentPadding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
                     hintText: "วันเดือนปีเกิด",
                     border: OutlineInputBorder(
@@ -2179,7 +2179,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
                 vertical: 0,
               ),
               decoration: BoxDecoration(
-                color: Color(0xFFC5DAFC),
+                color: AppColors.grayligh,
                 borderRadius: BorderRadius.circular(
                   10,
                 ),
@@ -2187,17 +2187,21 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
               child: _selectedSex != ''
                   ? DropdownButtonFormField(
                       decoration: InputDecoration(
-                        errorStyle: TextStyle(
-                          fontWeight: FontWeight.normal,
-                          fontFamily: 'Sarabun',
-                          fontSize: 10.0,
-                        ),
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.white,
+                          errorStyle: TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontFamily: 'Sarabun',
+                            fontSize: 10.0,
                           ),
-                        ),
-                      ),
+                          enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.white,
+                            ),
+                          ),
+                          focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.white,
+                            ),
+                          )),
                       validator: (value) =>
                           value == '' || value == null ? 'กรุณาเลือกเพศ' : null,
                       hint: Text(
@@ -2318,7 +2322,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
                 vertical: 0,
               ),
               decoration: BoxDecoration(
-                color: Color(0xFFC5DAFC),
+                color: AppColors.grayligh,
                 borderRadius: BorderRadius.circular(
                   10,
                 ),
@@ -2444,7 +2448,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
                 vertical: 0,
               ),
               decoration: BoxDecoration(
-                color: Color(0xFFC5DAFC),
+                color: AppColors.grayligh,
                 borderRadius: BorderRadius.circular(
                   10,
                 ),
@@ -2566,7 +2570,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
                 vertical: 0,
               ),
               decoration: BoxDecoration(
-                color: Color(0xFFC5DAFC),
+                color: AppColors.grayligh,
                 borderRadius: BorderRadius.circular(
                   10,
                 ),
@@ -2684,7 +2688,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
                 vertical: 0,
               ),
               decoration: BoxDecoration(
-                color: Color(0xFFC5DAFC),
+                color: AppColors.grayligh,
                 borderRadius: BorderRadius.circular(
                   10,
                 ),
@@ -2798,7 +2802,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
                 child: Material(
                   elevation: 5.0,
                   borderRadius: BorderRadius.circular(10.0),
-                  color: Theme.of(context).primaryColor,
+                  color: AppColors.primary,
                   child: MaterialButton(
                     minWidth: MediaQuery.of(context).size.width,
                     height: 40,
@@ -2997,30 +3001,29 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
             // appBar: header(context, goBack,
             //     title: 'ข้อมูลสมาชิก', rightButton: null),
             appBar: AppBar(
-              leading: IconButton(
-                icon: Icon(Icons.arrow_back),
-                color: Colors.white,
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              title: Center(
-                child: Text(
-                  'ข้อมูลสมาชิก',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  color: Colors.transparent,
+                leading: IconButton(
+                  icon: Icon(Icons.arrow_back_ios_new),
+                  color: Colors.white,
                   onPressed: () {
                     Navigator.pop(context);
                   },
                 ),
-              ],
-              backgroundColor: Color(0XFF224B45),
-            ),
+                title: Center(
+                  child: Text(
+                    'ข้อมูลสมาชิก',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    color: Colors.transparent,
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+                backgroundColor: AppColors.primary),
             backgroundColor: Color(0xFFFFFFFF),
             body: Container(
               child: ListView(

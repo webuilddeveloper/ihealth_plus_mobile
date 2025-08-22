@@ -29,7 +29,7 @@ import 'package:ihealth_2025_mobile/profile.dart';
 import 'package:ihealth_2025_mobile/pages/contact/contact_list_category.dart';
 import 'package:ihealth_2025_mobile/pages/news/news_list.dart';
 import 'package:ihealth_2025_mobile/pages/privilege/privilege_main.dart';
-import 'package:ihealth_2025_mobile/pages/profile/user_information.dart';
+import 'package:ihealth_2025_mobile/pages/profile/ihealth/user_information.dart';
 import 'package:ihealth_2025_mobile/shared/api_provider.dart';
 import 'package:ihealth_2025_mobile/component/carousel_form.dart';
 import 'pages/event_calendar/event_calendar_main.dart';
@@ -511,14 +511,14 @@ class _HomePageV2State extends State<HomePageV2> {
                 begin: Alignment.centerRight,
                 end: Alignment.centerLeft,
               ), callback: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => EventCalendarMain(
-                  title: 'ปฏิทินกิจกรรม',
-                ),
-              ),
-            );
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(
+            //     builder: (context) => EventCalendarMain(
+            //       title: 'ปฏิทินกิจกรรม',
+            //     ),
+            //   ),
+            // );
           }),
           imageItem('ความรู้คู่การขับขี่', '(Driving Knowledge)',
               'assets/background/info_background.png', 2, callback: () {
@@ -698,14 +698,14 @@ class _HomePageV2State extends State<HomePageV2> {
                 isCenter: false,
                 isPrimaryColor: true,
                 nav: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => EventCalendarMain(
-                        title: snapshot.data[0]['title'],
-                      ),
-                    ),
-                  );
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (context) => EventCalendarMain(
+                  //       title: snapshot.data[0]['title'],
+                  //     ),
+                  //   ),
+                  // );
                   // if (checkDirection) {
                   //   Navigator.push(
                   //     context,

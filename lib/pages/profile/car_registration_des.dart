@@ -23,7 +23,6 @@ class _CarRegistrationDesPageState extends State<CarRegistrationDes> {
 
   @override
   void dispose() {
-    // Clean up the controller when the widget is disposed.
     super.dispose();
   }
 

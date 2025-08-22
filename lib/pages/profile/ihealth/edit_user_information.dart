@@ -1,10 +1,11 @@
 import 'dart:convert';
-import 'package:ihealth_2025_mobile/home_v2.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart'
     as dt_picker;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
+import 'package:ihealth_2025_mobile/pages/profile/ihealth/user_information.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:ihealth_2025_mobile/pages/blank_page/dialog_fail.dart';
@@ -21,7 +22,6 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
   final storage = new FlutterSecureStorage();
 
   late String _imageUrl = '';
-  late String _code;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -205,7 +205,6 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
           txtEmail.text = result['objectData'][0]['email'] ?? '';
           txtPhone.text = result['objectData'][0]['phone'] ?? '';
           _selectedPrefixName = result['objectData'][0]['prefixName'];
-          _code = result['objectData'][0]['code'] ?? '';
           txtPhone.text = result['objectData'][0]['phone'] ?? '';
           txtUsername.text = result['objectData'][0]['username'] ?? '';
           txtIdCard.text = result['objectData'][0]['idcard'] ?? '';
@@ -244,7 +243,7 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
   Future<dynamic> submitUpdateUser() async {
     var value = await storage.read(key: 'dataUserLoginOPEC');
     var user = json.decode(value!);
-    user['imageUrl'] = _imageUrl ?? '';
+    user['imageUrl'] = _imageUrl;
     // user['prefixName'] = _selectedPrefixName ?? '';
     user['prefixName'] = txtPrefixName.text;
     user['firstName'] = txtFirstName.text;
@@ -268,9 +267,9 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
     user['amphoe'] = '';
     user['province'] = '';
     user['postno'] = '';
-    user['tambonCode'] = _selectedSubDistrict ?? '';
+    user['tambonCode'] = _selectedSubDistrict;
     user['amphoeCode'] = _selectedDistrict;
-    user['provinceCode'] = _selectedProvince ?? '';
+    user['provinceCode'] = _selectedProvince;
     user['postnoCode'] = _selectedPostalCode;
     user['idcard'] = txtIdCard.text;
     user['officerCode'] = txtOfficerCode.text;
@@ -329,9 +328,15 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
                     ),
                   ),
                   onPressed: () {
+                    // Navigator.of(context).pushAndRemoveUntil(
+                    //   MaterialPageRoute(
+                    //     builder: (context) => HomePageV2(),
+                    //   ),
+                    //   (Route<dynamic> route) => false,
+                    // );
                     Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(
-                        builder: (context) => HomePageV2(),
+                        builder: (context) => UserInformationPage(),
                       ),
                       (Route<dynamic> route) => false,
                     );
@@ -408,7 +413,6 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
         txtPhone.text = user['phone'] ?? '';
         _selectedPrefixName = user['prefixName'];
         txtPrefixName.text = user['prefixName'] ?? '';
-        _code = user['code'];
         _selectedProvince = user['provinceCode'] ?? '';
         _selectedDistrict = user['amphoeCode'] ?? '';
         _selectedSubDistrict = user['tambonCode'] ?? '';
@@ -512,8 +516,6 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
           controller: scrollController,
           shrinkWrap: true,
           physics: ClampingScrollPhysics(),
-          // mainAxisAlignment: MainAxisAlignment.start,
-          // crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Padding(
               padding: EdgeInsets.only(top: 5.0),
@@ -527,7 +529,7 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
             //     // color: Color(0xFFBC0611),
             //   ),
             // ),
-            SizedBox(height: 5.0),
+            // SizedBox(height: 5.0),
             // labelTextFormField('* ชื่อผู้ใช้งาน'),
             // textFormField(
             //   txtUsername,
@@ -849,13 +851,12 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
             Center(
               child: Container(
                 width: 200,
-                margin: EdgeInsets.symmetric(vertical: 100.0),
+                margin: EdgeInsets.symmetric(vertical: 50.0),
                 child: Material(
                   elevation: 2.0,
                   borderRadius: BorderRadius.circular(5.0),
-                  color: Theme.of(context).primaryColor,
+                  color: AppColors.primary,
                   child: MaterialButton(
-                    // minWidth: MediaQuery.of(context).size.width,
                     height: 40,
                     onPressed: () {
                       final form = _formKey.currentState;
@@ -867,7 +868,7 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
                     child: new Text(
                       'บันทึกข้อมูล',
                       style: new TextStyle(
-                        fontSize: 13.0,
+                        fontSize: 16.0,
                         color: Colors.white,
                         fontWeight: FontWeight.normal,
                         fontFamily: 'Sarabun',
@@ -1020,10 +1021,9 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: header(context, goBack, title: 'แก้ไขข้อมูล', rightButton: null),
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back_ios_new),
           color: Colors.white,
           onPressed: () {
             Navigator.pop(context);
@@ -1044,7 +1044,7 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
             },
           ),
         ],
-        backgroundColor: Color(0XFF224B45),
+        backgroundColor: AppColors.primary,
       ),
       backgroundColor: Color(0xFFF5F8FB),
       body: FutureBuilder<dynamic>(
@@ -1097,24 +1097,29 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
                           ),
                         ),
                       ),
-                      Center(
-                        child: Container(
-                          width: 31.0,
-                          height: 31.0,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(16),
-                              color: Theme.of(context).primaryColor),
-                          margin: EdgeInsets.only(top: 90.0, left: 70.0),
+                      GestureDetector(
+                        onTap: () {
+                          _showPickerImage(context);
+                        },
+                        child: Center(
                           child: Container(
-                            padding: EdgeInsets.all(5.0),
-                            child: Image.asset('assets/logo/icons/Group37.png'),
+                            width: 31.0,
+                            height: 31.0,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                                color: Theme.of(context).primaryColor),
+                            margin: EdgeInsets.only(top: 90.0, left: 70.0),
+                            child: Container(
+                              padding: EdgeInsets.all(5.0),
+                              child:
+                                  Image.asset('assets/logo/icons/Group37.png'),
+                            ),
                           ),
                         ),
                       ),
                     ],
                   ),
                   Container(
-                    // color: Colors.white,
                     child: contentCard(),
                   ),
                 ],

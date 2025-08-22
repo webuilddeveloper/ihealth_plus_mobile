@@ -46,11 +46,12 @@ import 'package:ihealth_2025_mobile/component/link_url_in.dart';
 import 'package:ihealth_2025_mobile/pages/contact/contact_list_category.dart';
 import 'package:ihealth_2025_mobile/pages/news/news_list.dart';
 import 'package:ihealth_2025_mobile/pages/privilege/privilege_main.dart';
-import 'package:ihealth_2025_mobile/pages/profile/user_information.dart';
+import 'package:ihealth_2025_mobile/pages/profile/ihealth/user_information.dart';
 import 'package:ihealth_2025_mobile/pages/register_permission_mian.dart';
 import 'package:ihealth_2025_mobile/shared/api_provider.dart';
 import 'package:ihealth_2025_mobile/component/carousel_form.dart';
 import 'component/carousel_rotation.dart';
+import 'pages/coming_soon.dart';
 import 'pages/event_calendar/event_calendar_main.dart';
 import 'pages/knowledge/knowledge_list.dart';
 import 'pages/main_popup/dialog_main_popup.dart';
@@ -113,7 +114,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: Color(0XFFF3F5F5),
       backgroundColor: Colors.white,
       body: WillPopScope(
         child: _buildBackground(),
@@ -180,7 +180,6 @@ class _HomePageState extends State<HomePage> {
             SizedBox(
               height: 60,
             )
-
             // _build
             // _buildProfile(),
             // _buildBanner(),
@@ -199,13 +198,9 @@ class _HomePageState extends State<HomePage> {
       builder: (context, constraints) {
         final screenWidth = MediaQuery.of(context).size.width;
         final screenHeight = MediaQuery.of(context).size.height;
-
-        // Responsive values based on screen size
         final isSmallScreen = screenWidth < 360;
         final isMediumScreen = screenWidth >= 360 && screenWidth < 414;
         final isLargeScreen = screenWidth >= 414;
-
-        // Dynamic sizing
         final headerHeight =
             isSmallScreen ? 240.0 : (isMediumScreen ? 260.0 : 280.0);
         final backgroundHeight =
@@ -272,7 +267,6 @@ class _HomePageState extends State<HomePage> {
 
   _buildCardContent(
       double screenWidth, bool isSmallScreen, bool isMediumScreen) {
-    // Profile image size based on screen size
     final profileSize = isSmallScreen ? 70.0 : (isMediumScreen ? 80.0 : 85.0);
     final profilePadding = isSmallScreen ? 8.0 : 10.0;
     final spacing = isSmallScreen ? 15.0 : 20.0;
@@ -315,8 +309,6 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         SizedBox(width: spacing),
-
-        // Content Section
         Expanded(
           child: isLoggedIn == true
               ? _buildLoggedInContent(isSmallScreen, isMediumScreen)
@@ -327,7 +319,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   _buildLoggedInContent(bool isSmallScreen, bool isMediumScreen) {
-    // Responsive font sizes
     final titleFontSize = isSmallScreen ? 18.0 : (isMediumScreen ? 22.0 : 24.0);
     final subtitleFontSize =
         isSmallScreen ? 15.0 : (isMediumScreen ? 18.0 : 20.0);
@@ -804,9 +795,9 @@ class _HomePageState extends State<HomePage> {
                 callBack: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => ComplaintForm(),
-                    ),
+                    MaterialPageRoute(builder: (context) => ComingSoon()
+                        // ComplaintForm(),
+                        ),
                   );
                 },
               ),
@@ -816,12 +807,12 @@ class _HomePageState extends State<HomePage> {
                 callBack: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => PrivilegeMain(
-                        title: "สิทธิประโยชน์",
-                        fromPolicy: false,
-                      ),
-                    ),
+                    MaterialPageRoute(builder: (context) => ComingSoon()
+                        // PrivilegeMain(
+                        //   title: "สิทธิประโยชน์",
+                        //   fromPolicy: false,
+                        // ),
+                        ),
                   );
                 },
               ),
@@ -1073,249 +1064,249 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  _buildGridMenu1() {
-    return FutureBuilder<dynamic>(
-      future: _futureMenu, // function where you call your api
-      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-        if (snapshot.hasData) {
-          return Row(
-            children: [
-              MenuGridItem(
-                title: snapshot.data[0]['title'],
-                imageUrl: snapshot.data[0]['imageUrl'],
-                isCenter: false,
-                isPrimaryColor: true,
-                nav: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => EventCalendarMain(
-                        title: snapshot.data[0]['title'],
-                      ),
-                    ),
-                  );
-                  // if (checkDirection) {
-                  //   Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(
-                  //       builder: (context) => EventCalendarMain(
-                  //         title: snapshot.data[0]['title'],
-                  //       ),
-                  //     ),
-                  //   );
-                  // } else {
-                  //   _showDialogDirection();
-                  // }
-                },
-              ),
-              MenuGridItem(
-                title: snapshot.data[1]['title'] != ''
-                    ? snapshot.data[1]['title']
-                    : '',
-                imageUrl: snapshot.data[1]['imageUrl'],
-                subTitle: '',
-                isCenter: true,
-                isPrimaryColor: true,
-                nav: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => KnowledgeList(
-                        title: snapshot.data[1]['title'],
-                      ),
-                    ),
-                  );
-                  // if (checkDirection) {
-                  //   Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(
-                  //       builder: (context) => KnowledgeList(
-                  //         title: snapshot.data[1]['title'],
-                  //       ),
-                  //     ),
-                  //   );
-                  // } else {
-                  //   _Direction();
-                  // }
-                },
-              ),
-              MenuGridItem(
-                title: snapshot.data[2]['title'] != ''
-                    ? snapshot.data[2]['title']
-                    : '',
-                imageUrl: snapshot.data[2]['imageUrl'],
-                subTitle: '',
-                isCenter: false,
-                isPrimaryColor: true,
-                nav: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ReporterMain(
-                        title: snapshot.data[2]['title'],
-                        key: null,
-                      ),
-                    ),
-                  );
-                  // if (checkDirection) {
-                  //   Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(
-                  //       builder: (context) => ReporterMain(
-                  //         title: snapshot.data[2]['title'],
-                  //       ),
-                  //     ),
-                  //   );
-                  // } else {
-                  //   _showDialogDirection();
-                  // }
-                },
-              ),
-            ],
-          );
-        } else if (snapshot.hasError) {
-          return Container();
-        } else {
-          return Container();
-        }
-      },
-    );
-  }
+  // _buildGridMenu1() {
+  //   return FutureBuilder<dynamic>(
+  //     future: _futureMenu, // function where you call your api
+  //     builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+  //       if (snapshot.hasData) {
+  //         return Row(
+  //           children: [
+  //             MenuGridItem(
+  //               title: snapshot.data[0]['title'],
+  //               imageUrl: snapshot.data[0]['imageUrl'],
+  //               isCenter: false,
+  //               isPrimaryColor: true,
+  //               nav: () {
+  //                 Navigator.push(
+  //                   context,
+  //                   MaterialPageRoute(
+  //                     builder: (context) => EventCalendarMain(
+  //                       title: snapshot.data[0]['title'],
+  //                     ),
+  //                   ),
+  //                 );
+  //                 // if (checkDirection) {
+  //                 //   Navigator.push(
+  //                 //     context,
+  //                 //     MaterialPageRoute(
+  //                 //       builder: (context) => EventCalendarMain(
+  //                 //         title: snapshot.data[0]['title'],
+  //                 //       ),
+  //                 //     ),
+  //                 //   );
+  //                 // } else {
+  //                 //   _showDialogDirection();
+  //                 // }
+  //               },
+  //             ),
+  //             MenuGridItem(
+  //               title: snapshot.data[1]['title'] != ''
+  //                   ? snapshot.data[1]['title']
+  //                   : '',
+  //               imageUrl: snapshot.data[1]['imageUrl'],
+  //               subTitle: '',
+  //               isCenter: true,
+  //               isPrimaryColor: true,
+  //               nav: () {
+  //                 Navigator.push(
+  //                   context,
+  //                   MaterialPageRoute(
+  //                     builder: (context) => KnowledgeList(
+  //                       title: snapshot.data[1]['title'],
+  //                     ),
+  //                   ),
+  //                 );
+  //                 // if (checkDirection) {
+  //                 //   Navigator.push(
+  //                 //     context,
+  //                 //     MaterialPageRoute(
+  //                 //       builder: (context) => KnowledgeList(
+  //                 //         title: snapshot.data[1]['title'],
+  //                 //       ),
+  //                 //     ),
+  //                 //   );
+  //                 // } else {
+  //                 //   _Direction();
+  //                 // }
+  //               },
+  //             ),
+  //             MenuGridItem(
+  //               title: snapshot.data[2]['title'] != ''
+  //                   ? snapshot.data[2]['title']
+  //                   : '',
+  //               imageUrl: snapshot.data[2]['imageUrl'],
+  //               subTitle: '',
+  //               isCenter: false,
+  //               isPrimaryColor: true,
+  //               nav: () {
+  //                 Navigator.push(
+  //                   context,
+  //                   MaterialPageRoute(
+  //                     builder: (context) => ReporterMain(
+  //                       title: snapshot.data[2]['title'],
+  //                       key: null,
+  //                     ),
+  //                   ),
+  //                 );
+  //                 // if (checkDirection) {
+  //                 //   Navigator.push(
+  //                 //     context,
+  //                 //     MaterialPageRoute(
+  //                 //       builder: (context) => ReporterMain(
+  //                 //         title: snapshot.data[2]['title'],
+  //                 //       ),
+  //                 //     ),
+  //                 //   );
+  //                 // } else {
+  //                 //   _showDialogDirection();
+  //                 // }
+  //               },
+  //             ),
+  //           ],
+  //         );
+  //       } else if (snapshot.hasError) {
+  //         return Container();
+  //       } else {
+  //         return Container();
+  //       }
+  //     },
+  //   );
+  // }
 
-  _buildGridMenu2() {
-    return FutureBuilder<dynamic>(
-      future: _futureMenu, // function where you call your api
-      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-        if (snapshot.hasData) {
-          return Row(
-            children: [
-              MenuGridItem(
-                title: snapshot.data[3]['title'] != ''
-                    ? snapshot.data[3]['title']
-                    : '',
-                imageUrl: snapshot.data[3]['imageUrl'],
-                subTitle: '',
-                isCenter: false,
-                isPrimaryColor: true,
-                nav: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => WarningList(
-                        title: snapshot.data[3]['title'],
-                      ),
-                    ),
-                  );
-                  // if (checkDirection) {
-                  //   Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(
-                  //       builder: (context) => WarningList(
-                  //         title: snapshot.data[3]['title'],
-                  //       ),
-                  //     ),
-                  //   );
-                  // } else {
-                  //   _showDialogDirection();
-                  // }
-                },
-              ),
-              MenuGridItem(
-                title: snapshot.data[4]['title'] != ''
-                    ? snapshot.data[4]['title']
-                    : '',
-                imageUrl: snapshot.data[4]['imageUrl'],
-                subTitle: '',
-                isCenter: true,
-                isPrimaryColor: true,
-                nav: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => WelfareList(
-                        title: snapshot.data[4]['title'],
-                      ),
-                    ),
-                  );
-                  // if (checkDirection) {
-                  //   Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(
-                  //       builder: (context) => WelfareList(
-                  //         title: snapshot.data[4]['title'],
-                  //       ),
-                  //     ),
-                  //   );
-                  // } else {
-                  //   _showDialogDirection();
-                  // }
-                },
-              ),
-              MenuGridItem(
-                title: snapshot.data[5]['title'] != ''
-                    ? snapshot.data[5]['title']
-                    : '',
-                imageUrl: snapshot.data[5]['imageUrl'],
-                subTitle: '',
-                isCenter: false,
-                isPrimaryColor: true,
-                nav: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => NewsList(
-                        title: snapshot.data[5]['title'],
-                      ),
-                    ),
-                  );
-                  // if (checkDirection) {
-                  //   Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(
-                  //       builder: (context) => NewsList(
-                  //         title: snapshot.data[5]['title'],
-                  //       ),
-                  //     ),
-                  //   );
-                  // } else {
-                  //   _showDialogDirection();
-                  // }
-                },
-              ),
-            ],
-          );
-        } else if (snapshot.hasError) {
-          return Container();
-        } else {
-          return Container();
-        }
-      },
-    );
-  }
+  // _buildGridMenu2() {
+  //   return FutureBuilder<dynamic>(
+  //     future: _futureMenu, // function where you call your api
+  //     builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+  //       if (snapshot.hasData) {
+  //         return Row(
+  //           children: [
+  //             MenuGridItem(
+  //               title: snapshot.data[3]['title'] != ''
+  //                   ? snapshot.data[3]['title']
+  //                   : '',
+  //               imageUrl: snapshot.data[3]['imageUrl'],
+  //               subTitle: '',
+  //               isCenter: false,
+  //               isPrimaryColor: true,
+  //               nav: () {
+  //                 Navigator.push(
+  //                   context,
+  //                   MaterialPageRoute(
+  //                     builder: (context) => WarningList(
+  //                       title: snapshot.data[3]['title'],
+  //                     ),
+  //                   ),
+  //                 );
+  //                 // if (checkDirection) {
+  //                 //   Navigator.push(
+  //                 //     context,
+  //                 //     MaterialPageRoute(
+  //                 //       builder: (context) => WarningList(
+  //                 //         title: snapshot.data[3]['title'],
+  //                 //       ),
+  //                 //     ),
+  //                 //   );
+  //                 // } else {
+  //                 //   _showDialogDirection();
+  //                 // }
+  //               },
+  //             ),
+  //             MenuGridItem(
+  //               title: snapshot.data[4]['title'] != ''
+  //                   ? snapshot.data[4]['title']
+  //                   : '',
+  //               imageUrl: snapshot.data[4]['imageUrl'],
+  //               subTitle: '',
+  //               isCenter: true,
+  //               isPrimaryColor: true,
+  //               nav: () {
+  //                 Navigator.push(
+  //                   context,
+  //                   MaterialPageRoute(
+  //                     builder: (context) => WelfareList(
+  //                       title: snapshot.data[4]['title'],
+  //                     ),
+  //                   ),
+  //                 );
+  //                 // if (checkDirection) {
+  //                 //   Navigator.push(
+  //                 //     context,
+  //                 //     MaterialPageRoute(
+  //                 //       builder: (context) => WelfareList(
+  //                 //         title: snapshot.data[4]['title'],
+  //                 //       ),
+  //                 //     ),
+  //                 //   );
+  //                 // } else {
+  //                 //   _showDialogDirection();
+  //                 // }
+  //               },
+  //             ),
+  //             MenuGridItem(
+  //               title: snapshot.data[5]['title'] != ''
+  //                   ? snapshot.data[5]['title']
+  //                   : '',
+  //               imageUrl: snapshot.data[5]['imageUrl'],
+  //               subTitle: '',
+  //               isCenter: false,
+  //               isPrimaryColor: true,
+  //               nav: () {
+  //                 Navigator.push(
+  //                   context,
+  //                   MaterialPageRoute(
+  //                     builder: (context) => NewsList(
+  //                       title: snapshot.data[5]['title'],
+  //                     ),
+  //                   ),
+  //                 );
+  //                 // if (checkDirection) {
+  //                 //   Navigator.push(
+  //                 //     context,
+  //                 //     MaterialPageRoute(
+  //                 //       builder: (context) => NewsList(
+  //                 //         title: snapshot.data[5]['title'],
+  //                 //       ),
+  //                 //     ),
+  //                 //   );
+  //                 // } else {
+  //                 //   _showDialogDirection();
+  //                 // }
+  //               },
+  //             ),
+  //           ],
+  //         );
+  //       } else if (snapshot.hasError) {
+  //         return Container();
+  //       } else {
+  //         return Container();
+  //       }
+  //     },
+  //   );
+  // }
 
-  _buildRotation() {
-    return CarouselRotation(
-      model: _futureRotation,
-      nav: (String path, String action, dynamic model, String code) {
-        if (action == 'out') {
-          launchInWebViewWithJavaScript(path);
-          // launchURL(path);
-        } else if (action == 'in') {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => CarouselForm(
-                code: code,
-                model: model,
-                url: mainBannerApi,
-                urlGallery: bannerGalleryApi,
-              ),
-            ),
-          );
-        }
-      },
-    );
-  }
+  // _buildRotation() {
+  //   return CarouselRotation(
+  //     model: _futureRotation,
+  //     nav: (String path, String action, dynamic model, String code) {
+  //       if (action == 'out') {
+  //         launchInWebViewWithJavaScript(path);
+  //         // launchURL(path);
+  //       } else if (action == 'in') {
+  //         Navigator.push(
+  //           context,
+  //           MaterialPageRoute(
+  //             builder: (context) => CarouselForm(
+  //               code: code,
+  //               model: model,
+  //               url: mainBannerApi,
+  //               urlGallery: bannerGalleryApi,
+  //             ),
+  //           ),
+  //         );
+  //       }
+  //     },
+  //   );
+  // }
 
   // _buildProfile() {
   //   return Container(
@@ -1943,300 +1934,300 @@ class _HomePageState extends State<HomePage> {
   //   );
   // }
 
-  _buildBanner() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      child: CarouselBanner(
-        model: _futureBanner,
-        nav: (String path, String action, dynamic model, String code,
-            String urlGallery) {
-          if (action == 'out') {
-            launchInWebViewWithJavaScript(path);
-            // launchURL(path);
-          } else if (action == 'in') {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => CarouselForm(
-                  code: code,
-                  model: model,
-                  url: mainBannerApi,
-                  urlGallery: bannerGalleryApi,
-                ),
-              ),
-            );
-          }
-        },
-      ),
-    );
-  }
-
-  // _buildCurrentLocationBar() {
-  //   return Row(
-  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //     children: [
-  //       Container(
-  //         // color: Color(0xFF000070),
-  //         // padding: EdgeInsets.symmetric(horizontal: 5),
-  //         alignment: Alignment.center,
-  //         padding: EdgeInsets.only(left: 10),
-  //         child: Row(
-  //           children: [
-  //             Icon(Icons.credit_card),
-  //             Text(
-  //               ' ใบอนุญาตขับขี่',
-  //               style: TextStyle(
-  //                 fontFamily: 'Sarabun',
-  //                 // fontSize: 10,
-  //                 // color: Colors.white,
+  // _buildBanner() {
+  //   return Padding(
+  //     padding: const EdgeInsets.symmetric(horizontal: 20.0),
+  //     child: CarouselBanner(
+  //       model: _futureBanner,
+  //       nav: (String path, String action, dynamic model, String code,
+  //           String urlGallery) {
+  //         if (action == 'out') {
+  //           launchInWebViewWithJavaScript(path);
+  //           // launchURL(path);
+  //         } else if (action == 'in') {
+  //           Navigator.push(
+  //             context,
+  //             MaterialPageRoute(
+  //               builder: (context) => CarouselForm(
+  //                 code: code,
+  //                 model: model,
+  //                 url: mainBannerApi,
+  //                 urlGallery: bannerGalleryApi,
   //               ),
   //             ),
-  //           ],
-  //         ),
-  //       ),
-  //       Container(
-  //         // color: Color(0xFF000070),
-  //         // padding: EdgeInsets.symmetric(horizontal: 5),
-  //         alignment: Alignment.center,
-  //         padding: EdgeInsets.only(right: 10),
-  //         height: 40,
-  //         child: Row(
-  //           children: [
-  //             Icon(
-  //               Icons.pin_drop,
-  //               color: Colors.orange[400],
-  //             ),
-  //             Text(
-  //               ' ' + currentLocation,
-  //               style: TextStyle(
-  //                 fontFamily: 'Sarabun', color: Colors.orange[400],
-  //                 // fontSize: 10,
-  //                 // color: Colors.white,
-  //               ),
-  //             ),
-  //           ],
-  //         ),
-  //       )
-  //     ],
+  //           );
+  //         }
+  //       },
+  //     ),
   //   );
   // }
 
-  _buildPrivilegeMenu() {
-    return Padding(
-      padding: EdgeInsets.only(left: 15, right: 15, top: 3, bottom: 3),
-      child: FutureBuilder<dynamic>(
-        future: _futureMenu, // function where you call your api
-        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-          if (snapshot.hasData) {
-            return ButtonMenuFull(
-              title: snapshot.data[7]['title'] != ''
-                  ? snapshot.data[7]['title']
-                  : '',
-              imageUrl: snapshot.data[7]['imageUrl'],
-              model: _futureMenu,
-              subTitle: 'สำหรับสมาชิก',
-              nav: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PrivilegeMain(
-                      title: snapshot.data[7]['title'],
-                      fromPolicy: false,
-                    ),
-                  ),
-                );
-                // if (!checkDirection) {
-                //   _showDialogDirection();
-                // } else if (_dataPolicy.length > 0) {
-                //   Navigator.push(
-                //     context,
-                //     MaterialPageRoute(
-                //       builder: (context) => PolicyPrivilege(
-                //         title: snapshot.data[4]['title'],
-                //         username: userData.username,
-                //         fromPolicy: true,
-                //       ),
-                //     ),
-                //   );
-                // } else {
-                //   Navigator.push(
-                //     context,
-                //     MaterialPageRoute(
-                //       builder: (context) => PrivilegeMain(
-                //         title: snapshot.data[7]['title'],
-                //         fromPolicy: false,
-                //       ),
-                //     ),
-                //   );
-                // }
-              },
-              userData: null,
-            );
-          } else if (snapshot.hasError) {
-            return Container();
-          } else {
-            return Container();
-          }
-        },
-      ),
-    );
-  }
+  // // _buildCurrentLocationBar() {
+  // //   return Row(
+  // //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  // //     children: [
+  // //       Container(
+  // //         // color: Color(0xFF000070),
+  // //         // padding: EdgeInsets.symmetric(horizontal: 5),
+  // //         alignment: Alignment.center,
+  // //         padding: EdgeInsets.only(left: 10),
+  // //         child: Row(
+  // //           children: [
+  // //             Icon(Icons.credit_card),
+  // //             Text(
+  // //               ' ใบอนุญาตขับขี่',
+  // //               style: TextStyle(
+  // //                 fontFamily: 'Sarabun',
+  // //                 // fontSize: 10,
+  // //                 // color: Colors.white,
+  // //               ),
+  // //             ),
+  // //           ],
+  // //         ),
+  // //       ),
+  // //       Container(
+  // //         // color: Color(0xFF000070),
+  // //         // padding: EdgeInsets.symmetric(horizontal: 5),
+  // //         alignment: Alignment.center,
+  // //         padding: EdgeInsets.only(right: 10),
+  // //         height: 40,
+  // //         child: Row(
+  // //           children: [
+  // //             Icon(
+  // //               Icons.pin_drop,
+  // //               color: Colors.orange[400],
+  // //             ),
+  // //             Text(
+  // //               ' ' + currentLocation,
+  // //               style: TextStyle(
+  // //                 fontFamily: 'Sarabun', color: Colors.orange[400],
+  // //                 // fontSize: 10,
+  // //                 // color: Colors.white,
+  // //               ),
+  // //             ),
+  // //           ],
+  // //         ),
+  // //       )
+  // //     ],
+  // //   );
+  // // }
 
-  _buildContactMenu() {
-    return Padding(
-      padding: EdgeInsets.only(left: 15, right: 15, top: 3, bottom: 3),
-      child: FutureBuilder<dynamic>(
-        future: _futureMenu, // function where you call your api
-        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-          if (snapshot.hasData) {
-            return ButtonMenuFull(
-              title: snapshot.data[6]['title'] != ''
-                  ? snapshot.data[6]['title']
-                  : '',
-              imageUrl: snapshot.data[6]['imageUrl'],
-              model: _futureMenu,
-              subTitle: 'สำหรับสมาชิก',
-              nav: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ContactListCategory(
-                      title: snapshot.data[6]['title'],
-                    ),
-                  ),
-                );
-                // if (checkDirection) {
-                //   Navigator.push(
-                //     context,
-                //     MaterialPageRoute(
-                //       builder: (context) => ContactListCategory(
-                //         title: snapshot.data[6]['title'],
-                //       ),
-                //     ),
-                //   );
-                // } else {
-                //   _showDialogDirection();
-                // }
-              },
-              userData: null,
-            );
-          } else if (snapshot.hasError) {
-            return Container();
-          } else {
-            return Container();
-          }
-        },
-      ),
-    );
-  }
+  // _buildPrivilegeMenu() {
+  //   return Padding(
+  //     padding: EdgeInsets.only(left: 15, right: 15, top: 3, bottom: 3),
+  //     child: FutureBuilder<dynamic>(
+  //       future: _futureMenu, // function where you call your api
+  //       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+  //         if (snapshot.hasData) {
+  //           return ButtonMenuFull(
+  //             title: snapshot.data[7]['title'] != ''
+  //                 ? snapshot.data[7]['title']
+  //                 : '',
+  //             imageUrl: snapshot.data[7]['imageUrl'],
+  //             model: _futureMenu,
+  //             subTitle: 'สำหรับสมาชิก',
+  //             nav: () {
+  //               Navigator.push(
+  //                 context,
+  //                 MaterialPageRoute(
+  //                   builder: (context) => PrivilegeMain(
+  //                     title: snapshot.data[7]['title'],
+  //                     fromPolicy: false,
+  //                   ),
+  //                 ),
+  //               );
+  //               // if (!checkDirection) {
+  //               //   _showDialogDirection();
+  //               // } else if (_dataPolicy.length > 0) {
+  //               //   Navigator.push(
+  //               //     context,
+  //               //     MaterialPageRoute(
+  //               //       builder: (context) => PolicyPrivilege(
+  //               //         title: snapshot.data[4]['title'],
+  //               //         username: userData.username,
+  //               //         fromPolicy: true,
+  //               //       ),
+  //               //     ),
+  //               //   );
+  //               // } else {
+  //               //   Navigator.push(
+  //               //     context,
+  //               //     MaterialPageRoute(
+  //               //       builder: (context) => PrivilegeMain(
+  //               //         title: snapshot.data[7]['title'],
+  //               //         fromPolicy: false,
+  //               //       ),
+  //               //     ),
+  //               //   );
+  //               // }
+  //             },
+  //             userData: null,
+  //           );
+  //         } else if (snapshot.hasError) {
+  //           return Container();
+  //         } else {
+  //           return Container();
+  //         }
+  //       },
+  //     ),
+  //   );
+  // }
 
-  _buildPoiMenu() {
-    return Padding(
-      padding: EdgeInsets.only(left: 15, right: 15, top: 3, bottom: 3),
-      child: FutureBuilder<dynamic>(
-        future: _futureMenu, // function where you call your api
-        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-          if (snapshot.hasData) {
-            return ButtonMenuFull(
-              title: snapshot.data[8]['title'] != ''
-                  ? snapshot.data[8]['title']
-                  : '',
-              imageUrl: snapshot.data[8]['imageUrl'],
-              model: _futureMenu,
-              subTitle: 'สำหรับสมาชิก',
-              nav: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PoiList(
-                      title: snapshot.data[8]['title'],
-                      latLng: null,
-                    ),
-                  ),
-                );
-                // if (checkDirection) {
-                //   Navigator.push(
-                //     context,
-                //     MaterialPageRoute(
-                //       builder: (context) => PoiList(
-                //         title: snapshot.data[8]['title'],
-                //       ),
-                //     ),
-                //   );
-                // } else {
-                //   _showDialogDirection();
-                // }
-              },
-              userData: null,
-            );
-          } else if (snapshot.hasError) {
-            return Container();
-          } else {
-            return Container();
-          }
-        },
-      ),
-    );
-  }
+  // _buildContactMenu() {
+  //   return Padding(
+  //     padding: EdgeInsets.only(left: 15, right: 15, top: 3, bottom: 3),
+  //     child: FutureBuilder<dynamic>(
+  //       future: _futureMenu, // function where you call your api
+  //       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+  //         if (snapshot.hasData) {
+  //           return ButtonMenuFull(
+  //             title: snapshot.data[6]['title'] != ''
+  //                 ? snapshot.data[6]['title']
+  //                 : '',
+  //             imageUrl: snapshot.data[6]['imageUrl'],
+  //             model: _futureMenu,
+  //             subTitle: 'สำหรับสมาชิก',
+  //             nav: () {
+  //               Navigator.push(
+  //                 context,
+  //                 MaterialPageRoute(
+  //                   builder: (context) => ContactListCategory(
+  //                     title: snapshot.data[6]['title'],
+  //                   ),
+  //                 ),
+  //               );
+  //               // if (checkDirection) {
+  //               //   Navigator.push(
+  //               //     context,
+  //               //     MaterialPageRoute(
+  //               //       builder: (context) => ContactListCategory(
+  //               //         title: snapshot.data[6]['title'],
+  //               //       ),
+  //               //     ),
+  //               //   );
+  //               // } else {
+  //               //   _showDialogDirection();
+  //               // }
+  //             },
+  //             userData: null,
+  //           );
+  //         } else if (snapshot.hasError) {
+  //           return Container();
+  //         } else {
+  //           return Container();
+  //         }
+  //       },
+  //     ),
+  //   );
+  // }
 
-  _buildPollMenu() {
-    return Padding(
-      padding: EdgeInsets.only(left: 15, right: 15, top: 3, bottom: 3),
-      child: FutureBuilder<dynamic>(
-        future: _futureMenu, // function where you call your api
-        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-          if (snapshot.hasData) {
-            return ButtonMenuFull(
-              title: snapshot.data[9]['title'] != ''
-                  ? snapshot.data[9]['title']
-                  : '',
-              imageUrl: snapshot.data[9]['imageUrl'],
-              model: _futureMenu,
-              subTitle: 'สำหรับสมาชิก',
-              nav: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PollList(
-                      title: snapshot.data[9]['title'],
-                    ),
-                  ),
-                );
-                // if (checkDirection) {
-                //   Navigator.push(
-                //     context,
-                //     MaterialPageRoute(
-                //       builder: (context) => PollList(
-                //         title: snapshot.data[9]['title'],
-                //       ),
-                //     ),
-                //   );
-                // } else {
-                //   _showDialogDirection();
-                // }
-              },
-              userData: null,
-            );
-          } else if (snapshot.hasError) {
-            return Container();
-          } else {
-            return Container();
-          }
-        },
-      ),
-    );
-  }
+  // _buildPoiMenu() {
+  //   return Padding(
+  //     padding: EdgeInsets.only(left: 15, right: 15, top: 3, bottom: 3),
+  //     child: FutureBuilder<dynamic>(
+  //       future: _futureMenu, // function where you call your api
+  //       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+  //         if (snapshot.hasData) {
+  //           return ButtonMenuFull(
+  //             title: snapshot.data[8]['title'] != ''
+  //                 ? snapshot.data[8]['title']
+  //                 : '',
+  //             imageUrl: snapshot.data[8]['imageUrl'],
+  //             model: _futureMenu,
+  //             subTitle: 'สำหรับสมาชิก',
+  //             nav: () {
+  //               Navigator.push(
+  //                 context,
+  //                 MaterialPageRoute(
+  //                   builder: (context) => PoiList(
+  //                     title: snapshot.data[8]['title'],
+  //                     latLng: null,
+  //                   ),
+  //                 ),
+  //               );
+  //               // if (checkDirection) {
+  //               //   Navigator.push(
+  //               //     context,
+  //               //     MaterialPageRoute(
+  //               //       builder: (context) => PoiList(
+  //               //         title: snapshot.data[8]['title'],
+  //               //       ),
+  //               //     ),
+  //               //   );
+  //               // } else {
+  //               //   _showDialogDirection();
+  //               // }
+  //             },
+  //             userData: null,
+  //           );
+  //         } else if (snapshot.hasError) {
+  //           return Container();
+  //         } else {
+  //           return Container();
+  //         }
+  //       },
+  //     ),
+  //   );
+  // }
 
-  _buildFooter() {
-    return Container(
-      // height: 70,
-      padding: EdgeInsets.symmetric(horizontal: 80, vertical: 15),
-      child: Image.asset(
-        'assets/background/background_mics_webuilds.png',
-        fit: BoxFit.cover,
-      ),
-    );
-  }
+  // _buildPollMenu() {
+  //   return Padding(
+  //     padding: EdgeInsets.only(left: 15, right: 15, top: 3, bottom: 3),
+  //     child: FutureBuilder<dynamic>(
+  //       future: _futureMenu, // function where you call your api
+  //       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+  //         if (snapshot.hasData) {
+  //           return ButtonMenuFull(
+  //             title: snapshot.data[9]['title'] != ''
+  //                 ? snapshot.data[9]['title']
+  //                 : '',
+  //             imageUrl: snapshot.data[9]['imageUrl'],
+  //             model: _futureMenu,
+  //             subTitle: 'สำหรับสมาชิก',
+  //             nav: () {
+  //               Navigator.push(
+  //                 context,
+  //                 MaterialPageRoute(
+  //                   builder: (context) => PollList(
+  //                     title: snapshot.data[9]['title'],
+  //                   ),
+  //                 ),
+  //               );
+  //               // if (checkDirection) {
+  //               //   Navigator.push(
+  //               //     context,
+  //               //     MaterialPageRoute(
+  //               //       builder: (context) => PollList(
+  //               //         title: snapshot.data[9]['title'],
+  //               //       ),
+  //               //     ),
+  //               //   );
+  //               // } else {
+  //               //   _showDialogDirection();
+  //               // }
+  //             },
+  //             userData: null,
+  //           );
+  //         } else if (snapshot.hasError) {
+  //           return Container();
+  //         } else {
+  //           return Container();
+  //         }
+  //       },
+  //     ),
+  //   );
+  // }
+
+  // _buildFooter() {
+  //   return Container(
+  //     // height: 70,
+  //     padding: EdgeInsets.symmetric(horizontal: 80, vertical: 15),
+  //     child: Image.asset(
+  //       'assets/background/background_mics_webuilds.png',
+  //       fit: BoxFit.cover,
+  //     ),
+  //   );
+  // }
 
   _read() async {
     // print('-------------start response------------');
@@ -2592,6 +2583,7 @@ class _HomePageState extends State<HomePage> {
       "count": "3",
       "maincategories": "นวดเพื่อสุขภาพ",
       "subcategories": "การแช่น้ำสมุนไพร",
+      "status": "ยังไม่ประกาศผล",
     },
     {
       "id": 2,
@@ -2608,6 +2600,24 @@ class _HomePageState extends State<HomePage> {
       "count": "5",
       "maincategories": "นวดเพื่อสุขภาพ",
       "subcategories": "คอ / บ่า / ไหล่",
+      "status": "ผ่านการคัดเลือก",
+    },
+    {
+      "id": 3,
+      "imgUrl":
+          "https://thethaiger.com/th/wp-content/uploads/2023/04/%E0%B8%A3%E0%B9%89%E0%B8%B2%E0%B8%99%E0%B8%99%E0%B8%A7%E0%B8%94-diora.jpg",
+      "title": "นวดเพื่อสุขภาพ",
+      "company": "Wellness Spa Chiang Mai",
+      "type": "บริการเพื่อความงาม",
+      "location": "กรุงเทพมหานคร",
+      "salary": "15,000 - 18,000 บาท",
+      "working_hours": "09.00 - 19.00 น.",
+      "Date": "25/07/2025",
+      "welfare": "ประกันชีวิต, โบนัสรายเดือน, วันหยุดประจำ",
+      "count": "5",
+      "maincategories": "นวดเพื่อสุขภาพ",
+      "subcategories": "คอ / บ่า / ไหล่",
+      "status": "ไม่ผ่านการคัดเลือก",
     },
   ];
 }

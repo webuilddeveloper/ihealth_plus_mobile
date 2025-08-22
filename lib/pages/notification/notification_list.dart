@@ -1,4 +1,5 @@
 import 'package:ihealth_2025_mobile/home_v2.dart';
+import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
 import 'package:ihealth_2025_mobile/pages/warning/warning_form.dart';
 import 'package:ihealth_2025_mobile/pages/welfare/welfare_form.dart';
 import 'package:flutter/cupertino.dart';
@@ -6,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:ihealth_2025_mobile/component/header.dart';
 import 'package:ihealth_2025_mobile/pages/blank_page/blank_loading.dart';
 import 'package:ihealth_2025_mobile/pages/blank_page/toast_fail.dart';
-import 'package:ihealth_2025_mobile/pages/event_calendar/event_calendar_form.dart';
+
 import 'package:ihealth_2025_mobile/pages/knowledge/knowledge_form.dart';
 import 'package:ihealth_2025_mobile/pages/news/news_form.dart';
 import 'package:ihealth_2025_mobile/pages/poi/poi_form.dart';
@@ -64,27 +65,27 @@ class _NotificationList extends State<NotificationList> {
         }
         break;
 
-      case 'eventPage':
-        {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => EventCalendarForm(
-                url: eventCalendarApi + 'read',
-                code: model['reference'],
-                model: model,
-                urlComment: eventCalendarCommentApi,
-                urlGallery: eventCalendarGalleryApi,
-              ),
-            ),
-          ).then((value) => {
-                setState(() {
-                  _futureModel = postDio(
-                      '${notificationApi}read', {'skip': 0, 'limit': 999});
-                })
-              });
-        }
-        break;
+      // case 'eventPage':
+      //   {
+      //     Navigator.push(
+      //       context,
+      //       MaterialPageRoute(
+      //         builder: (context) => EventCalendarForm(
+      //           url: eventCalendarApi + 'read',
+      //           code: model['reference'],
+      //           model: model,
+      //           urlComment: eventCalendarCommentApi,
+      //           urlGallery: eventCalendarGalleryApi,
+      //         ),
+      //       ),
+      //     ).then((value) => {
+      //           setState(() {
+      //             _futureModel = postDio(
+      //                 '${notificationApi}read', {'skip': 0, 'limit': 999});
+      //           })
+      //         });
+      //   }
+      //   break;
 
       case 'privilegePage':
         {
@@ -246,14 +247,25 @@ class _NotificationList extends State<NotificationList> {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     return Scaffold(
-      appBar: header(
-        context,
-        () => goBack(),
-        title: widget.title,
-        isButtonLeft: false,
-        isButtonRight: true,
-        rightButton: () => _handleClickMe(),
-        imageRightButton: 'assets/images/task_list.png',
+      // appBar: header(
+      //   context,
+      //   () => goBack(),
+      //   title: widget.title,
+      //   isButtonLeft: false,
+      //   isButtonRight: true,
+      //   rightButton: () => _handleClickMe(),
+      //   imageRightButton: 'assets/images/task_list.png',
+      // ),
+      appBar: AppBar(
+        title: Text(
+          widget.title,
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+        backgroundColor: AppColors.primary,
       ),
       backgroundColor: Colors.white,
       body: FutureBuilder<dynamic>(

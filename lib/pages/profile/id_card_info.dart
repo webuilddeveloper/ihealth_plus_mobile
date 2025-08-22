@@ -24,7 +24,6 @@ class _IDCardInfoPageState extends State<IDCardInfo> {
 
   @override
   void dispose() {
-    // Clean up the controller when the widget is disposed.
     super.dispose();
   }
 

@@ -83,7 +83,6 @@ class _ApplyState extends State<Apply> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: Colors.grey[50],
       appBar: AppBar(
         elevation: 0,
         leading: IconButton(
@@ -145,7 +144,6 @@ class _ApplyState extends State<Apply> {
                         duration: Duration(milliseconds: 300),
                         child: isFilterExpanded ? Filter() : SizedBox(),
                       ),
-                      // Divider(height: 1, color: Colors.grey[300]),
                     ],
                   ),
                 )
@@ -447,8 +445,7 @@ class _ApplyState extends State<Apply> {
   Widget announcement() {
     return ListView.builder(
       padding: EdgeInsets.all(16),
-      itemCount:
-          itemsToShow > widget.job.length ? widget.job.length : itemsToShow,
+      itemCount: widget.job.length,
       itemBuilder: (context, index) {
         final job = widget.job[index];
 
@@ -645,34 +642,286 @@ class _ApplyState extends State<Apply> {
   }
 
   Widget applied() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.work_off,
-            size: 80,
-            color: Colors.grey[400],
-          ),
-          SizedBox(height: 16),
-          Text(
-            'ยังไม่มีงานที่สมัครแล้ว',
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.grey[600],
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            'เมื่อคุณสมัครงานแล้ว จะแสดงรายการที่นี่',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[500],
-            ),
-          ),
-        ],
-      ),
+    // หาว่ามีงานไหนที่มีค่า status ไหม
+    final hasStatus = widget.job.any(
+      (job) => job["status"] != null && job["status"].toString().isNotEmpty,
     );
+
+    if (hasStatus) {
+      // แสดงงานทั้งหมดที่มี status
+      return ListView.builder(
+        itemCount: widget.job.length,
+        itemBuilder: (context, index) {
+          final status = widget.job[index]["status"]?.toString() ?? "";
+          final job = widget.job[index];
+          if (status.isNotEmpty) {
+            // return
+
+            return Padding(
+              padding: EdgeInsets.only(bottom: 16),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 10,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 80,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              image: DecorationImage(
+                                image: NetworkImage(job['imgUrl'] ?? ''),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        job['title'] ?? '',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 4,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.red,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Text(
+                                        '${job['count'] ?? ''} จำนวน',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  job['company'] ?? '',
+                                  style: TextStyle(
+                                    color: AppColors.textdark,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.location_on_outlined,
+                                      size: 16,
+                                      color: AppColors.textdark,
+                                    ),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      job['location'] ?? '',
+                                      style: TextStyle(
+                                        color: AppColors.textdark,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[50],
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(16),
+                          bottomRight: Radius.circular(16),
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.access_time,
+                                      size: 16,
+                                      color: Colors.grey[600],
+                                    ),
+                                    SizedBox(width: 4),
+                                    Flexible(
+                                      child: Text(
+                                        job['working_hours'] ?? '',
+                                        style: TextStyle(
+                                          color: Colors.grey[600],
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.lightgreen,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  job['salary'] ?? '',
+                                  style: TextStyle(
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 12),
+                          Row(
+                            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'สถานะ :',
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: 12,
+                                ),
+                              ),
+                              SizedBox(width: 12),
+                              Container(
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12),
+                                    color: job["status"] == 'ยังไม่ประกาศผล'
+                                        ? AppColors.grayligh
+                                        : job["status"] == "ผ่านการคัดเลือก"
+                                            ? Colors.green
+                                            : Colors.red),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 8,
+                                    horizontal: 12,
+                                  ),
+                                  child: Text(
+                                    '${job["status"]}',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          } else {
+            return const SizedBox.shrink(); // ไม่แสดงถ้า status ว่าง
+          }
+        },
+      );
+    } else {
+      // ถ้าไม่มีงานที่มี status เลย
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.work_off,
+              size: 80,
+              color: Colors.grey[400],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'ยังไม่มีงานที่สมัครแล้ว',
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'เมื่อคุณสมัครงานแล้ว จะแสดงรายการที่นี่',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[500],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
   }
+  // Widget applied() {
+  //   return
+  //   // final jobstatus = widget.job;
+  //   // return Text(widget.job[0]["status"]);
+  //   // Center(
+  //   //   child: Column(
+  //   //     mainAxisAlignment: MainAxisAlignment.center,
+  //   //     children: [
+  //   //       Icon(
+  //   //         Icons.work_off,
+  //   //         size: 80,
+  //   //         color: Colors.grey[400],
+  //   //       ),
+  //   //       SizedBox(height: 16),
+  //   //       Text(
+  //   //         'ยังไม่มีงานที่สมัครแล้ว',
+  //   //         style: TextStyle(
+  //   //           fontSize: 18,
+  //   //           color: Colors.grey[600],
+  //   //           fontWeight: FontWeight.w500,
+  //   //         ),
+  //   //       ),
+  //   //       SizedBox(height: 8),
+  //   //       Text(
+  //   //         'เมื่อคุณสมัครงานแล้ว จะแสดงรายการที่นี่',
+  //   //         style: TextStyle(
+  //   //           fontSize: 14,
+  //   //           color: Colors.grey[500],
+  //   //         ),
+  //   //       ),
+  //   //     ],
+  //   //   ),
+  //   // );
+  // }
 }

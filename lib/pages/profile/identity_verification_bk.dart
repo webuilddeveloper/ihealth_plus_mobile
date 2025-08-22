@@ -8,8 +8,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:ihealth_2025_mobile/component/header.dart';
 import 'package:ihealth_2025_mobile/pages/blank_page/dialog_fail.dart';
-import 'package:ihealth_2025_mobile/pages/profile/policy_identity_verification.dart';
-import 'package:ihealth_2025_mobile/pages/profile/user_information.dart';
+import 'package:ihealth_2025_mobile/pages/profile/ihealth/policy_identity_verification.dart';
+import 'package:ihealth_2025_mobile/pages/profile/ihealth/user_information.dart';
 import 'package:ihealth_2025_mobile/shared/api_provider.dart';
 import 'package:ihealth_2025_mobile/widget/text_form_field.dart';
 

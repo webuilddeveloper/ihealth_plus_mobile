@@ -1,5 +1,6 @@
 import 'dart:convert';
-import 'package:ihealth_2025_mobile/pages/profile/user_information.dart';
+import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
+import 'package:ihealth_2025_mobile/pages/profile/ihealth/user_information.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -69,12 +70,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         key: 'dataUserLoginDDPM',
         value: jsonEncode(result['objectData']),
       );
-      // Navigator.pushReplacement(
-      //   context,
-      //   MaterialPageRoute(
-      //     builder: (context) => UserInformationPage(),
-      //   ),
-      // );
 
       return showDialog(
         barrierDismissible: false,
@@ -189,7 +184,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           TextFormField(
             obscureText: showTxtPasswordOld,
             style: TextStyle(
-              color: Color(0xFF000070),
+              color: AppColors.textdark,
               fontWeight: FontWeight.normal,
               fontFamily: 'Sarabun',
               fontSize: 15.0,
@@ -206,7 +201,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 },
               ),
               filled: true,
-              fillColor: Color(0xFFC5DAFC),
+              fillColor: AppColors.grayligh,
               contentPadding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
               hintText: 'รหัสผ่านปัจจุบัน',
               border: OutlineInputBorder(
@@ -232,7 +227,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           TextFormField(
             obscureText: showTxtPasswordNew,
             style: TextStyle(
-              color: Color(0xFF000070),
+              color: AppColors.textdark,
               fontWeight: FontWeight.normal,
               fontFamily: 'Sarabun',
               fontSize: 15.0,
@@ -249,7 +244,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 },
               ),
               filled: true,
-              fillColor: Color(0xFFC5DAFC),
+              fillColor: AppColors.grayligh,
               contentPadding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
               hintText: 'รหัสผ่านใหม่',
               border: OutlineInputBorder(
@@ -270,7 +265,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
               String pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{6,}$';
               RegExp regex = new RegExp(pattern);
               if (!regex.hasMatch(model)) {
-                return 'กรุณากรอกรูปแบบรหัสผ่านให้ถูกต้อง.';
+                return 'กรุณากรอกรูปแบบรหัسผ่านให้ถูกต้อง.';
               }
               return null;
             },
@@ -281,7 +276,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           TextFormField(
             obscureText: showTxtConPasswordNew,
             style: TextStyle(
-              color: Color(0xFF000070),
+              color: AppColors.textdark,
               fontWeight: FontWeight.normal,
               fontFamily: 'Sarabun',
               fontSize: 15.0,
@@ -300,7 +295,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 },
               ),
               filled: true,
-              fillColor: Color(0xFFC5DAFC),
+              fillColor: AppColors.grayligh,
               contentPadding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
               hintText: 'ยืนยันรหัสผ่านใหม่',
               border: OutlineInputBorder(
@@ -342,7 +337,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
               child: Material(
                 elevation: 5.0,
                 borderRadius: BorderRadius.circular(10.0),
-                color: Theme.of(context).primaryColor,
+                color: AppColors.primary,
                 child: MaterialButton(
                   minWidth: MediaQuery.of(context).size.width,
                   height: 40,
@@ -425,40 +420,16 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
       ),
       (Route<dynamic> route) => false,
     );
-    // Navigator.pop(context, false);
-    //  Navigator.of(context).push(
-    //   MaterialPageRoute(
-    //     builder: (context) => UserInformationPage(),
-    //   ),
-    // );
   }
 
   @override
   Widget build(BuildContext context) {
-    // return FutureBuilder<dynamic>(
-    //   future: futureModel,
-    //   builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-    //     if (snapshot.connectionState == ConnectionState.waiting) {
-    //       // return Center(child: Text('Please wait its loading...'));
-    //       // return Center(
-    //       //   child: CircularProgressIndicator(),
-    //       // );
-    //       return Center(
-    //         child: Image.asset(
-    //           "assets/background/login.png",
-    //           fit: BoxFit.cover,
-    //         ),
-    //       );
-    //     } else {
-    //       if (snapshot.hasError)
-    //         return Center(child: Text('Error: ${snapshot.error}'));
-    //       else
     return Scaffold(
-      // appBar:
-      //     header(context, goBack, title: 'เปลี่ยนรหัสผ่าน', rightButton: null),
+      // เพิ่ม resizeToAvoidBottomInset เพื่อป้องกันการ resize เมื่อ keyboard ขึ้น
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back_ios_new),
           color: Colors.white,
           onPressed: () {
             Navigator.pop(context);
@@ -479,36 +450,38 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             },
           ),
         ],
-        backgroundColor: Color(0XFF224B45),
+        backgroundColor: AppColors.primary,
       ),
       backgroundColor: Colors.white,
-      body: InkWell(
-        splashColor: Colors.transparent,
-        highlightColor: Colors.transparent,
-        onTap: () {
-          FocusScope.of(context).unfocus();
-        },
-        child: Container(
-          child: ListView(
+      body: Container(
+        // เพิ่ม height และ decoration เพื่อให้แน่ใจว่าสีพื้นหลังจะแสดงผลตลอด
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        decoration: BoxDecoration(
+          color: Colors.white,
+        ),
+        child: InkWell(
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: SingleChildScrollView(
             controller: scrollController,
-            shrinkWrap: true,
             physics: ClampingScrollPhysics(),
-            // padding: const EdgeInsets.all(10.0),
-            children: <Widget>[
-              new Column(
-                // alignment: Alignment.topCenter,
-                children: <Widget>[
-                  Container(
-                    alignment: Alignment.topCenter,
-                    margin: EdgeInsets.symmetric(
-                      horizontal: 15.0,
-                      // vertical: 10.0,
-                    ),
-                    child: contentCard(),
+            child: Column(
+              children: <Widget>[
+                Container(
+                  alignment: Alignment.topCenter,
+                  margin: EdgeInsets.symmetric(
+                    horizontal: 15.0,
                   ),
-                ],
-              ),
-            ],
+                  child: contentCard(),
+                ),
+                // เพิ่ม SizedBox เพื่อให้มีพื้นที่เพียงพอสำหรับการ scroll
+                SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
+              ],
+            ),
           ),
         ),
       ),

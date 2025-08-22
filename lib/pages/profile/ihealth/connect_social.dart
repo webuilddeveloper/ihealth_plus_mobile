@@ -1,5 +1,6 @@
 import 'dart:convert';
-import 'package:ihealth_2025_mobile/pages/profile/user_information.dart';
+import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
+import 'package:ihealth_2025_mobile/pages/profile/ihealth/user_information.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -890,7 +891,7 @@ class _ConnectSocialPageState extends State<ConnectSocialPage> {
             //     title: 'การเชื่อมต่อ', rightButton: null),
             appBar: AppBar(
               leading: IconButton(
-                icon: Icon(Icons.arrow_back),
+                icon: Icon(Icons.arrow_back_ios_new),
                 color: Colors.white,
                 onPressed: () {
                   Navigator.pop(context);
@@ -898,7 +899,7 @@ class _ConnectSocialPageState extends State<ConnectSocialPage> {
               ),
               title: Center(
                 child: Text(
-                  'การเชื่อมต่อ',
+                  'การเชื่อมต่อ ',
                   style: TextStyle(color: Colors.white),
                 ),
               ),
@@ -911,7 +912,7 @@ class _ConnectSocialPageState extends State<ConnectSocialPage> {
                   },
                 ),
               ],
-              backgroundColor: Color(0XFF224B45),
+              backgroundColor: AppColors.primary,
             ),
             backgroundColor: Colors.white,
             body: Container(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
 
 labelTextFormFieldPasswordOldNew(String lable, bool showSubtitle) {
   return new Padding(
@@ -145,19 +146,16 @@ textFormField(
   return TextField(
     obscureText: isPassword,
     style: TextStyle(
-      color: enabled ? Color(0xFF000070) : Color(0xFFFFFFFF),
+      color: enabled ? AppColors.textdark : Color(0xFFFFFFFF),
       fontWeight: FontWeight.normal,
       fontFamily: 'Sarabun',
       fontSize: 15.00,
     ),
     decoration: InputDecoration(
       filled: true,
-      fillColor: enabled ? Color(0xFFC5DAFC) : Color(0xFF707070),
+      fillColor: enabled ? AppColors.grayligh : Color(0xFF707070),
       contentPadding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
       hintText: hintText,
-      // focusedBorder: UnderlineInputBorder(
-      //   borderSide: BorderSide(color: Colors.amber, width: 0.5),
-      // ),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10.0),
         borderSide: BorderSide.none,
@@ -181,14 +179,14 @@ textFormFieldNoValidator(
 ) {
   return TextFormField(
     style: TextStyle(
-      color: enabled ? Color(0xFF000070) : Color(0xFFFFFFFF),
+      color: enabled ? AppColors.textdark : Color(0xFFFFFFFF),
       fontWeight: FontWeight.normal,
       fontFamily: 'Sarabun',
       fontSize: 15.00,
     ),
     decoration: InputDecoration(
       filled: true,
-      fillColor: enabled ? Color(0xFFC5DAFC) : Color(0xFF707070),
+      fillColor: enabled ? AppColors.grayligh : Color(0xFF707070),
       contentPadding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
       hintText: hintText,
       border: OutlineInputBorder(
@@ -228,14 +226,14 @@ textFormPhoneField(
   return TextFormField(
     keyboardType: TextInputType.number,
     style: TextStyle(
-      color: enabled ? Color(0xFF000070) : Color(0xFFFFFFFF),
+      color: enabled ? AppColors.textdark : Color(0xFFFFFFFF),
       fontWeight: FontWeight.normal,
       fontFamily: 'Sarabun',
       fontSize: 15.00,
     ),
     decoration: InputDecoration(
       filled: true,
-      fillColor: enabled ? Color(0xFFC5DAFC) : Color(0xFF707070),
+      fillColor: enabled ? AppColors.grayligh : Color(0xFF707070),
       contentPadding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
       hintText: hintText,
       border: OutlineInputBorder(
@@ -275,14 +273,14 @@ textFormIdCardField(
   return TextFormField(
     keyboardType: TextInputType.number,
     style: TextStyle(
-      color: enabled ? Color(0xFF000070) : Color(0xFFFFFFFF),
+      color: enabled ? AppColors.textdark : Color(0xFFFFFFFF),
       fontWeight: FontWeight.normal,
       fontFamily: 'Sarabun',
       fontSize: 15.00,
     ),
     decoration: InputDecoration(
       filled: true,
-      fillColor: enabled ? Color(0xFFC5DAFC) : Color(0xFF707070),
+      fillColor: enabled ? AppColors.grayligh : Color(0xFF707070),
       contentPadding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
       hintText: hintText,
       border: OutlineInputBorder(
@@ -340,7 +338,7 @@ textFormFieldEdit(
   return TextFormField(
     obscureText: isPassword,
     style: TextStyle(
-      color: enabled ? Color(0xFF1B6CA8) : Color(0xFFFFFFFF),
+      color: enabled ? AppColors.textdark : Color(0xFFFFFFFF),
       fontWeight: FontWeight.normal,
       fontFamily: 'Kanit',
       fontSize: 15.00,
@@ -430,7 +428,7 @@ textFormPhoneFieldEdit(
   return TextFormField(
     keyboardType: TextInputType.number,
     style: TextStyle(
-      color: enabled ? Color(0xFF1B6CA8) : Color(0xFFFFFFFF),
+      color: enabled ? AppColors.textdark : Color(0xFFFFFFFF),
       fontWeight: FontWeight.normal,
       fontFamily: 'Kanit',
       fontSize: 15.00,
@@ -524,7 +522,7 @@ textFormLicenseFieldEdit(
   return TextFormField(
     // keyboardType: TextInputType.number,
     style: TextStyle(
-      color: enabled ? Color(0xFF1B6CA8) : Color(0xFFFFFFFF),
+      color: enabled ? AppColors.textdark : Color(0xFFFFFFFF),
       fontWeight: FontWeight.normal,
       fontFamily: 'Kanit',
       fontSize: 15.00,
@@ -572,7 +570,7 @@ textFormFieldIsEmptyEdit(
   return TextFormField(
     obscureText: isPassword,
     style: TextStyle(
-      color: enabled ? Color(0xFF1B6CA8) : Color(0xFFFFFFFF),
+      color: enabled ? AppColors.textdark : Color(0xFFFFFFFF),
       fontWeight: FontWeight.normal,
       fontFamily: 'Kanit',
       fontSize: 15.00,
@@ -635,7 +633,7 @@ textFormIdCardFieldEdit(
   return TextFormField(
     keyboardType: TextInputType.number,
     style: TextStyle(
-      color: enabled ? Color(0xFF1B6CA8) : Color(0xFFFFFFFF),
+      color: enabled ? AppColors.textdark : Color(0xFFFFFFFF),
       fontWeight: FontWeight.normal,
       fontFamily: 'Kanit',
       fontSize: 15.00,
