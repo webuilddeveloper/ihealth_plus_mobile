@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:ihealth_2025_mobile/component/button_close_back.dart';
 import 'package:ihealth_2025_mobile/component/carousel_form.dart';
 import 'package:ihealth_2025_mobile/component/link_url_in.dart';
-import 'package:ihealth_2025_mobile/pages/main_popup/mainpop_up_form.dart';
+import 'package:ihealth_2025_mobile/ihealth/main_popup/mainpop_up_form.dart';
 
 class MainPopupDialog extends StatefulWidget {
   MainPopupDialog(

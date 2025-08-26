@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
-import 'package:ihealth_2025_mobile/pages/ihealth/apply/apply-detail.dart';
+import 'package:ihealth_2025_mobile/ihealth/apply/apply-detail.dart';
 
 class Apply extends StatefulWidget {
   final List<Map<String, dynamic>> job;

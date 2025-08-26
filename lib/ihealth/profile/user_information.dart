@@ -1,14 +1,13 @@
 import 'dart:ui';
 import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
+import 'package:ihealth_2025_mobile/ihealth/profile/personalskills.dart';
 import 'package:ihealth_2025_mobile/pages/blank_page/dialog_fail.dart';
-import 'package:ihealth_2025_mobile/pages/profile/ihealth/company.dart';
-import 'package:ihealth_2025_mobile/pages/profile/ihealth/edit_user_information.dart';
-import 'package:ihealth_2025_mobile/pages/profile/ihealth/identity_verification.dart';
+import 'package:ihealth_2025_mobile/ihealth/profile/company.dart';
+import 'package:ihealth_2025_mobile/ihealth/profile/edit_user_information.dart';
 import 'package:ihealth_2025_mobile/shared/api_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'change_password.dart';
-import 'connect_social.dart';
 
 class UserInformationPage extends StatefulWidget {
   @override
@@ -17,7 +16,7 @@ class UserInformationPage extends StatefulWidget {
 
 class _UserInformationPageState extends State<UserInformationPage> {
   final storage = new FlutterSecureStorage();
-  late Future<dynamic> _futureProfile;
+  Future<dynamic> _futureProfile = Future.value();
   dynamic _tempData = {'imageUrl': '', 'firstName': '', 'lastName': ''};
 
   @override
@@ -167,11 +166,11 @@ class _UserInformationPageState extends State<UserInformationPage> {
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => IdentityVerificationPage(),
+                            builder: (context) => PersonalSkill(),
                           ),
                         ),
                         child: buttonMenuUser(
-                            'assets/icons/papers.png', 'ข้อมูลสมาชิก'),
+                            'assets/icons/person.png', 'ทักษะส่วนตัว'),
                       ),
                       InkWell(
                         onTap: () => Navigator.push(
@@ -181,40 +180,6 @@ class _UserInformationPageState extends State<UserInformationPage> {
                         ),
                         child: buttonMenuUser(
                             'assets/icons/service_7.png', 'สถานประกอบการ'),
-                      ),
-                      // InkWell(
-                      //   onTap: () => Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //       builder: (context) => SettingNotificationPage(),
-                      //     ),
-                      //   ),
-                      //   child: buttonMenuUser(
-                      //       'assets/icons/bell.png', 'ตั้งค่าการแจ้งเตือน'),
-                      // ),
-
-                      // InkWell(
-                      //   onTap: () => Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //       builder: (context) => AboutUsForm(
-                      //         model: _futureAboutUs,
-                      //         title: 'ติดต่อเรา',
-                      //       ),
-                      //     ),
-                      //   ),
-                      //   child: buttonMenuUser(
-                      //       'assets/icons/phone.png', 'ติดต่อเรา'),
-                      // ),
-                      InkWell(
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ConnectSocialPage(),
-                          ),
-                        ),
-                        child: buttonMenuUser(
-                            'assets/icons/link.png', 'การเชื่อมต่อ'),
                       ),
                       InkWell(
                         onTap: () => Navigator.push(
@@ -265,7 +230,8 @@ class _UserInformationPageState extends State<UserInformationPage> {
                             ],
                           ),
                         ),
-                      )
+                      ),
+                      SizedBox(height: 30),
                     ],
                   ),
                 ),

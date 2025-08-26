@@ -6,7 +6,7 @@ import 'package:ihealth_2025_mobile/component/menu/build_verify_ticket.dart';
 import 'package:ihealth_2025_mobile/component/menu/color_item.dart';
 import 'package:ihealth_2025_mobile/component/menu/image_item.dart';
 import 'package:ihealth_2025_mobile/component/v2/button_menu_full.dart';
-import 'package:ihealth_2025_mobile/login.dart';
+import 'package:ihealth_2025_mobile/ihealth/login.dart';
 import 'package:ihealth_2025_mobile/pages/blank_page/blank_loading.dart';
 import 'package:ihealth_2025_mobile/pages/blank_page/toast_fail.dart';
 import 'package:ihealth_2025_mobile/pages/dispute_an_allegation.dart';
@@ -18,7 +18,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:ihealth_2025_mobile/component/carousel_banner.dart';
 import 'package:ihealth_2025_mobile/pages/about_us/about_us_form.dart';
 import 'package:ihealth_2025_mobile/pages/menu_grid_item.dart';
-import 'package:ihealth_2025_mobile/pages/notification/notification_list.dart';
+import 'package:ihealth_2025_mobile/ihealth/notification/notification_list.dart';
 import 'package:ihealth_2025_mobile/pages/poi/poi_list.dart';
 import 'package:ihealth_2025_mobile/pages/poll/poll_list.dart';
 import 'package:ihealth_2025_mobile/pages/welfare/welfare_list.dart';
@@ -29,12 +29,12 @@ import 'package:ihealth_2025_mobile/profile.dart';
 import 'package:ihealth_2025_mobile/pages/contact/contact_list_category.dart';
 import 'package:ihealth_2025_mobile/pages/news/news_list.dart';
 import 'package:ihealth_2025_mobile/pages/privilege/privilege_main.dart';
-import 'package:ihealth_2025_mobile/pages/profile/ihealth/user_information.dart';
+import 'package:ihealth_2025_mobile/ihealth/profile/user_information.dart';
 import 'package:ihealth_2025_mobile/shared/api_provider.dart';
 import 'package:ihealth_2025_mobile/component/carousel_form.dart';
-import 'pages/event_calendar/event_calendar_main.dart';
+import 'ihealth/event_calendar/event_calendar_main.dart';
 import 'pages/knowledge/knowledge_list.dart';
-import 'pages/main_popup/dialog_main_popup.dart';
+import 'ihealth/main_popup/dialog_main_popup.dart';
 
 class HomePageV2 extends StatefulWidget {
   @override
@@ -680,9 +680,9 @@ class _HomePageV2State extends State<HomePageV2> {
   }
 
   _buildProfile() {
-    return Profile(
-      model: _futureProfile,
-    );
+    // return Profile(
+    //   model: _futureProfile,
+    // );
   }
 
   _buildGridMenu1() {

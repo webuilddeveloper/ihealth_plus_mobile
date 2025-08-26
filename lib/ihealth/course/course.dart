@@ -2,7 +2,7 @@ import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
-import 'package:ihealth_2025_mobile/pages/ihealth/course/course-detail.dart';
+import 'package:ihealth_2025_mobile/ihealth/course/course-detail.dart';
 
 class Course extends StatefulWidget {
   const Course({super.key, required this.course});

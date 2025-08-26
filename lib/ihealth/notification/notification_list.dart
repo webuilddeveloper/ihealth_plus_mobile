@@ -4,7 +4,6 @@ import 'package:ihealth_2025_mobile/pages/warning/warning_form.dart';
 import 'package:ihealth_2025_mobile/pages/welfare/welfare_form.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:ihealth_2025_mobile/component/header.dart';
 import 'package:ihealth_2025_mobile/pages/blank_page/blank_loading.dart';
 import 'package:ihealth_2025_mobile/pages/blank_page/toast_fail.dart';
 
@@ -228,13 +227,11 @@ class _NotificationList extends State<NotificationList> {
                 })
               });
         }
-        break;
 
       default:
         {
           return toastFail(context, text: 'เกิดข้อผิดพลาด');
         }
-        break;
     }
   }
 

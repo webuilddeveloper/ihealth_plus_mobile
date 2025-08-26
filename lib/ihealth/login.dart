@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:ihealth_2025_mobile/menu.dart';
+import 'package:ihealth_2025_mobile/ihealth/menu.dart';
 import 'package:ihealth_2025_mobile/pages/login_phone.dart';
 import 'package:ihealth_2025_mobile/shared/line.dart';
 import 'package:dio/dio.dart';
@@ -13,10 +13,10 @@ import 'package:ihealth_2025_mobile/shared/api_provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:ihealth_2025_mobile/widget/text_field.dart';
 
-import 'pages/auth/forgot_password.dart';
-import 'shared/apple_firebase.dart';
-import 'shared/facebook_firebase.dart';
-import 'shared/google_firebase.dart';
+import '../pages/auth/forgot_password.dart';
+import '../shared/apple_firebase.dart';
+import '../shared/facebook_firebase.dart';
+import '../shared/google_firebase.dart';
 
 DateTime now = new DateTime.now();
 void main() {

@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-// import 'package:ihealth_2025_mobile/pages/my_qr_code.dart';
 import 'home.dart';
-import 'pages/event_calendar/event_calendar_main.dart';
-
-import 'pages/notification/notification_list.dart';
-import 'pages/profile/ihealth/user_information.dart';
-import 'shared/api_provider.dart';
+import 'event_calendar/event_calendar_main.dart';
+import 'notification/notification_list.dart';
+import 'profile/user_information.dart';
+import '../shared/api_provider.dart';
 
 class Menu extends StatefulWidget {
   const Menu({super.key, this.pageIndex});

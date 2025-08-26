@@ -11,7 +11,7 @@ import 'package:ihealth_2025_mobile/component/header.dart';
 import 'package:ihealth_2025_mobile/shared/api_provider.dart';
 import 'package:ihealth_2025_mobile/widget/text_form_field.dart';
 import 'package:intl/intl.dart';
-import '../../login.dart';
+import '../../ihealth/login.dart';
 
 class RegisterPage extends StatefulWidget {
   final String username;

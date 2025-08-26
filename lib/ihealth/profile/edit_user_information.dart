@@ -5,7 +5,7 @@ import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart'
     as dt_picker;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
-import 'package:ihealth_2025_mobile/pages/profile/ihealth/user_information.dart';
+import 'package:ihealth_2025_mobile/ihealth/profile/user_information.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:ihealth_2025_mobile/pages/blank_page/dialog_fail.dart';
@@ -19,7 +19,7 @@ class EditUserInformationPage extends StatefulWidget {
 }
 
 class _EditUserInformationPageState extends State<EditUserInformationPage> {
-  final storage = new FlutterSecureStorage();
+  final storage = FlutterSecureStorage();
 
   late String _imageUrl = '';
 
@@ -50,11 +50,14 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
   final txtEmail = TextEditingController();
   final txtPassword = TextEditingController();
   final txtConPassword = TextEditingController();
+
   final txtPrefixName = TextEditingController();
   final txtFirstName = TextEditingController();
   final txtLastName = TextEditingController();
+
   final txtPhone = TextEditingController();
   final txtUsername = TextEditingController();
+
   final txtIdCard = TextEditingController();
   final txtLineID = TextEditingController();
   final txtOfficerCode = TextEditingController();
@@ -63,12 +66,14 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
   final txtSoi = TextEditingController();
   final txtRoad = TextEditingController();
 
+  final licensenumber = TextEditingController();
+
   DateTime selectedDate = DateTime.now();
   TextEditingController txtDate = TextEditingController();
 
   late Future<dynamic> futureModel;
 
-  ScrollController scrollController = new ScrollController();
+  ScrollController scrollController = ScrollController();
 
   late XFile _image;
 
@@ -81,7 +86,6 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
 
   @override
   void dispose() {
-    // Clean up the controller when the widget is disposed.
     txtEmail.dispose();
     txtPassword.dispose();
     txtConPassword.dispose();
@@ -97,7 +101,7 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
     futureModel = getUser();
 
     scrollController = ScrollController();
-    var now = new DateTime.now();
+    var now = DateTime.now();
     setState(() {
       year = now.year;
       month = now.month;
@@ -305,7 +309,7 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
               return Future.value(false);
             },
             child: CupertinoAlertDialog(
-              title: new Text(
+              title: Text(
                 'อัพเดตข้อมูลเรียบร้อยแล้ว',
                 style: TextStyle(
                   fontSize: 16,
@@ -318,7 +322,7 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
               actions: [
                 CupertinoDialogAction(
                   isDefaultAction: true,
-                  child: new Text(
+                  child: Text(
                     "ตกลง",
                     style: TextStyle(
                       fontSize: 13,
@@ -358,7 +362,7 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
               return Future.value(false);
             },
             child: CupertinoAlertDialog(
-              title: new Text(
+              title: Text(
                 'อัพเดตข้อมูลไม่สำเร็จ',
                 style: TextStyle(
                   fontSize: 16,
@@ -367,7 +371,7 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
                   fontWeight: FontWeight.normal,
                 ),
               ),
-              content: new Text(
+              content: Text(
                 result['message'],
                 style: TextStyle(
                   fontSize: 13,
@@ -379,7 +383,7 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
               actions: [
                 CupertinoDialogAction(
                   isDefaultAction: true,
-                  child: new Text(
+                  child: Text(
                     "ตกลง",
                     style: TextStyle(
                       fontSize: 13,
@@ -530,36 +534,67 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
             //   ),
             // ),
             // SizedBox(height: 5.0),
-            // labelTextFormField('* ชื่อผู้ใช้งาน'),
-            // textFormField(
-            //   txtUsername,
-            //   null,
-            //   'ชื่อผู้ใช้งาน',
-            //   'ชื่อผู้ใช้งาน',
-            //   false,
-            //   false,
-            //   false,
-            // ),
-            // SizedBox(height: 15.0),
-            // Text(
-            //   'ข้อมูลส่วนตัว',
-            //   style: TextStyle(
-            //     fontSize: 18.00,
-            //     fontFamily: 'Sarabun',
-            //     fontWeight: FontWeight.w500,
-            //     // color: Color(0xFFBC0611),
-            //   ),
-            // ),
-            // labelTextFormField('* คำนำหน้า'),
-            // textFormField(
-            //   txtPrefixName,
-            //   null,
-            //   'คำนำหน้า',
-            //   'คำนำหน้า',
-            //   true,
-            //   false,
-            //   false,
-            // ),
+            labelTextFormField('* ชื่อผู้ใช้งาน'),
+            textFormField(
+              txtUsername,
+              null,
+              'ชื่อผู้ใช้งาน',
+              'ชื่อผู้ใช้งาน',
+              false,
+              false,
+              false,
+            ),
+            SizedBox(height: 15.0),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      labelTextFormField('* รหัสผ่านใหม่'),
+                      textFormField(
+                        txtPassword,
+                        null,
+                        'รหัสผ่านใหม่',
+                        'รหัสผ่านใหม่',
+                        true,
+                        false,
+                        false,
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      labelTextFormField('* ยืนยันรหัสผ่าน'),
+                      textFormField(
+                        txtConPassword,
+                        null,
+                        'ยืนยันรหัสผ่าน',
+                        'ยืนยันรหัสผ่าน',
+                        true,
+                        false,
+                        false,
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+            labelTextFormField('* เลขใบอนุญาต'),
+            textFormField(
+              licensenumber,
+              null,
+              'เลขใบอนุญาต',
+              'เลขใบอนุญาต',
+              true,
+              false,
+              false,
+            ),
+
             labelTextFormField('* ชื่อ'),
             textFormField(
               txtFirstName,
@@ -580,48 +615,7 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
               false,
               false,
             ),
-            // labelTextFormField('* วันเดือนปีเกิด'),
-            // GestureDetector(
-            //   onTap: () => dialogOpenPickerDate(),
-            //   child: AbsorbPointer(
-            //     child: TextFormField(
-            //       controller: txtDate,
-            //       style: TextStyle(
-            //         color: Color(0xFF9A1120),
-            //         fontWeight: FontWeight.normal,
-            //         fontFamily: 'Sarabun',
-            //         fontSize: 15.0,
-            //       ),
-            //       decoration: InputDecoration(
-            //         filled: true,
-            //         fillColor: Color(0xFFEEBA33),
-            //         contentPadding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
-            //         hintText: "วันเดือนปีเกิด",
-            //         border: OutlineInputBorder(
-            //           borderRadius: BorderRadius.circular(10.0),
-            //           borderSide: BorderSide.none,
-            //         ),
-            //         errorStyle: TextStyle(
-            //           fontWeight: FontWeight.normal,
-            //           fontFamily: 'Sarabun',
-            //           fontSize: 10.0,
-            //         ),
-            //       ),
-            //       // validator: (model) {
-            //       //   if (model.isEmpty) {
-            //       //     return 'กรุณากรอกวันเดือนปีเกิด.';
-            //       //   }
-            //       // },
-            //     ),
-            //   ),
-            // ),
-            // labelTextFormField('* รหัสประจำตัวประชาชน'),
-            // textFormIdCardField(
-            //   txtIdCard,
-            //   'รหัสประจำตัวประชาชน',
-            //   'รหัสประจำตัวประชาชน',
-            //   true,
-            // ),
+
             labelTextFormField('* เบอร์โทรศัพท์ (10 หลัก)'),
             textFormPhoneField(
               txtPhone,
@@ -637,119 +631,66 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
               false,
               false,
             ),
-            // labelTextFormField('Line ID'),
-            // textFormFieldNoValidator(
-            //   txtLineID,
-            //   'Line ID',
-            //   true,
-            //   false,
-            // ),
-            // labelTextFormField('* รหัสสมาชิก'),
-            // textFormField(
-            //   txtOfficerCode,
-            //   null,
-            //   'รหัสสมาชิก',
-            //   'รหัสสมาชิก',
-            //   true,
-            //   false,
-            //   false,
-            // ),
-            // labelTextFormField('* เพศ'),
 
-            // new Container(
+            labelTextFormField('ที่อยู่ปัจจุบัน'),
+            textFormFieldNoValidator(
+              txtAddress,
+              'ที่อยู่ปัจจุบัน',
+              true,
+              false,
+            ),
+            labelTextFormField('หมู่ที่'),
+            textFormFieldNoValidator(
+              txtMoo,
+              'หมู่ที่',
+              true,
+              false,
+            ),
+            labelTextFormField('ซอย'),
+            textFormFieldNoValidator(
+              txtSoi,
+              'ซอย',
+              true,
+              false,
+            ),
+            labelTextFormField('ถนน'),
+            textFormFieldNoValidator(
+              txtRoad,
+              'ถนน',
+              true,
+              false,
+            ),
+            labelTextFormField('ตำบล/แขวง'),
+            textFormFieldNoValidator(
+              txtRoad,
+              'ตำบล/แขวง',
+              true,
+              false,
+            ),
+            labelTextFormField('อำเภอ/เขต'),
+            textFormFieldNoValidator(
+              txtRoad,
+              'อำเภอ/เขต',
+              true,
+              false,
+            ),
+            labelTextFormField('จังหวัด'),
+            textFormFieldNoValidator(
+              txtRoad,
+              'จังหวัด',
+              true,
+              false,
+            ),
+
+            // SizedBox(height: 15),
+            // Container(
             //   width: 5000.0,
             //   padding: EdgeInsets.symmetric(
             //     horizontal: 5,
             //     vertical: 0,
             //   ),
             //   decoration: BoxDecoration(
-            //     color: Color(0xFFEEBA33),
-            //     borderRadius: BorderRadius.circular(
-            //       10,
-            //     ),
-            //   ),
-            //   child: DropdownButtonFormField(
-            //     decoration: InputDecoration(
-            //       errorStyle: TextStyle(
-            //         fontWeight: FontWeight.normal,
-            //         fontFamily: 'Sarabun',
-            //         fontSize: 10.0,
-            //       ),
-            //       enabledBorder: UnderlineInputBorder(
-            //         borderSide: BorderSide(
-            //           color: Colors.white,
-            //         ),
-            //       ),
-            //     ),
-            //     validator: (value) =>
-            //         // value == '' ||
-            //         value == null ? 'กรุณาเลือกเพศ' : null,
-            //     hint: Text(
-            //       'เพศ',
-            //       style: TextStyle(
-            //         fontSize: 15.00,
-            //         fontFamily: 'Sarabun',
-            //       ),
-            //     ),
-            //     value: _selectedSex,
-            //     onChanged: (newValue) {
-            //       setState(() {
-            //         _selectedSex = newValue;
-            //       });
-            //     },
-            //     items: _itemSex.map((item) {
-            //       return DropdownMenuItem(
-            //         child: new Text(
-            //           item['title'],
-            //           style: TextStyle(
-            //             fontSize: 15.00,
-            //             fontFamily: 'Sarabun',
-            //             color: Color(
-            //               0xFF9A1120,
-            //             ),
-            //           ),
-            //         ),
-            //         value: item['code'],
-            //       );
-            //     }).toList(),
-            //   ),
-            // ),
-            // labelTextFormField('ที่อยู่ปัจจุบัน'),
-            // textFormFieldNoValidator(
-            //   txtAddress,
-            //   'ที่อยู่ปัจจุบัน',
-            //   true,
-            //   false,
-            // ),
-            // labelTextFormField('หมู่ที่'),
-            // textFormFieldNoValidator(
-            //   txtMoo,
-            //   'หมู่ที่',
-            //   true,
-            //   false,
-            // ),
-            // labelTextFormField('ซอย'),
-            // textFormFieldNoValidator(
-            //   txtSoi,
-            //   'ซอย',
-            //   true,
-            //   false,
-            // ),
-            // labelTextFormField('ถนน'),
-            // textFormFieldNoValidator(
-            //   txtRoad,
-            //   'ถนน',
-            //   true,
-            //   false,
-            // ),
-            // new Container(
-            //   width: 5000.0,
-            //   padding: EdgeInsets.symmetric(
-            //     horizontal: 5,
-            //     vertical: 0,
-            //   ),
-            //   decoration: BoxDecoration(
-            //     color: Color(0xFFEEBA33),
+            //     color: AppColors.grayligh,
             //     borderRadius: BorderRadius.circular(
             //       10,
             //     ),
@@ -779,14 +720,14 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
             //             ),
             //           ),
             //           value: _selectedPostalCode,
-            //           onChanged: (newValue) {
+            //           onChanged: (Value) {
             //             setState(() {
-            //               _selectedPostalCode = newValue;
+            //               _selectedPostalCode = Value as String;
             //             });
             //           },
             //           items: _itemPostalCode.map((item) {
             //             return DropdownMenuItem(
-            //               child: new Text(
+            //               child: Text(
             //                 item['postCode'],
             //                 style: TextStyle(
             //                   fontSize: 15.00,
@@ -823,14 +764,14 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
             //               fontFamily: 'Sarabun',
             //             ),
             //           ),
-            //           onChanged: (newValue) {
+            //           onChanged: (Value) {
             //             setState(() {
-            //               _selectedPostalCode = newValue;
+            //               _selectedPostalCode = Value as String;
             //             });
             //           },
             //           items: _itemPostalCode.map((item) {
             //             return DropdownMenuItem(
-            //               child: new Text(
+            //               child: Text(
             //                 item['postCode'],
             //                 style: TextStyle(
             //                   fontSize: 15.00,
@@ -845,9 +786,9 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
             //           }).toList(),
             //         ),
             // ),
-            // Padding(
-            //   padding: EdgeInsets.only(top: 10.0),
-            // ),
+            Padding(
+              padding: EdgeInsets.only(top: 10.0),
+            ),
             Center(
               child: Container(
                 width: 200,
@@ -855,7 +796,7 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
                 child: Material(
                   elevation: 2.0,
                   borderRadius: BorderRadius.circular(5.0),
-                  color: AppColors.primary,
+                  color: AppColors.primary_gold,
                   child: MaterialButton(
                     height: 40,
                     onPressed: () {
@@ -865,9 +806,9 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
                         submitUpdateUser();
                       }
                     },
-                    child: new Text(
+                    child: Text(
                       'บันทึกข้อมูล',
-                      style: new TextStyle(
+                      style: TextStyle(
                         fontSize: 16.0,
                         color: Colors.white,
                         fontWeight: FontWeight.normal,
@@ -890,7 +831,7 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
       child: Row(
         children: <Widget>[
           Container(
-            child: new Padding(
+            child: Padding(
               padding: EdgeInsets.all(5.0),
               child: Image.asset(
                 urlImage,
@@ -910,7 +851,7 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
             margin: EdgeInsets.only(left: 10.0, right: 10.0),
             child: Text(
               title,
-              style: new TextStyle(
+              style: TextStyle(
                 fontSize: 12.0,
                 color: Color(0xFF9A1120),
                 fontWeight: FontWeight.normal,
@@ -969,11 +910,11 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
       builder: (BuildContext bc) {
         return SafeArea(
           child: Container(
-            child: new Wrap(
+            child: Wrap(
               children: <Widget>[
-                new ListTile(
-                    leading: new Icon(Icons.photo_library),
-                    title: new Text(
+                ListTile(
+                    leading: Icon(Icons.photo_library),
+                    title: Text(
                       'อัลบั้มรูปภาพ',
                       style: TextStyle(
                         fontSize: 13,
@@ -985,9 +926,9 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
                       _imgFromGallery();
                       Navigator.of(context).pop();
                     }),
-                new ListTile(
-                  leading: new Icon(Icons.photo_camera),
-                  title: new Text(
+                ListTile(
+                  leading: Icon(Icons.photo_camera),
+                  title: Text(
                     'กล้องถ่ายรูป',
                     style: TextStyle(
                       fontSize: 13,
@@ -1010,12 +951,6 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
 
   void goBack() async {
     Navigator.pop(context, false);
-    // Navigator.of(context).pushAndRemoveUntil(
-    //   MaterialPageRoute(
-    //     builder: (context) => UserInformationPage(),
-    //   ),
-    //   (Route<dynamic> route) => false,
-    // );
   }
 
   @override

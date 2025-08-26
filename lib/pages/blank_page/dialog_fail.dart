@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:ihealth_2025_mobile/splash.dart';
+import 'package:ihealth_2025_mobile/ihealth/splash.dart';
 
 dialogFail(BuildContext context,
     {String title = 'การเชื่อมต่อมีปัญหากรุณาลองใหม่อีกครั้ง',

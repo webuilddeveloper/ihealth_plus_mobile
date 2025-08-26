@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:ihealth_2025_mobile/component/key_search.dart';
-import 'package:ihealth_2025_mobile/pages/main_popup/dialog_main_popup.dart';
+import 'package:ihealth_2025_mobile/ihealth/main_popup/dialog_main_popup.dart';
 import 'package:ihealth_2025_mobile/pages/privilege/list_content_horizontal_privilege.dart';
 import 'package:ihealth_2025_mobile/pages/privilege/list_content_horizontal_privlege_suggested.dart';
 import 'package:ihealth_2025_mobile/pages/privilege/privilege_form.dart';
