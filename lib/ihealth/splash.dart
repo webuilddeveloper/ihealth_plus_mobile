@@ -39,7 +39,7 @@ class _SplashPageState extends State<SplashPage> {
 
   _callNavigatorPage() async {
     final storage = new FlutterSecureStorage();
-    String? value = await storage.read(key: 'profileCode3');
+    String? value = await storage.read(key: 'token');
 
     if (value != null && value != '') {
       Navigator.of(context).pushAndRemoveUntil(

@@ -388,23 +388,23 @@ createStorageApp({dynamic model, required String category}) {
 
 logout(BuildContext context) async {
   final storage = new FlutterSecureStorage();
-  storage.delete(key: 'profileCode3');
-  var profileCategory = await storage.read(key: 'profileCategory');
-  if (profileCategory != '' && profileCategory != null) {
-    switch (profileCategory) {
-      case 'facebook':
-        // logoutFacebook();
-        logoutFacebook();
-        break;
-      case 'google':
-        logoutGoogle();
-        break;
-      case 'line':
-        logoutLine();
-        break;
-      default:
-    }
-  }
+  storage.delete(key: 'token');
+  // var profileCategory = await storage.read(key: 'profileCategory');
+  // if (profileCategory != '' && profileCategory != null) {
+  //   switch (profileCategory) {
+  //     case 'facebook':
+  //       // logoutFacebook();
+  //       logoutFacebook();
+  //       break;
+  //     case 'google':
+  //       logoutGoogle();
+  //       break;
+  //     case 'line':
+  //       logoutLine();
+  //       break;
+  //     default:
+  //   }
+  // }
 
   Navigator.pushAndRemoveUntil(
       context,
