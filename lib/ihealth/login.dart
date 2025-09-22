@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
+import 'package:ihealth_2025_mobile/client/home_client.dart';
 import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
 import 'package:ihealth_2025_mobile/ihealth/menu.dart';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:ihealth_2025_mobile/models/user.dart';
-import 'package:ihealth_2025_mobile/pages/auth/register.dart';
+import 'package:ihealth_2025_mobile/ihealth/register.dart';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:ihealth_2025_mobile/widget/text_field.dart';
@@ -42,30 +44,30 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final ValueNotifier<bool> obscureNotifier = ValueNotifier(true);
 
-  late String _username;
-  late String _password;
-  late String _facebookID;
-  late String _appleID;
-  late String _googleID;
-  late String _lineID;
-  late String _email;
-  late String _imageUrl;
-  late String _category;
-  late String _prefixName;
-  late String _firstName;
-  late String _lastName;
+  // late String _username;
+  // late String _password;
+  // late String _facebookID;
+  // late String _appleID;
+  // late String _googleID;
+  // late String _lineID;
+  // late String _email;
+  // late String _imageUrl;
+  // late String _category;
+  // late String _prefixName;
+  // late String _firstName;
+  // late String _lastName;
 
   late Map userProfile;
-  bool _isOnlyWebLogin = false;
+  // bool _isOnlyWebLogin = false;
 
   late DataUser dataUser;
+  late Map<String, dynamic> profile;
 
   final txtUsername = TextEditingController();
   final txtPassword = TextEditingController();
 
   @override
   void dispose() {
-    // Clean up the controller when the widget is disposed.
     txtUsername.dispose();
     txtPassword.dispose();
 
@@ -75,18 +77,18 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     setState(() {
-      _username = "";
-      _password = "";
-      _facebookID = "";
-      _appleID = "";
-      _googleID = "";
-      _lineID = "";
-      _email = "";
-      _imageUrl = "";
-      _category = "";
-      _prefixName = "";
-      _firstName = "";
-      _lastName = "";
+      // _username = "";
+      // _password = "";
+      // _facebookID = "";
+      // _appleID = "";
+      // _googleID = "";
+      // _lineID = "";
+      // _email = "";
+      // _imageUrl = "";
+      // _category = "";
+      // _prefixName = "";
+      // _firstName = "";
+      // _lastName = "";
     });
     // checkStatus();
     super.initState();
@@ -119,316 +121,309 @@ class _LoginPageState extends State<LoginPage> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: InkWell(
-        splashColor: Colors.transparent,
-        highlightColor: Colors.transparent,
-        onTap: () {
-          FocusScope.of(context).unfocus();
-        },
-        child: Stack(
-          children: [
-            Container(
-              height: MediaQuery.of(context).size.height / 2,
-              width: double.infinity,
-              child: Image.asset(
-                'assets/bg_login.png',
-                fit: BoxFit.cover,
-              ),
+      body: Stack(
+        children: [
+          Container(
+            height: MediaQuery.of(context).size.height / 2,
+            width: double.infinity,
+            child: Image.asset(
+              'assets/bg_login.png',
+              fit: BoxFit.cover,
             ),
-            SingleChildScrollView(
-              padding: const EdgeInsets.all(10.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.only(
-                        top: MediaQuery.of(context).padding.top + 40,
-                      ),
+          ),
+          SingleChildScrollView(
+            padding: const EdgeInsets.all(10.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.only(
+                      top: MediaQuery.of(context).padding.top + 40,
                     ),
-                    Center(
-                      child: Image.asset(
-                        "assets/logo/logo_main.png",
-                        fit: BoxFit.contain,
-                        height: 120.0,
-                      ),
+                  ),
+                  Center(
+                    child: Image.asset(
+                      "assets/logo/logo_main.png",
+                      fit: BoxFit.contain,
+                      height: 120.0,
                     ),
-                    SizedBox(
-                      height: 20.0,
+                  ),
+                  SizedBox(
+                    height: 20.0,
+                  ),
+                  Card(
+                    color: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15.0),
                     ),
-                    Card(
-                      color: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15.0),
-                      ),
-                      elevation: 10,
-                      child: Container(
-                        padding: EdgeInsets.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Row(
-                              children: <Widget>[
-                                Text(
-                                  'เข้าสู่ระบบ',
+                    elevation: 10,
+                    child: Container(
+                      padding: EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Row(
+                            children: <Widget>[
+                              Text(
+                                'เข้าสู่ระบบ',
+                                style: TextStyle(
+                                  fontSize: 20.00,
+                                  fontFamily: 'Sarabun',
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 20.0),
+                          labelTextField(
+                            'ชื่อผู้ใช้งาน',
+                            Icon(
+                              Icons.person,
+                              color: AppColors.primary,
+                              size: 20.00,
+                            ),
+                          ),
+                          SizedBox(height: 5.0),
+                          ihealtTextFormField(
+                            txtUsername,
+                            'ชื่อผู้ใช้งาน',
+                            true,
+                            validator: emailValidator,
+                          ),
+                          SizedBox(height: 15.0),
+                          labelTextField(
+                            'รหัสผ่าน',
+                            Icon(
+                              Icons.lock,
+                              color: AppColors.primary,
+                              size: 20.00,
+                            ),
+                          ),
+                          SizedBox(height: 5.0),
+                          ihealtTextFormField(
+                            txtPassword,
+                            'รหัสผ่าน',
+                            true,
+                            validator: passwordValidator,
+                            obscureText: obscureNotifier.value,
+                            suffixIcon: ValueListenableBuilder<bool>(
+                              valueListenable: obscureNotifier,
+                              builder: (context, value, child) {
+                                return IconButton(
+                                  icon: Icon(
+                                    value
+                                        ? Icons.visibility_off_rounded
+                                        : Icons.remove_red_eye_rounded,
+                                    color: Colors.grey,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      obscureNotifier.value = !value;
+                                    });
+                                  },
+                                );
+                              },
+                            ),
+                          ),
+                          SizedBox(
+                            height: 30.0,
+                          ),
+                          loginButton,
+                          SizedBox(
+                            height: 5.0,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          ForgotPasswordPage(),
+                                    ),
+                                  );
+                                },
+                                child: Text(
+                                  "ลืมรหัสผ่าน",
                                   style: TextStyle(
-                                    fontSize: 20.00,
+                                    fontSize: 12.00,
                                     fontFamily: 'Sarabun',
-                                    fontWeight: FontWeight.bold,
                                     color: AppColors.primary,
                                   ),
                                 ),
-                              ],
-                            ),
-                            SizedBox(height: 20.0),
-                            labelTextField(
-                              'ชื่อผู้ใช้งาน',
-                              Icon(
-                                Icons.person,
-                                color: AppColors.primary,
-                                size: 20.00,
                               ),
-                            ),
-                            SizedBox(height: 5.0),
-                            ihealtTextFormField(
-                              txtUsername,
-                              'ชื่อผู้ใช้งาน',
-                              true,
-                              validator: emailValidator,
-                            ),
-                            SizedBox(height: 15.0),
-                            labelTextField(
-                              'รหัสผ่าน',
-                              Icon(
-                                Icons.lock,
-                                color: AppColors.primary,
-                                size: 20.00,
+                              Text(
+                                '|',
+                                style: TextStyle(
+                                  fontSize: 15.00,
+                                  fontFamily: 'Sarabun',
+                                  color: AppColors.primary_gold,
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 5.0),
-                            ihealtTextFormField(
-                              txtPassword,
-                              'รหัสผ่าน',
-                              true,
-                              validator: passwordlValidator,
-                              obscureText: obscureNotifier.value,
-                              suffixIcon: ValueListenableBuilder<bool>(
-                                valueListenable: obscureNotifier,
-                                builder: (context, value, child) {
-                                  return IconButton(
-                                    icon: Icon(
-                                      value
-                                          ? Icons.visibility_off_rounded
-                                          : Icons.remove_red_eye_rounded,
-                                      color: Colors.grey,
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          RegisterPage(),
                                     ),
-                                    onPressed: () {
-                                      setState(() {
-                                        obscureNotifier.value = !value;
-                                      });
-                                    },
                                   );
                                 },
-                              ),
-                            ),
-                            SizedBox(
-                              height: 30.0,
-                            ),
-                            loginButton,
-                            SizedBox(
-                              height: 5.0,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            ForgotPasswordPage(),
-                                      ),
-                                    );
-                                  },
-                                  child: Text(
-                                    "ลืมรหัสผ่าน",
-                                    style: TextStyle(
-                                      fontSize: 12.00,
-                                      fontFamily: 'Sarabun',
-                                      color: AppColors.primary,
-                                    ),
-                                  ),
-                                ),
-                                Text(
-                                  '|',
+                                child: Text(
+                                  "สมัครสมาชิก",
                                   style: TextStyle(
-                                    fontSize: 15.00,
+                                    fontSize: 12.00,
                                     fontFamily: 'Sarabun',
-                                    color: AppColors.primary_gold,
+                                    color: AppColors.primary,
                                   ),
                                 ),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (BuildContext context) =>
-                                            RegisterPage(),
-                                      ),
-                                    );
-                                  },
-                                  child: Text(
-                                    "สมัครสมาชิก",
-                                    style: TextStyle(
-                                      fontSize: 12.00,
-                                      fontFamily: 'Sarabun',
-                                      color: AppColors.primary,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            // Row(
-                            //   mainAxisAlignment: MainAxisAlignment.center,
-                            //   children: <Widget>[
-                            //     Text(
-                            //       ' หรือเข้าสู่ระบบโดย ',
-                            //       style: TextStyle(
-                            //         fontSize: 14.00,
-                            //         fontFamily: 'Sarabun',
-                            //         color: AppColors.primary_gold,
-                            //       ),
-                            //     ),
-                            //   ],
-                            // ),
-                            // SizedBox(
-                            //   height: 8.0,
-                            // ),
-                            // Row(
-                            //   mainAxisAlignment: MainAxisAlignment.center,
-                            //   children: <Widget>[
-                            //     if (Platform.isIOS)
-                            //       Container(
-                            //         alignment: FractionalOffset(0.5, 0.5),
-                            //         height: 50.0,
-                            //         width: 50.0,
-                            //         child: IconButton(
-                            //           onPressed: () async {
-                            //             _loginApple();
-                            //           },
-                            //           icon: Image.asset(
-                            //             "assets/logo/socials/apple.png",
-                            //           ),
-                            //           padding: EdgeInsets.all(5.0),
-                            //         ),
-                            //       ),
-                            //     Container(
-                            //       alignment: FractionalOffset(0.5, 0.5),
-                            //       height: 50.0,
-                            //       width: 50.0,
-                            //       child: IconButton(
-                            //         onPressed: () async {
-                            //           _loginFacebook();
-                            //         },
-                            //         icon: Image.asset(
-                            //           "assets/logo/socials/Group379.png",
-                            //         ),
-                            //         padding: EdgeInsets.all(5.0),
-                            //       ),
-                            //     ),
-                            //     Container(
-                            //       alignment: FractionalOffset(0.5, 0.5),
-                            //       height: 50.0,
-                            //       width: 50.0,
-                            //       child: IconButton(
-                            //         onPressed: () async {
-                            //           _loginGoogle();
-                            //         },
-                            //         icon: Image.asset(
-                            //           "assets/logo/socials/Group380.png",
-                            //         ),
-                            //         padding: EdgeInsets.all(5.0),
-                            //       ),
-                            //     ),
-                            //     Container(
-                            //       alignment: FractionalOffset(0.5, 0.5),
-                            //       height: 50.0,
-                            //       width: 50.0,
-                            //       child: IconButton(
-                            //         onPressed: () async {
-                            //           var obj = await loginLine();
-                            //           final idToken = obj.accessToken.idToken;
-                            //           final userEmail = (idToken != null)
-                            //               ? idToken['email'] != null
-                            //                   ? idToken['email']
-                            //                   : ''
-                            //               : '';
-                            //           var model = {
-                            //             "username": userEmail == ''
-                            //                 ? obj.userProfile?.userId
-                            //                 : userEmail,
-                            //             "email": userEmail,
-                            //             "imageUrl": obj.userProfile?.pictureUrl,
-                            //             "firstName": obj.userProfile?.displayName,
-                            //             "lastName": '',
-                            //             "lineID": obj.userProfile?.userId
-                            //           };
-                            //           Dio dio = Dio();
-                            //           var response = await dio.post(
-                            //             '${server}m/v2/register/line/login',
-                            //             data: model,
-                            //           );
-                            //           createStorageApp(
-                            //             model: response.data['objectData'],
-                            //             category: 'line',
-                            //           );
-                            //           Navigator.pushReplacement(
-                            //             context,
-                            //             MaterialPageRoute(
-                            //               builder: (context) => Menu(
-                            //                 pageIndex: null,
-                            //               ),
-                            //             ),
-                            //           );
-                            //         },
-                            //         icon: Image.asset(
-                            //           "assets/logo/socials/Group381.png",
-                            //         ),
-                            //         padding: EdgeInsets.all(5.0),
-                            //       ),
-                            //     ),
-                            //     Container(
-                            //       alignment: FractionalOffset(0.5, 0.5),
-                            //       height: 50.0,
-                            //       width: 50.0,
-                            //       child: IconButton(
-                            //         onPressed: () async {
-                            //           Navigator.push(
-                            //               context,
-                            //               MaterialPageRoute(
-                            //                   builder: (context) =>
-                            //                       LoginPhone()));
-                            //         },
-                            //         icon: Image.asset(
-                            //           "assets/logo/phone.png",
-                            //         ),
-                            //         padding: EdgeInsets.all(5.0),
-                            //       ),
-                            //     ),
-                            //   ],
-                            // ),
-                          ],
-                        ),
+                              ),
+                            ],
+                          ),
+                          // Row(
+                          //   mainAxisAlignment: MainAxisAlignment.center,
+                          //   children: <Widget>[
+                          //     Text(
+                          //       ' หรือเข้าสู่ระบบโดย ',
+                          //       style: TextStyle(
+                          //         fontSize: 14.00,
+                          //         fontFamily: 'Sarabun',
+                          //         color: AppColors.primary_gold,
+                          //       ),
+                          //     ),
+                          //   ],
+                          // ),
+                          // SizedBox(
+                          //   height: 8.0,
+                          // ),
+                          // Row(
+                          //   mainAxisAlignment: MainAxisAlignment.center,
+                          //   children: <Widget>[
+                          //     if (Platform.isIOS)
+                          //       Container(
+                          //         alignment: FractionalOffset(0.5, 0.5),
+                          //         height: 50.0,
+                          //         width: 50.0,
+                          //         child: IconButton(
+                          //           onPressed: () async {
+                          //             _loginApple();
+                          //           },
+                          //           icon: Image.asset(
+                          //             "assets/logo/socials/apple.png",
+                          //           ),
+                          //           padding: EdgeInsets.all(5.0),
+                          //         ),
+                          //       ),
+                          //     Container(
+                          //       alignment: FractionalOffset(0.5, 0.5),
+                          //       height: 50.0,
+                          //       width: 50.0,
+                          //       child: IconButton(
+                          //         onPressed: () async {
+                          //           _loginFacebook();
+                          //         },
+                          //         icon: Image.asset(
+                          //           "assets/logo/socials/Group379.png",
+                          //         ),
+                          //         padding: EdgeInsets.all(5.0),
+                          //       ),
+                          //     ),
+                          //     Container(
+                          //       alignment: FractionalOffset(0.5, 0.5),
+                          //       height: 50.0,
+                          //       width: 50.0,
+                          //       child: IconButton(
+                          //         onPressed: () async {
+                          //           _loginGoogle();
+                          //         },
+                          //         icon: Image.asset(
+                          //           "assets/logo/socials/Group380.png",
+                          //         ),
+                          //         padding: EdgeInsets.all(5.0),
+                          //       ),
+                          //     ),
+                          //     Container(
+                          //       alignment: FractionalOffset(0.5, 0.5),
+                          //       height: 50.0,
+                          //       width: 50.0,
+                          //       child: IconButton(
+                          //         onPressed: () async {
+                          //           var obj = await loginLine();
+                          //           final idToken = obj.accessToken.idToken;
+                          //           final userEmail = (idToken != null)
+                          //               ? idToken['email'] != null
+                          //                   ? idToken['email']
+                          //                   : ''
+                          //               : '';
+                          //           var model = {
+                          //             "username": userEmail == ''
+                          //                 ? obj.userProfile?.userId
+                          //                 : userEmail,
+                          //             "email": userEmail,
+                          //             "imageUrl": obj.userProfile?.pictureUrl,
+                          //             "firstName": obj.userProfile?.displayName,
+                          //             "lastName": '',
+                          //             "lineID": obj.userProfile?.userId
+                          //           };
+                          //           Dio dio = Dio();
+                          //           var response = await dio.post(
+                          //             '${server}m/v2/register/line/login',
+                          //             data: model,
+                          //           );
+                          //           createStorageApp(
+                          //             model: response.data['objectData'],
+                          //             category: 'line',
+                          //           );
+                          //           Navigator.pushReplacement(
+                          //             context,
+                          //             MaterialPageRoute(
+                          //               builder: (context) => Menu(
+                          //                 pageIndex: null,
+                          //               ),
+                          //             ),
+                          //           );
+                          //         },
+                          //         icon: Image.asset(
+                          //           "assets/logo/socials/Group381.png",
+                          //         ),
+                          //         padding: EdgeInsets.all(5.0),
+                          //       ),
+                          //     ),
+                          //     Container(
+                          //       alignment: FractionalOffset(0.5, 0.5),
+                          //       height: 50.0,
+                          //       width: 50.0,
+                          //       child: IconButton(
+                          //         onPressed: () async {
+                          //           Navigator.push(
+                          //               context,
+                          //               MaterialPageRoute(
+                          //                   builder: (context) =>
+                          //                       LoginPhone()));
+                          //         },
+                          //         icon: Image.asset(
+                          //           "assets/logo/phone.png",
+                          //         ),
+                          //         padding: EdgeInsets.all(5.0),
+                          //       ),
+                          //     ),
+                          //   ],
+                          // ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -448,18 +443,39 @@ class _LoginPageState extends State<LoginPage> {
         );
         if (response.statusCode == 200) {
           var token = response.data["token"];
+          var info_id = response.data['info_id'];
+
           if (token != null && token is String && token.isNotEmpty) {
-            print("✅ SignIn Success: $token");
             storage.write(key: 'token', value: token);
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (context) => Menu()),
-              (Route<dynamic> route) => false,
-            );
+
+            await _readProfile(token: token, info_id: info_id);
+            print('---------------- Start LogIn ------------------');
+
+            if (profile['affiliation_id'] == 2) {
+              print('---------------masseuse-------------------');
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                    builder: (context) => Menu(
+                          modelprofile: profile,
+                        )),
+                (Route<dynamic> route) => false,
+              );
+            } else if (profile['affiliation_id'] == 6) {
+              print('---------------Client-------------------');
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => HomeClient(),
+                ),
+              );
+            }
           } else {
             // token เป็น null หรือว่าง -> รหัสผ่านผิด
             print("❌ SignIn Failed: Invalid credentials");
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Username หรือ Password ไม่ถูกต้อง")),
+            showErrorDialog(
+              context: context,
+              title: "แจ้งเตือน",
+              message: "Username หรือ Password \nของคุณไม่ถูกต้อง",
+              barrierDismissible: true,
             );
           }
         } else {
@@ -469,6 +485,93 @@ class _LoginPageState extends State<LoginPage> {
         print("❌ Error in SignIn: $e");
       }
     }
+  }
+
+  _readProfile({
+    required String token,
+    required String info_id,
+  }) async {
+    var headers = {'Authorization': 'Bearer $token'};
+    var dio = Dio();
+    var response = await dio.request(
+      'http://110.78.211.156:3001/api/v1/user/$info_id',
+      options: Options(
+        method: 'GET',
+        headers: headers,
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      setState(() {
+        profile = response.data['data'];
+      });
+
+      print(json.encode(response.data));
+    } else {
+      print(response.statusMessage);
+    }
+  }
+
+  Future<void> showErrorDialog({
+    required BuildContext context,
+    required String title,
+    String? message,
+    String confirmText = "ตกลง",
+    VoidCallback? onConfirm,
+    bool barrierDismissible = false,
+  }) {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: barrierDismissible,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: () async => barrierDismissible,
+          child: CupertinoAlertDialog(
+            title: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 16,
+                fontFamily: 'Sarabun',
+                color: Colors.black,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            content: message != null
+                ? Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Text(
+                      message,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontFamily: 'Sarabun',
+                        color: Colors.black87,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  )
+                : null,
+            actions: [
+              CupertinoDialogAction(
+                isDefaultAction: true,
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  onConfirm?.call();
+                },
+                child: Text(
+                  confirmText,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontFamily: 'Sarabun',
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   // void checkStatus() async {

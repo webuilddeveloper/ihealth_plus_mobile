@@ -7,8 +7,9 @@ import 'profile/user_information.dart';
 import '../shared/api_provider.dart';
 
 class Menu extends StatefulWidget {
-  const Menu({super.key, this.pageIndex});
+  const Menu({super.key, this.pageIndex, this.modelprofile});
   final int? pageIndex;
+  final modelprofile;
 
   @override
   State<Menu> createState() => _MenuState();
@@ -37,7 +38,10 @@ class _MenuState extends State<Menu> {
     // _callRead();
     _callReadNoti();
     pages = <Widget>[
-      HomePage(changePage: _changePage),
+      HomePage(
+        changePage: _changePage,
+        modelprofile: widget.modelprofile,
+      ),
       EventCalendarMain(
         title: 'ตารางงาน',
       ),

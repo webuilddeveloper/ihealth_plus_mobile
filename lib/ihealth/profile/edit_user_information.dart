@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart'
     as dt_picker;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
 import 'package:ihealth_2025_mobile/ihealth/profile/user_information.dart';
 import 'package:image_picker/image_picker.dart';
@@ -338,14 +339,15 @@ class _EditUserInformationPageState extends State<EditUserInformationPage> {
                     //   ),
                     //   (Route<dynamic> route) => false,
                     // );
-                    Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(
-                        builder: (context) => UserInformationPage(),
-                      ),
-                      (Route<dynamic> route) => false,
-                    );
+                    // Navigator.of(context).pushAndRemoveUntil(
+                    //   MaterialPageRoute(
+                    //     builder: (context) => UserInformationPage(),
+                    //   ),
+                    //   (Route<dynamic> route) => false,
+                    // );
                     // goBack();
-                    // Navigator.of(context).pop();
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pop();
                   },
                 ),
               ],

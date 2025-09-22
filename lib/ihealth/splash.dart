@@ -71,7 +71,6 @@ class _SplashPageState extends State<SplashPage> {
           future: futureModel,
           builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
             if (snapshot.hasData) {
-              //if no splash from service is return array length 0
               _callTimer((snapshot.data.length > 0
                       ? int.parse(snapshot.data[0]['timeOut']) / 1000
                       : 0)

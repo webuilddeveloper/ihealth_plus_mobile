@@ -91,15 +91,30 @@ String? emailValidator(String? value) {
   return null;
 }
 
-String? passwordlValidator(String? value) {
+// String? passwordValidator(String? value) {
+//   if (value == null || value.isEmpty) {
+//     return 'กรุณากรอกรหัสผ่าน';
+//   }
+
+//   String pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{6,}$';
+//   RegExp regex = RegExp(pattern);
+//   if (!regex.hasMatch(value)) {
+//     return 'รหัสผ่านต้องมีอย่างน้อย 6 ตัว และประกอบด้วย ตัวพิมพ์เล็ก, พิมพ์ใหญ่ และตัวเลข';
+//   }
+//   return null;
+// }|
+
+String? passwordValidator(String? value) {
   if (value == null || value.isEmpty) {
     return 'กรุณากรอกรหัสผ่าน';
   }
 
-  String pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{6,}$';
+  // ต้องมีตัวพิมพ์เล็ก + ตัวเลข และอย่างน้อย 6 ตัว
+  String pattern = r'^(?=.*[a-z])(?=.*[0-9]).{6,}$';
   RegExp regex = RegExp(pattern);
+
   if (!regex.hasMatch(value)) {
-    return 'รหัสผ่านต้องมีอย่างน้อย 6 ตัว และประกอบด้วย ตัวพิมพ์เล็ก, พิมพ์ใหญ่ และตัวเลข';
+    return 'รหัสผ่านต้องมีอย่างน้อย 6 ตัว และประกอบด้วย ตัวพิมพ์เล็ก และตัวเลข';
   }
   return null;
 }

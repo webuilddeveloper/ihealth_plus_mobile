@@ -6,9 +6,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
-import 'package:ihealth_2025_mobile/ihealth/menu.dart';
 import 'package:ihealth_2025_mobile/widget/text_form_field.dart';
-import '../../ihealth/login.dart';
+import 'login.dart';
 
 class RegisterPage extends StatefulWidget {
   RegisterPage({
@@ -88,7 +87,7 @@ class _RegisterPageState extends State<RegisterPage> {
       try {
         var headers = {'Content-Type': 'application/json'};
         var data = json.encode({
-          "license_number": txtLicenseNumber.text,
+          // "license_number": txtLicenseNumber.text,
           "username": txtUsername.text,
           "password": txtPassword.text,
           "confirm_password": txtConPassword.text,
@@ -223,7 +222,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   txtPassword,
                                   'รหัสผ่าน',
                                   true,
-                                  validator: passwordlValidator,
+                                  validator: passwordValidator,
                                 ),
                               ),
                               SizedBox(height: 8),
@@ -325,7 +324,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   txtPassword,
                                   'รหัสผ่าน',
                                   true,
-                                  validator: passwordlValidator,
+                                  validator: passwordValidator,
                                 ),
                               ),
                               SizedBox(height: 8),

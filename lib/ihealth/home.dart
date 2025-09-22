@@ -5,6 +5,7 @@ import 'dart:ffi';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
+import 'package:ihealth_2025_mobile/ihealth/register.dart';
 import 'package:ihealth_2025_mobile/pages/check_security_license.dart';
 import 'package:ihealth_2025_mobile/ihealth/apply/apply-detail.dart';
 import 'package:ihealth_2025_mobile/ihealth/apply/apply.dart';
@@ -58,8 +59,9 @@ import 'main_popup/dialog_main_popup.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({Key? key, required this.changePage}) : super(key: key);
-
+  HomePage({Key? key, required this.changePage, this.modelprofile})
+      : super(key: key);
+  final modelprofile;
   Function changePage;
 
   @override
@@ -435,6 +437,11 @@ class _HomePageState extends State<HomePage> {
                 recognizer: TapGestureRecognizer()
                   ..onTap = () {
                     print('สมัครสมาชิก');
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => RegisterPage(),
+                        ));
                   },
               ),
             ],
@@ -467,7 +474,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           SizedBox(
-            height: 220,
+            height: 230,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: mockCourse.length,

@@ -433,7 +433,7 @@ Future<dynamic> postDio(String url, dynamic criteria) async {
     criteria = {'username': username, ...criteria};
   }
 
-  Dio dio = new Dio();
+  Dio dio = Dio();
   var response = await dio.post(url, data: criteria);
   // print(response.data['objectData'].toString());
   return Future.value(response.data['objectData']);
