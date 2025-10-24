@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
-import 'package:ihealth_2025_mobile/splash.dart';
+import 'package:ihealth_2025_mobile/ihealth/splash.dart';
 import 'package:flutter_line_sdk/flutter_line_sdk.dart';
 
 import 'shared/api_provider.dart';

@@ -1,4 +1,136 @@
 import 'package:flutter/material.dart';
+import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
+
+//--------------------------- >> iHealth. << ---------------------------//
+labelTextihealt(String label) {
+  return Padding(
+    padding: EdgeInsets.fromLTRB(0, 10, 0, 5),
+    child: Text(
+      label,
+      style: TextStyle(
+        fontSize: 15.000,
+        fontFamily: 'Sarabun',
+        color: AppColors.primary,
+        fontWeight: FontWeight.w600,
+      ),
+    ),
+  );
+}
+
+ihealtTextFormField(
+  TextEditingController controller,
+  String hintText,
+  bool enabled, {
+  String? Function(String?)? validator,
+  bool obscureText = false,
+  Widget? suffixIcon,
+}) {
+  return TextFormField(
+    style: TextStyle(
+      color: enabled ? AppColors.textdark : Color(0xFFFFFFFF),
+      fontWeight: FontWeight.normal,
+      fontFamily: 'Sarabun',
+      fontSize: 15.00,
+    ),
+    cursorColor: AppColors.primary_gold,
+    decoration: InputDecoration(
+      filled: true,
+      fillColor: enabled ? Colors.grey[100] : Color(0xFF707070),
+      contentPadding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
+      hintText: hintText,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10.0),
+        borderSide: BorderSide.none,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10.0),
+        borderSide: BorderSide(
+          color: AppColors.primary_gold,
+          width: 1.0,
+        ),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10.0),
+        borderSide: BorderSide(
+          color: Colors.red,
+          width: 1.0,
+        ),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10.0),
+        borderSide: BorderSide(
+          color: Colors.red,
+          width: 1.0,
+        ),
+      ),
+      errorStyle: TextStyle(
+        fontWeight: FontWeight.normal,
+        fontFamily: 'Sarabun',
+        fontSize: 8.0,
+        overflow: TextOverflow.ellipsis,
+      ),
+      suffixIcon: suffixIcon,
+    ),
+    validator: validator,
+    controller: controller,
+    enabled: enabled,
+    obscureText: obscureText,
+  );
+}
+
+String? emailValidator(String? value) {
+  if (value == null || value.isEmpty) {
+    return 'กรุณากรอกอีเมล';
+  }
+  String pattern =
+      r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+  RegExp regex = RegExp(pattern);
+  if (!regex.hasMatch(value)) {
+    return 'กรุณากรอกรูปแบบอีเมลให้ถูกต้อง';
+  }
+  return null;
+}
+
+// String? passwordValidator(String? value) {
+//   if (value == null || value.isEmpty) {
+//     return 'กรุณากรอกรหัสผ่าน';
+//   }
+
+//   String pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{6,}$';
+//   RegExp regex = RegExp(pattern);
+//   if (!regex.hasMatch(value)) {
+//     return 'รหัสผ่านต้องมีอย่างน้อย 6 ตัว และประกอบด้วย ตัวพิมพ์เล็ก, พิมพ์ใหญ่ และตัวเลข';
+//   }
+//   return null;
+// }|
+
+String? passwordValidator(String? value) {
+  if (value == null || value.isEmpty) {
+    return 'กรุณากรอกรหัสผ่าน';
+  }
+
+  // ต้องมีตัวพิมพ์เล็ก + ตัวเลข และอย่างน้อย 6 ตัว
+  String pattern = r'^(?=.*[a-z])(?=.*[0-9]).{6,}$';
+  RegExp regex = RegExp(pattern);
+
+  if (!regex.hasMatch(value)) {
+    return 'รหัสผ่านต้องมีอย่างน้อย 6 ตัว และประกอบด้วย ตัวพิมพ์เล็ก และตัวเลข';
+  }
+  return null;
+}
+
+String? confirmPasswordValidator(String? value, String? password) {
+  if (value == null || value.isEmpty) {
+    return 'กรุณากรอกรหัสผ่าน';
+  }
+  if (value != password) {
+    return 'รหัสผ่านไม่ตรงกัน';
+  }
+
+  return null;
+}
+
+//--------------------------- >> iHealth. << ---------------------------//
 
 labelTextFormFieldPasswordOldNew(String lable, bool showSubtitle) {
   return new Padding(
@@ -143,24 +275,29 @@ textFormField(
   bool isEmail,
 ) {
   return TextField(
+    cursorColor: AppColors.primary_gold,
     obscureText: isPassword,
     style: TextStyle(
-      color: enabled ? Color(0xFF000070) : Color(0xFFFFFFFF),
+      color: enabled ? AppColors.textdark : Color(0xFFFFFFFF),
       fontWeight: FontWeight.normal,
       fontFamily: 'Sarabun',
       fontSize: 15.00,
     ),
     decoration: InputDecoration(
       filled: true,
-      fillColor: enabled ? Color(0xFFC5DAFC) : Color(0xFF707070),
+      fillColor: enabled ? AppColors.grayligh : Color(0xFF707070),
       contentPadding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
       hintText: hintText,
-      // focusedBorder: UnderlineInputBorder(
-      //   borderSide: BorderSide(color: Colors.amber, width: 0.5),
-      // ),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10.0),
         borderSide: BorderSide.none,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10.0),
+        borderSide: BorderSide(
+          color: AppColors.primary_gold,
+          width: 1.0,
+        ),
       ),
       errorStyle: TextStyle(
         fontWeight: FontWeight.normal,
@@ -181,14 +318,14 @@ textFormFieldNoValidator(
 ) {
   return TextFormField(
     style: TextStyle(
-      color: enabled ? Color(0xFF000070) : Color(0xFFFFFFFF),
+      color: enabled ? AppColors.textdark : Color(0xFFFFFFFF),
       fontWeight: FontWeight.normal,
       fontFamily: 'Sarabun',
       fontSize: 15.00,
     ),
     decoration: InputDecoration(
       filled: true,
-      fillColor: enabled ? Color(0xFFC5DAFC) : Color(0xFF707070),
+      fillColor: enabled ? AppColors.grayligh : Color(0xFF707070),
       contentPadding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
       hintText: hintText,
       border: OutlineInputBorder(
@@ -228,14 +365,14 @@ textFormPhoneField(
   return TextFormField(
     keyboardType: TextInputType.number,
     style: TextStyle(
-      color: enabled ? Color(0xFF000070) : Color(0xFFFFFFFF),
+      color: enabled ? AppColors.textdark : Color(0xFFFFFFFF),
       fontWeight: FontWeight.normal,
       fontFamily: 'Sarabun',
       fontSize: 15.00,
     ),
     decoration: InputDecoration(
       filled: true,
-      fillColor: enabled ? Color(0xFFC5DAFC) : Color(0xFF707070),
+      fillColor: enabled ? AppColors.grayligh : Color(0xFF707070),
       contentPadding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
       hintText: hintText,
       border: OutlineInputBorder(
@@ -275,14 +412,14 @@ textFormIdCardField(
   return TextFormField(
     keyboardType: TextInputType.number,
     style: TextStyle(
-      color: enabled ? Color(0xFF000070) : Color(0xFFFFFFFF),
+      color: enabled ? AppColors.textdark : Color(0xFFFFFFFF),
       fontWeight: FontWeight.normal,
       fontFamily: 'Sarabun',
       fontSize: 15.00,
     ),
     decoration: InputDecoration(
       filled: true,
-      fillColor: enabled ? Color(0xFFC5DAFC) : Color(0xFF707070),
+      fillColor: enabled ? AppColors.grayligh : Color(0xFF707070),
       contentPadding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
       hintText: hintText,
       border: OutlineInputBorder(
@@ -340,7 +477,7 @@ textFormFieldEdit(
   return TextFormField(
     obscureText: isPassword,
     style: TextStyle(
-      color: enabled ? Color(0xFF1B6CA8) : Color(0xFFFFFFFF),
+      color: enabled ? AppColors.textdark : Color(0xFFFFFFFF),
       fontWeight: FontWeight.normal,
       fontFamily: 'Kanit',
       fontSize: 15.00,
@@ -430,7 +567,7 @@ textFormPhoneFieldEdit(
   return TextFormField(
     keyboardType: TextInputType.number,
     style: TextStyle(
-      color: enabled ? Color(0xFF1B6CA8) : Color(0xFFFFFFFF),
+      color: enabled ? AppColors.textdark : Color(0xFFFFFFFF),
       fontWeight: FontWeight.normal,
       fontFamily: 'Kanit',
       fontSize: 15.00,
@@ -524,7 +661,7 @@ textFormLicenseFieldEdit(
   return TextFormField(
     // keyboardType: TextInputType.number,
     style: TextStyle(
-      color: enabled ? Color(0xFF1B6CA8) : Color(0xFFFFFFFF),
+      color: enabled ? AppColors.textdark : Color(0xFFFFFFFF),
       fontWeight: FontWeight.normal,
       fontFamily: 'Kanit',
       fontSize: 15.00,
@@ -572,7 +709,7 @@ textFormFieldIsEmptyEdit(
   return TextFormField(
     obscureText: isPassword,
     style: TextStyle(
-      color: enabled ? Color(0xFF1B6CA8) : Color(0xFFFFFFFF),
+      color: enabled ? AppColors.textdark : Color(0xFFFFFFFF),
       fontWeight: FontWeight.normal,
       fontFamily: 'Kanit',
       fontSize: 15.00,
@@ -635,7 +772,7 @@ textFormIdCardFieldEdit(
   return TextFormField(
     keyboardType: TextInputType.number,
     style: TextStyle(
-      color: enabled ? Color(0xFF1B6CA8) : Color(0xFFFFFFFF),
+      color: enabled ? AppColors.textdark : Color(0xFFFFFFFF),
       fontWeight: FontWeight.normal,
       fontFamily: 'Kanit',
       fontSize: 15.00,

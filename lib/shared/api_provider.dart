@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
-import 'package:ihealth_2025_mobile/login.dart';
+import 'package:ihealth_2025_mobile/ihealth/login.dart';
 import 'package:ihealth_2025_mobile/shared/facebook_firebase.dart';
 import 'package:ihealth_2025_mobile/shared/google.dart';
 import 'package:ihealth_2025_mobile/shared/line.dart';
@@ -388,23 +388,23 @@ createStorageApp({dynamic model, required String category}) {
 
 logout(BuildContext context) async {
   final storage = new FlutterSecureStorage();
-  storage.delete(key: 'profileCode3');
-  var profileCategory = await storage.read(key: 'profileCategory');
-  if (profileCategory != '' && profileCategory != null) {
-    switch (profileCategory) {
-      case 'facebook':
-        // logoutFacebook();
-        logoutFacebook();
-        break;
-      case 'google':
-        logoutGoogle();
-        break;
-      case 'line':
-        logoutLine();
-        break;
-      default:
-    }
-  }
+  storage.delete(key: 'token');
+  // var profileCategory = await storage.read(key: 'profileCategory');
+  // if (profileCategory != '' && profileCategory != null) {
+  //   switch (profileCategory) {
+  //     case 'facebook':
+  //       // logoutFacebook();
+  //       logoutFacebook();
+  //       break;
+  //     case 'google':
+  //       logoutGoogle();
+  //       break;
+  //     case 'line':
+  //       logoutLine();
+  //       break;
+  //     default:
+  //   }
+  // }
 
   Navigator.pushAndRemoveUntil(
       context,
@@ -433,7 +433,7 @@ Future<dynamic> postDio(String url, dynamic criteria) async {
     criteria = {'username': username, ...criteria};
   }
 
-  Dio dio = new Dio();
+  Dio dio = Dio();
   var response = await dio.post(url, data: criteria);
   // print(response.data['objectData'].toString());
   return Future.value(response.data['objectData']);
