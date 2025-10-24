@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:ihealth_2025_mobile/client/home_client.dart';
+import 'package:ihealth_2025_mobile/client/menu_client.dart';
 import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
 import 'package:ihealth_2025_mobile/ihealth/menu.dart';
 
@@ -105,7 +106,7 @@ class _LoginPageState extends State<LoginPage> {
         height: 40,
         onPressed: () {
           // loginWithGuest();
-          _signIn();
+          _signInTest();
         },
         child: Text(
           'เข้าสู่ระบบ',
@@ -464,7 +465,7 @@ class _LoginPageState extends State<LoginPage> {
               print('---------------Client-------------------');
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => HomeClient(),
+                  builder: (context) => MenuClient(),
                 ),
               );
             }
@@ -957,4 +958,42 @@ class _LoginPageState extends State<LoginPage> {
   //     ),
   //   );
   // }
+
+  _signInTest() {
+    var username = txtUsername.text;
+    var password = txtPassword.text;
+    if (username == "spa" && password == "spa1234") {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+            builder: (context) => Menu(
+                  modelprofile: {
+                    "_id": "68b92e4d93e98ae878b7a3aa",
+                    "uuid": "40e5eba9-3260-4c35-914c-01069106b6c0",
+                    "fullname": "นายทดสอบ นามสมมุติ",
+                    "image": "user-1756966477011-11001613.png",
+                    "role": "ผู้ใช้งาน",
+                    "createdAt": "2025-09-04T06:14:37.066Z",
+                    "updatedAt": "2025-09-04T06:14:37.066Z",
+                    "__v": 0,
+                    "username": "phomha",
+                    "affiliation_id": 4
+                  },
+                )),
+        (Route<dynamic> route) => false,
+      );
+    } else if (username == "guest" && password == "guest1234") {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => MenuClient(),
+        ),
+      );
+    } else {
+      print('---------------Client-------------------');
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => MenuClient(),
+        ),
+      );
+    }
+  }
 }

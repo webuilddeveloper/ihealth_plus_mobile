@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'home.dart';
-import 'event_calendar/event_calendar_main.dart';
-import 'notification/notification_list.dart';
-import 'profile/user_information.dart';
+import 'package:ihealth_2025_mobile/client/booking/booking_favorite.dart';
+import 'package:ihealth_2025_mobile/client/booking/booking_history.dart';
+import 'package:ihealth_2025_mobile/client/home_client.dart';
+import 'package:ihealth_2025_mobile/ihealth/profile/user_information_client.dart';
 import '../shared/api_provider.dart';
 
-class Menu extends StatefulWidget {
-  const Menu({super.key, this.pageIndex, this.modelprofile});
+class MenuClient extends StatefulWidget {
+  const MenuClient({super.key, this.pageIndex, this.modelprofile});
   final int? pageIndex;
   final modelprofile;
 
   @override
-  State<Menu> createState() => _MenuState();
+  State<MenuClient> createState() => _MenuClientState();
 }
 
-class _MenuState extends State<Menu> {
+class _MenuClientState extends State<MenuClient> {
   DateTime? currentBackPressTime;
   dynamic futureNotificationTire;
   int notiCount = 0;
@@ -38,17 +38,12 @@ class _MenuState extends State<Menu> {
     // _callRead();
     // _callReadNoti();
     pages = <Widget>[
-      HomePage(
+      HomeClient(
         changePage: _changePage,
-        modelprofile: widget.modelprofile,
       ),
-      EventCalendarMain(
-        title: 'ตารางงาน',
-      ),
-      NotificationList(
-        title: 'แจ้งเตือน',
-      ),
-      UserInformationPage(),
+      BookingHistoryPage(),
+      BookingFavoritePage(),
+      UserInformationClientPage(),
     ];
     super.initState();
   }
@@ -182,8 +177,8 @@ class _MenuState extends State<Menu> {
             _buildTap(
               2,
               '',
-              icon: 'assets/ihealth/icon/noti.png',
-              iconActive: 'assets/ihealth/icon/noti_active.png',
+              icon: 'assets/ihealth/icon/heart1.png',
+              iconActive: 'assets/ihealth/icon/heart_active.png',
               isNoti: true,
             ),
             _buildTap(

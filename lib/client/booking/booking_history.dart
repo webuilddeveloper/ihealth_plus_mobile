@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:dropdown_button2/dropdown_button2.dart';
@@ -32,7 +33,8 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
       "date": "25/06/2025",
       "time": "20:30 น.",
       "price": "800 บาท",
-      "payment": ""
+      "payment": "",
+      "imageUrl": "",
     },
     {
       "shopName": "ผ่อนคลายสปา",
@@ -44,7 +46,8 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
       "date": "23/06/2025",
       "time": "14:00 น.",
       "price": "1,200 บาท",
-      "payment": ""
+      "payment": "",
+      "imageUrl": "",
     },
   ];
 
@@ -114,7 +117,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
     super.dispose();
   }
 
-  Widget buildBookingCard(Map<String, dynamic> booking) {
+  Widget buildBookingCard(Map<String, dynamic> booking, int index) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -133,8 +136,17 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: Colors.green)),
-                  Text(booking["status"],
-                      style: const TextStyle(color: Colors.grey, fontSize: 13)),
+                  booking['payment'] == "promptpay" && isSubmit == true
+                      ? Text('ชำระแล้ว',
+                          style: const TextStyle(
+                              color: Colors.green, fontSize: 13))
+                      : booking['payment'] == "cash" && isSubmit == true
+                          ? Text('ชำระปลายทาง',
+                              style: const TextStyle(
+                                  color: Colors.green, fontSize: 13))
+                          : Text(booking["status"],
+                              style: const TextStyle(
+                                  color: Colors.grey, fontSize: 13)),
                 ],
               ),
 
@@ -175,8 +187,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
               ),
               const SizedBox(height: 20),
               booking['payment'] == 'promptpay'
-                  ? itemImage1['imageUrl'] == "" &&
-                          itemImage1['imageUrl'] == null
+                  ? booking['imageUrl'] == "" || booking['imageUrl'] == null
                       ? Container(
                           width: double.infinity,
                           height: 60,
@@ -192,7 +203,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
                           height: 150,
                           width: double.infinity,
                           child: Image.network(
-                            itemImage1['imageUrl'],
+                            booking['imageUrl'],
                             height: 150,
                             width: 120,
                             fit: BoxFit.fill,
@@ -216,7 +227,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
                           ),
                         ),
                         onPressed: () {
-                          _showPickerImage(context, '1');
+                          _showPickerImage(context, index);
                         },
                         child: const Text(
                           "แนบสลิป",
@@ -370,16 +381,27 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
                       ],
                     ),
                   ),
-                  InkWell(
-                    onTap: () {},
-                    child: const Column(
-                      children: [
-                        Icon(Icons.add_task, color: Colors.green, size: 40),
-                        Text("บันทึก",
-                            style:
-                                TextStyle(fontSize: 14, color: Colors.black)),
-                      ],
-                    ),
+                  booking['payment'] != "" && booking['payment'] != null
+                      ? InkWell(
+                          onTap: () {
+                            setState(() {
+                              isSubmit = true;
+                            });
+                            _showSuccessDialog();
+                          },
+                          child: const Column(
+                            children: [
+                              Icon(Icons.add_task,
+                                  color: Colors.green, size: 40),
+                              Text("บันทึก",
+                                  style: TextStyle(
+                                      fontSize: 14, color: Colors.black)),
+                            ],
+                          ),
+                        )
+                      : Container(),
+                  SizedBox(
+                    width: 35,
                   ),
                   InkWell(
                     onTap: () {},
@@ -525,7 +547,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
                 ListView.builder(
                   itemCount: bookings.length,
                   itemBuilder: (context, index) {
-                    return buildBookingCard(bookings[index]);
+                    return buildBookingCard(bookings[index], index);
                   },
                 ),
                 SingleChildScrollView(
@@ -916,7 +938,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
     );
   }
 
-  void _showPickerImage(context, String type) {
+  void _showPickerImage(context, int index) {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext bc) {
@@ -934,7 +956,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
                   ),
                 ),
                 onTap: () {
-                  _imgFromGallery(type);
+                  _imgFromGallery(index);
                   Navigator.of(context).pop();
                 },
               ),
@@ -960,7 +982,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
     );
   }
 
-  _imgFromCamera(String type) async {
+  _imgFromCamera(int index) async {
     final ImagePicker _picker = ImagePicker();
     // Pick an image
     final XFile? image = await _picker.pickImage(source: ImageSource.camera);
@@ -968,10 +990,10 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
     setState(() {
       _image = image!;
     });
-    _upload(type);
+    _upload(index);
   }
 
-  _imgFromGallery(String type) async {
+  _imgFromGallery(int index) async {
     final ImagePicker _picker = ImagePicker();
     // Pick an image
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
@@ -979,20 +1001,14 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
     setState(() {
       _image = image!;
     });
-    _upload(type);
+    _upload(index);
   }
 
-  void _upload(String type) async {
+  void _upload(int index) async {
     Random random = Random();
     uploadImageX(_image).then((res) {
       setState(() {
-        if (type == "1") {
-          itemImage1 = {
-            'imageUrl': res,
-            'id': random.nextInt(100),
-            'imageType': type
-          };
-        }
+        bookings[index]['imageUrl'] = res;
       });
 
       // setState(() {
@@ -1014,6 +1030,43 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
       therapistCare = 0;
       therapistPunctuality = 0;
       feedbackController.clear();
+    });
+  }
+
+  _showSuccessDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // ห้ามกดปิดเอง
+      builder: (context) {
+        return Dialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.check_circle,
+                    color: Color(0xFF07663a), size: 60),
+                const SizedBox(height: 16),
+                const Text(
+                  "สำเร็จ",
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF07663a)),
+                ),
+                const SizedBox(height: 8),
+                const Text("บันทึกข้อมูลสำเร็จ!",
+                    style: TextStyle(fontSize: 16)),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+    Timer(const Duration(seconds: 2), () {
+      Navigator.of(context).pop(); // ปิด dialog
     });
   }
 }

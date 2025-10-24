@@ -27,7 +27,8 @@ import 'package:ihealth_2025_mobile/shared/api_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class HomeClient extends StatefulWidget {
-  HomeClient({Key? key}) : super(key: key);
+  HomeClient({Key? key, required this.changePage}) : super(key: key);
+  Function changePage;
 
   @override
   _HomeClientState createState() => _HomeClientState();
@@ -449,7 +450,7 @@ class _HomeClientState extends State<HomeClient>
         width: 360,
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: Colors.white, 
+          color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -467,7 +468,7 @@ class _HomeClientState extends State<HomeClient>
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF006D3E), 
+                color: Color(0xFF006D3E),
               ),
             ),
             SizedBox(height: 12),
@@ -476,8 +477,8 @@ class _HomeClientState extends State<HomeClient>
               style: TextStyle(
                 fontSize: 14,
                 height: 1.5,
-                color: Color(0xFF1F2937), 
-                  fontFamily: 'Kanit',
+                color: Color(0xFF1F2937),
+                fontFamily: 'Kanit',
               ),
             ),
             SizedBox(height: 20),
@@ -490,13 +491,12 @@ class _HomeClientState extends State<HomeClient>
                 padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               ),
               onPressed: () {
-                 Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => Booking(
-                        ),
-                      ),
-                    );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Booking(),
+                  ),
+                );
               },
               child: Text(
                 'จองเลย !',
@@ -504,7 +504,7 @@ class _HomeClientState extends State<HomeClient>
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
                   color: Colors.white,
-                    fontFamily: 'Kanit',
+                  fontFamily: 'Kanit',
                 ),
               ),
             ),
@@ -535,7 +535,7 @@ class _HomeClientState extends State<HomeClient>
             ),
           ),
           SizedBox(
-            height: 220,
+            height: 200,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: mockShop.length,
@@ -544,14 +544,14 @@ class _HomeClientState extends State<HomeClient>
                 return GestureDetector(
                   onTap: () {
                     print(mockShop[index]);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CourseDetail(
-                          course: shop,
-                        ),
-                      ),
-                    );
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => CourseDetail(
+                    //       course: shop,
+                    //     ),
+                    //   ),
+                    // );
                   },
                   child: Container(
                     width: 220,
@@ -622,22 +622,22 @@ class _HomeClientState extends State<HomeClient>
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
-                                  fontFamily: "sarabun",
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                    fontFamily: "sarabun",
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF07663a)),
                               ),
-                              Row(
-                                children: [
-                                  const Icon(
-                                    Icons.timer_outlined,
-                                    color: Colors.black87,
-                                    size: 16,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  // Text('${widget.course['time']}'),
-                                ],
-                              ),
+                              // Row(
+                              //   children: [
+                              //     const Icon(
+                              //       Icons.timer_outlined,
+                              //       color: Colors.black87,
+                              //       size: 16,
+                              //     ),
+                              //     const SizedBox(width: 8),
+                              //     Text('${widget.course['time']}'),
+                              //   ],
+                              // ),
                             ],
                           ),
                         ),
@@ -682,14 +682,14 @@ class _HomeClientState extends State<HomeClient>
                 final course = mockCourse[index];
                 return GestureDetector(
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CourseDetail(
-                          course: course,
-                        ),
-                      ),
-                    );
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => CourseDetail(
+                    //       course: course,
+                    //     ),
+                    //   ),
+                    // );
                   },
                   child: Container(
                     width: 220,
@@ -736,20 +736,21 @@ class _HomeClientState extends State<HomeClient>
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
-                                  fontFamily: "sarabun",
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                    fontFamily: "sarabun",
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF07663a)),
                               ),
                               Row(
                                 children: [
+                                  Text('ระยะเวลาเรียน'),
                                   const Icon(
                                     Icons.timer_outlined,
                                     color: Colors.black87,
                                     size: 16,
                                   ),
                                   const SizedBox(width: 8),
-                                  // Text('${widget.course['time']}'),
+                                  Text(': ${course['courseTime']} ชั่วโมง'),
                                 ],
                               ),
                             ],

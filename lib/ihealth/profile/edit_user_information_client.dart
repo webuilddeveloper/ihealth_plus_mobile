@@ -12,13 +12,13 @@ import 'package:ihealth_2025_mobile/pages/blank_page/dialog_fail.dart';
 import 'package:ihealth_2025_mobile/shared/api_provider.dart';
 import 'package:ihealth_2025_mobile/widget/text_form_field.dart';
 
-class EditUserInformationPage extends StatefulWidget {
+class EditUserInformationClientPage extends StatefulWidget {
   @override
-  _EditUserInformationPageState createState() =>
-      _EditUserInformationPageState();
+  _EditUserInformationClientPageState createState() =>
+      _EditUserInformationClientPageState();
 }
 
-class _EditUserInformationPageState extends State<EditUserInformationPage> {
+class _EditUserInformationClientPageState extends State<EditUserInformationClientPage> {
   final storage = FlutterSecureStorage();
 
   late String _imageUrl = '';
