@@ -566,6 +566,21 @@ Future<dynamic> postDioCategoryWeMartNoAll(String url, dynamic criteria) async {
   return Future.value(list);
 }
 
+
+Future<String> uploadImageX(XFile file) async {
+  Dio dio = Dio();
+  String fileName = file.path.split('/').last;
+  FormData formData = FormData.fromMap({
+    "ImageCaption": "flutter",
+    "Image": await MultipartFile.fromFile(file.path, filename: fileName),
+  });
+
+  var response = await dio.post(serverUpload, data: formData);
+
+  return response.data['imageUrl'];
+}
+
+
 const splashReadApi = server + 'm/splash/read';
 const profileReadApi = server + 'm/v2/register/read';
 const organizationImageReadApi = server + 'm/v2/organization/image/read';

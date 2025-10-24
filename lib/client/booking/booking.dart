@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart'
     as dt_picker;
 import 'package:geolocator/geolocator.dart';
+import 'package:ihealth_2025_mobile/client/booking/booking_detail.dart';
+import 'package:ihealth_2025_mobile/client/booking/booking_shop.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -187,14 +189,12 @@ class _BookingState extends State<Booking> {
                 padding: EdgeInsets.symmetric(vertical: 16),
               ),
               onPressed: () {
-                // ✅ ส่งข้อมูลหรือ Navigate ต่อได้ที่นี่
-                print('ตำแหน่ง: ${locationCtrl.text}');
-                print('วันที่: ${dateCtrl.text}');
-                print('เวลา: ${timeCtrl.text}');
-                print('ระยะเวลา: $selectedDuration นาที');
-                print('ช่วงราคา: ${priceMinCtrl.text} - ${priceMaxCtrl.text}');
-
-                // Navigator.push(...);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => BookingShopPage(),
+                  ),
+                );
               },
               child: Text(
                 'ถัดไป',

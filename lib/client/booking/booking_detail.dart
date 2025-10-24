@@ -1,9 +1,10 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart'
-    as dt_picker;
-import 'package:geolocator/geolocator.dart';
-import 'package:intl/intl.dart';
-import 'package:table_calendar/table_calendar.dart';
+import 'package:ihealth_2025_mobile/client/booking/booking_confirm.dart';
+import 'package:ihealth_2025_mobile/client/booking/booking_coupon.dart';
+import 'package:ihealth_2025_mobile/client/booking/booking_shop.dart';
+import 'package:ihealth_2025_mobile/client/review.dart';
+import 'package:photo_view/photo_view.dart';
 
 class BookingDetail extends StatefulWidget {
   @override
@@ -11,290 +12,719 @@ class BookingDetail extends StatefulWidget {
 }
 
 class _BookingDetailState extends State<BookingDetail> {
-  String? latLng;
-  DateTime? selectedDate;
-  TimeOfDay? selectedTime;
-  int selectedDuration = 60;
+  String? selectedCategory;
+  String? selectedCourse;
+  String? selectedTherapist;
+  bool isSelectedTherapist = false;
 
-  final TextEditingController priceMinCtrl = TextEditingController();
-  final TextEditingController priceMaxCtrl = TextEditingController();
-  final TextEditingController locationCtrl = TextEditingController();
-  final TextEditingController dateCtrl = TextEditingController();
-  final TextEditingController timeCtrl = TextEditingController();
+  final Map<String, List<Map<String, dynamic>>> courseCategories = {
+    "นวดน้ำมัน": [
+      {
+        "id": 1,
+        "name": "นวดอโรม่า / นวดน้ำมัน",
+        "price": 750,
+        "duration": 60,
+        "image":
+            "https://images.unsplash.com/photo-1600334129128-685c5582fd35?w=800",
+        "isFull": false,
+      },
+    ],
+    "นวดสวีดิช": [
+      {
+        "id": 2,
+        "name": "นวดสวีดิช",
+        "price": 500,
+        "duration": 45,
+        "image":
+            "https://images.unsplash.com/photo-1600334129128-685c5582fd35?w=800",
+        "isFull": false,
+      },
+      {
+        "id": 3,
+        "name": "นวดสวีดิช (พิเศษ)",
+        "price": 900,
+        "duration": 90,
+        "image":
+            "https://images.unsplash.com/photo-1600334129128-685c5582fd35?w=800",
+        "isFull": true,
+      },
+    ],
+  };
 
-  TextEditingController txtDate = TextEditingController();
+  final therapists = [
+    {"name": "หมอนวด A", "image": "https://i.pravatar.cc/150?img=1"},
+    {"name": "หมอนวด B", "image": "https://i.pravatar.cc/150?img=2"},
+    {"name": "หมอนวด C", "image": "https://i.pravatar.cc/150?img=3"},
+  ];
 
-  int _selectedDay = DateTime.now().day;
-  int _selectedMonth = DateTime.now().month;
-  int _selectedYear = DateTime.now().year;
+  // Mock Data
+  final List<String> images = [
+    'assets/ihealth/shop1.jpg',
+    'assets/ihealth/shop2.jpg',
+    'assets/ihealth/shop1.jpg',
+    'assets/ihealth/shop2.jpg',
+    'assets/ihealth/shop2.jpg',
+  ];
 
-  Future<void> _getCurrentLocation() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) return;
+  final Map<String, dynamic> infoData = {
+    "id": 1,
+    "name": "ศูนย์บำบัดครบวงจร",
+    "rating": "⭐ 4.95 (4 รีวิว)",
+    "description": "ให้บริการนวดและสปา ด้วยทีมงานมืออาชีพ",
+    "openDays": "จันทร์ – อาทิตย์",
+    "openHours": "10:00 – 20:00 น.",
+  };
 
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-    }
+ 
 
-    if (permission == LocationPermission.whileInUse ||
-        permission == LocationPermission.always) {
-      Position position = await Geolocator.getCurrentPosition();
-      setState(() {
-        latLng =
-            "${position.latitude.toStringAsFixed(6)}, ${position.longitude.toStringAsFixed(6)}";
-        locationCtrl.text = latLng!;
-      });
-    }
-  }
-
-  Future<void> _pickTime(BuildContext context) async {
-    final picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
+  Widget buildInfoRow(String label, String value) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              flex: 4,
+              child: Text(
+                label,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            Expanded(
+              flex: 6,
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: Text(value, textAlign: TextAlign.right),
+              ),
+            ),
+          ],
+        ),
+        const Divider(thickness: 1, height: 12),
+      ],
     );
-
-    if (picked != null) {
-      setState(() {
-        selectedTime = picked;
-        timeCtrl.text = picked.format(context);
-      });
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('จองนวด')),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: ListView(
-          children: [
-            // ตำแหน่ง
-            Text('ตำแหน่ง *'),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: locationCtrl,
-                    readOnly: true,
-                    decoration: InputDecoration(
-                      hintText: 'เมืองที่คุณต้องการ',
-                      border: OutlineInputBorder(),
+      appBar: AppBar(title: const Text("จองบริการนวด")),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.all(15),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // รูปหลัก
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => FullscreenImage(imageUrl: images[0]),
                     ),
-                  ),
-                ),
-                SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: _getCurrentLocation,
-                  child: Text('ใช้ตำแหน่งของฉัน'),
-                ),
-              ],
-            ),
-            SizedBox(height: 20),
-            // วันที่ต้องการ
-            Text('วันที่ต้องการ *'),
-            InkWell(
-              onTap: () => dialogOpenCalendar(context),
-              child: IgnorePointer(
-                child: TextField(
-                  controller: txtDate,
-                  decoration: InputDecoration(
-                    hintText: 'เลือกวันที่',
-                    suffixIcon: Icon(Icons.calendar_today),
-                    border: OutlineInputBorder(),
-                  ),
+                  );
+                },
+                child: Image.asset(
+                  images[0],
+                  width: double.infinity,
+                  height: 250,
+                  fit: BoxFit.cover,
                 ),
               ),
-            ),
-            SizedBox(height: 20),
-            // เวลาเริ่ม - ระยะเวลา
-            Text('เริ่มนวดเวลา *'),
-            Row(
-              children: [
-                Expanded(
-                  child: InkWell(
-                    onTap: () => _pickTime(context),
-                    child: IgnorePointer(
-                      child: TextField(
-                        controller: timeCtrl,
-                        decoration: InputDecoration(
-                          hintText: 'เลือกเวลา',
-                          border: OutlineInputBorder(),
+
+              // แกลเลอรี
+              Container(
+                height: 90,
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: images.length,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                FullscreenImage(imageUrl: images[index]),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(left: 8),
+                        child: Image.asset(
+                          images[index],
+                          width: 90,
+                          height: 90,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      infoData["name"],
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'คะแนนรีวิว:',
+                          style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w500),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ReviewPage()),
+                            );
+                          },
+                          child: Text(
+                            infoData["rating"],
+                            style:
+                                TextStyle(fontSize: 14, color: Colors.orange),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'รายละเอียด:',
+                          style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w500),
+                        ),
+                        Text(
+                          infoData["description"],
+                          style: TextStyle(fontSize: 14, color: Colors.black87),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'วันเปิดทำการ:',
+                          style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w500),
+                        ),
+                        Text(infoData["openDays"],
+                            style: TextStyle(fontSize: 13)),
+                      ],
+                    ),
+                    SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'วันเปิดทำการ:',
+                          style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w500),
+                        ),
+                        Text(infoData["openHours"],
+                            style: TextStyle(fontSize: 13)),
+                      ],
+                    ),
+                    SizedBox(height: 12),
+                  ],
+                ),
+              ),
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(8),
+                  border: const Border(
+                    left: BorderSide(color: Color(0xFF07663a), width: 4),
+                  ),
+                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // หัวข้อ
+                    Row(
+                      children: const [
+                        Icon(Icons.access_time,
+                            color: Color(0xFF07663a), size: 20),
+                        SizedBox(width: 6),
+                        Text(
+                          "รายละเอียดการจองเบื้องต้น",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF07663a),
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    // แถว 1 : วันที่จอง
+                    Row(
+                      children: const [
+                        Icon(Icons.calendar_today,
+                            size: 16, color: Colors.black54),
+                        SizedBox(width: 4),
+                        Text("วันที่จอง: ",
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        Expanded(
+                          child: Text("วันศุกร์ที่ 16 เมษายน 2570"),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+
+                    // แถว 2 : เวลาเริ่ม
+                    Row(
+                      children: const [
+                        Icon(Icons.access_time,
+                            size: 16, color: Colors.black54),
+                        SizedBox(width: 4),
+                        Text("เวลาเริ่ม: ",
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text("14:34"),
+                        const SizedBox(width: 20),
+                        Icon(Icons.timer, size: 16, color: Colors.black54),
+                        SizedBox(width: 4),
+                        Text("ระยะเวลา: ",
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text("60 นาที"),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 15),
+              // ปุ่ม
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                child: Row(
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: () {},
+                      icon: const Icon(Icons.map),
+                      label: const Text("ดูตำแหน่งร้าน"),
+                    ),
+                    const SizedBox(width: 10),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                      ),
+                      onPressed: () {},
+                      icon: const Icon(
+                        Icons.favorite,
+                        color: Colors.white,
+                      ),
+                      label: const Text(
+                        "เพิ่มลงรายการโปรด",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 30),
+              _buildSelection(),
+              SizedBox(height: 100),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFFe0e0e0),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 14), // ✅ เพิ่มความสูง
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => BookingShopPage()),
+                          );
+                        },
+                        label: const Text(
+                          "ย้อนกลับ",
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Color(0xFF494949),
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: DropdownButtonFormField<int>(
-                    value: selectedDuration,
-                    decoration: InputDecoration(
-                      labelText: 'ระยะเวลา',
-                      border: OutlineInputBorder(),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFF07663a),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => BookingConfirm()),
+                          );
+                        },
+                        label: const Text(
+                          "ถัดไป",
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
                     ),
-                    items: [30, 60, 90, 120]
-                        .map((e) =>
-                            DropdownMenuItem(value: e, child: Text('$e นาที')))
-                        .toList(),
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() {
-                          selectedDuration = value;
-                        });
-                      }
-                    },
-                  ),
+                  ],
                 ),
-              ],
-            ),
-            SizedBox(height: 20),
-
-            // ช่วงราคา
-            Text('ช่วงราคา (ไม่บังคับ)'),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: priceMinCtrl,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      labelText: 'ต่ำสุด (บาท)',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: TextField(
-                    controller: priceMaxCtrl,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      labelText: 'สูงสุด (บาท)',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 30),
-
-            // ปุ่มตกลง
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                padding: EdgeInsets.symmetric(vertical: 16),
               ),
-              onPressed: () {
-                // ✅ ส่งข้อมูลหรือ Navigate ต่อได้ที่นี่
-                print('ตำแหน่ง: ${locationCtrl.text}');
-                print('วันที่: ${dateCtrl.text}');
-                print('เวลา: ${timeCtrl.text}');
-                print('ระยะเวลา: $selectedDuration นาที');
-                print('ช่วงราคา: ${priceMinCtrl.text} - ${priceMaxCtrl.text}');
-
-                // Navigator.push(...);
-              },
-              child: Text(
-                'ถัดไป',
-                style: TextStyle(fontSize: 16, color: Colors.white),
-              ),
-            )
-          ],
+              SizedBox(height: 30),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Future<void> dialogOpenCalendar(BuildContext context) async {
-    DateTime today = DateTime.now();
-    DateTime selectedDate = today;
-
-    await showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          contentPadding: EdgeInsets.zero,
-          content: StatefulBuilder(
-            builder: (context, setState) {
-              return SizedBox(
-                width: 350,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TableCalendar(
-                      firstDay: DateTime(today.year, today.month, today.day),
-                      lastDay: DateTime(2100),
-                      focusedDay: selectedDate,
-                      selectedDayPredicate: (day) =>
-                          isSameDay(selectedDate, day),
-                      onDaySelected: (selected, focused) {
-                        setState(() {
-                          selectedDate = selected;
-                        });
-                      },
-                      headerStyle: const HeaderStyle(
-                        formatButtonVisible: false,
-                        titleCentered: true,
-                        titleTextStyle: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      calendarStyle: const CalendarStyle(
-                        todayDecoration: BoxDecoration(
-                          color: Color(0XFF224B45),
-                          shape: BoxShape.circle,
-                        ),
-                        selectedDecoration: BoxDecoration(
-                          color: Colors.orange,
-                          shape: BoxShape.circle,
-                        ),
-                        todayTextStyle: TextStyle(color: Colors.white),
-                        selectedTextStyle: TextStyle(color: Colors.white),
-                      ),
+  _buildSelection() {
+    final courses = selectedCategory != null
+        ? courseCategories[selectedCategory] ?? []
+        : [];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        DropdownButtonFormField2<String>(
+          decoration: InputDecoration(
+            labelText: "เลือกหมวดหมู่คอร์สนวด",
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          value: selectedCategory,
+          items: courseCategories.keys.map((category) {
+            return DropdownMenuItem<String>(
+              value: category,
+              child: Text(category),
+            );
+          }).toList(),
+          onChanged: (value) {
+            setState(() {
+              selectedCategory = value;
+              selectedCourse = null;
+            });
+          },
+          dropdownStyleData: DropdownStyleData(
+            useSafeArea: true,
+            elevation: 2,
+            offset: const Offset(0, -5),
+          ),
+          menuItemStyleData: const MenuItemStyleData(
+            overlayColor: WidgetStatePropertyAll(Colors.transparent),
+          ),
+        ),
+        SizedBox(height: 20),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: courses.map((course) {
+              bool isSelected = selectedCourse == course["name"];
+              return Container(
+                width: 270,
+                height: 385,
+                margin: EdgeInsets.only(right: 16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: isSelected ? Color(0xFF07663a) : Colors.transparent,
+                    width: 2,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 6,
+                      offset: Offset(0, 3),
                     ),
-                    const Divider(height: 1),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('CANCEL'),
-                          ),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0XFF224B45),
-                            ),
-                            onPressed: () {
-                              Navigator.pop(context, selectedDate);
-                            },
-                            child: const Text('OK'),
-                          ),
-                        ],
-                      ),
-                    )
                   ],
                 ),
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16)),
+                  margin: EdgeInsets.zero,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ClipRRect(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(16)),
+                        child: Image.network(
+                          course["image"],
+                          height: 150,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      Expanded(
+                        // ✅ บังคับให้ Padding ขยายเต็มพื้นที่ที่เหลือ
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            mainAxisAlignment:
+                                MainAxisAlignment.end, // ✅ ชิดล่าง
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(course["name"],
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold)),
+                              SizedBox(height: 4),
+                              Text(
+                                "${course["price"]} บาท • ${course["duration"]} นาที",
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.grey[700]),
+                              ),
+                              SizedBox(height: 12),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: course["isFull"]
+                                      ? Color(0xFFe0e0e0)
+                                      : isSelected
+                                          ? Color(0xFF07663a)
+                                          : Colors.grey[700],
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8)),
+                                  minimumSize: Size(double.infinity, 45),
+                                ),
+                                onPressed: () {
+                                  if (course["isFull"] != true) {
+                                    setState(() {
+                                      selectedCourse = course["name"] as String;
+                                    });
+                                  }
+                                },
+                                child: Text(
+                                  course["isFull"]
+                                      ? "ไม่ว่าง"
+                                      : isSelected
+                                          ? "✓ เลือกแล้ว"
+                                          : "เลือก",
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      color: course["isFull"]
+                                          ? Colors.grey[700]
+                                          : Colors.white),
+                                ),
+                              ),
+                              if (isSelected) ...[
+                                SizedBox(height: 8),
+                                OutlinedButton(
+                                  style: OutlinedButton.styleFrom(
+                                    side: BorderSide(color: Color(0xFF07663a)),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8)),
+                                    minimumSize: Size(double.infinity, 45),
+                                  ),
+                                  onPressed: () {
+                                    showModalBottomSheet(
+                                      context: context,
+                                      isScrollControlled: true,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.vertical(
+                                              top: Radius.circular(20))),
+                                      builder: (context) =>
+                                          buildTherapistSheet(),
+                                    );
+                                  },
+                                  child: Text(selectedTherapist != "" &&
+                                          selectedTherapist != null
+                                      ? "เปลี่ยนหมอนวด"
+                                      : "เลือกหมอนวด"),
+                                ),
+                                SizedBox(height: 5),
+                                selectedTherapist != "" &&
+                                        selectedTherapist != null
+                                    ? Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(Icons.check_circle,
+                                              color: Color(0xFF07663a)),
+                                          SizedBox(width: 5),
+                                          Container(
+                                            child: Text(
+                                              selectedTherapist ?? '',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Color(0xFF07663a)),
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    : Container()
+                              ],
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               );
-            },
+            }).toList(),
           ),
-        );
-      },
-    ).then((pickedDate) {
-      if (pickedDate != null) {
-        // อัพเดทค่าที่เลือก
-        _selectedYear = pickedDate.year;
-        _selectedMonth = pickedDate.month;
-        _selectedDay = pickedDate.day;
-        txtDate.value = TextEditingValue(
-          text:
-              "${pickedDate.day.toString().padLeft(2, '0')}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.year}",
-        );
-      }
-    });
+        )
+      ],
+    );
+  }
+
+  Widget buildTherapistSheet() {
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.6, // ครึ่งจอ
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                margin: EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            Text(
+              "เลือกหมอนวด",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 16),
+            Expanded(
+              child: ListView.separated(
+                itemCount: therapists.length,
+                separatorBuilder: (_, __) => SizedBox(height: 12),
+                itemBuilder: (context, index) {
+                  final t = therapists[index];
+                  isSelectedTherapist = selectedTherapist == t["name"];
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedTherapist = t["name"];
+                      });
+                      Navigator.pop(context);
+                    },
+                    child: AnimatedContainer(
+                      duration: Duration(milliseconds: 300),
+                      padding: EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: isSelectedTherapist
+                            ? Colors.green[50]
+                            : Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isSelectedTherapist
+                              ? Color(0xFF07663a)
+                              : Colors.grey,
+                          width: 2,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 5,
+                            offset: Offset(2, 3),
+                          )
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 28,
+                            backgroundImage: NetworkImage(t["image"]!),
+                          ),
+                          SizedBox(width: 16),
+                          Expanded(
+                            child: Text(
+                              t["name"]!,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: isSelectedTherapist
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                                color: isSelectedTherapist
+                                    ? Color(0xFF07663a)
+                                    : Colors.black87,
+                              ),
+                            ),
+                          ),
+                          if (isSelectedTherapist)
+                            Icon(Icons.check_circle, color: Color(0xFF07663a)),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class FullscreenImage extends StatelessWidget {
+  final String imageUrl;
+  const FullscreenImage({super.key, required this.imageUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Stack(
+        children: [
+          Center(
+            child: PhotoView(
+              imageProvider: NetworkImage(imageUrl),
+            ),
+          ),
+          Positioned(
+            top: 40,
+            right: 20,
+            child: IconButton(
+              icon: const Icon(Icons.close, color: Colors.white, size: 30),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
