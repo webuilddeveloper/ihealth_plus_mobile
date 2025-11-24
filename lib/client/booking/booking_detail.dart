@@ -1,9 +1,14 @@
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:ihealth_2025_mobile/client/booking/booking_confirm.dart';
 import 'package:ihealth_2025_mobile/client/booking/booking_coupon.dart';
 import 'package:ihealth_2025_mobile/client/booking/booking_shop.dart';
 import 'package:ihealth_2025_mobile/client/review.dart';
+import 'package:ihealth_2025_mobile/shared/dio_service.dart';
 import 'package:photo_view/photo_view.dart';
 
 class BookingDetail extends StatefulWidget {
@@ -75,7 +80,53 @@ class _BookingDetailState extends State<BookingDetail> {
     "openHours": "10:00 – 20:00 น.",
   };
 
- 
+  Map<String, dynamic> toggle = {};
+
+  _toggleFavorite() async {
+    print('------ Adding to favorites... ------');
+    final storage = FlutterSecureStorage();
+    final token = await storage.read(key: 'token');
+    var headers = {'Authorization': 'Bearer $token'};
+
+    final dioService = DioService();
+    await dioService.init();
+    final dio = dioService.dio;
+    final cookieJar = dioService.cookieJar;
+
+    var cookies = await cookieJar.loadForRequest(
+      Uri.parse('https://api-ihealth.spl-system.com'),
+    );
+    print("Cookies: $cookies");
+    var data = json
+        .encode({"massage_info_id": "645c9a68-d89f-41e9-b9d9-414e25c04a7e"});
+
+    var response = await dio.request(
+      'https://api-ihealth.spl-system.com/api/v1/customer/favorites',
+      options: Options(
+        method: 'POST',
+        headers: headers,
+      ),
+      data: data,
+    );
+
+    if (response.statusCode == 200) {
+      print('✅ Added to favorites successfully');
+
+      setState(() {
+        toggle = response.data['data'];
+      });
+      SnackBar snackBar = SnackBar(
+        backgroundColor: toggle['isFavorite'] ? Colors.green : Colors.red,
+        content: toggle['isFavorite']
+            ? Text(' เพิ่มลงรายการโปรดเรียบร้อยแล้ว')
+            : Text(' ลบออกจากรายการโปรดเรียบร้อยแล้ว'),
+        duration: Duration(seconds: 2),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    } else {
+      print(response.statusMessage);
+    }
+  }
 
   Widget buildInfoRow(String label, String value) {
     return Column(
@@ -333,13 +384,15 @@ class _BookingDetailState extends State<BookingDetail> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        _toggleFavorite();
+                      },
                       icon: const Icon(
                         Icons.favorite,
                         color: Colors.white,
                       ),
                       label: const Text(
-                        "เพิ่มลงรายการโปรด",
+                        "เพิ่มลงรายการโปรด ",
                         style: TextStyle(color: Colors.white),
                       ),
                     ),

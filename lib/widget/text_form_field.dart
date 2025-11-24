@@ -111,10 +111,13 @@ String? passwordValidator(String? value) {
 
   // ต้องมีตัวพิมพ์เล็ก + ตัวเลข และอย่างน้อย 6 ตัว
   String pattern = r'^(?=.*[a-z])(?=.*[0-9]).{6,}$';
-  RegExp regex = RegExp(pattern);
+  // RegExp regex = RegExp(pattern);
 
-  if (!regex.hasMatch(value)) {
-    return 'รหัสผ่านต้องมีอย่างน้อย 6 ตัว และประกอบด้วย ตัวพิมพ์เล็ก และตัวเลข';
+  // if (!regex.hasMatch(value)) {
+  //   return 'รหัสผ่านต้องมีอย่างน้อย 6 ตัว และประกอบด้วย ตัวพิมพ์เล็ก และตัวเลข';
+  // }
+  if (value.length < 6) {
+    return 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร';
   }
   return null;
 }

@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:ihealth_2025_mobile/client/menu_client.dart';
 import 'package:ihealth_2025_mobile/ihealth/menu.dart';
 import 'package:ihealth_2025_mobile/pages/blank_page/dialog_fail.dart';
 import 'package:ihealth_2025_mobile/shared/api_provider.dart';
@@ -40,16 +42,25 @@ class _SplashPageState extends State<SplashPage> {
   _callNavigatorPage() async {
     final storage = new FlutterSecureStorage();
     String? value = await storage.read(key: 'token');
-
+    var customer_id = await storage.read(key: 'customer_id');
     if (value != null && value != '') {
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (context) => Menu(
-            pageIndex: null,
+      if (customer_id == null || customer_id == '') {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (context) => Menu(
+              pageIndex: null,
+            ),
           ),
-        ),
-        (Route<dynamic> route) => false,
-      );
+          (Route<dynamic> route) => false,
+        );
+      } else {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (context) => MenuClient(),
+          ),
+          (Route<dynamic> route) => false,
+        );
+      }
     } else {
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
@@ -60,7 +71,7 @@ class _SplashPageState extends State<SplashPage> {
     }
   }
 
-  _buildSplash() {
+  Widget _buildSplash() {
     return WillPopScope(
       onWillPop: () {
         return Future.value(false);

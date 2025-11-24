@@ -1,28 +1,18 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
-import 'package:ihealth_2025_mobile/client/home_client.dart';
 import 'package:ihealth_2025_mobile/client/menu_client.dart';
 import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
 import 'package:ihealth_2025_mobile/ihealth/menu.dart';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:ihealth_2025_mobile/models/user.dart';
 import 'package:ihealth_2025_mobile/ihealth/register.dart';
-
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:ihealth_2025_mobile/shared/dio_service.dart';
 import 'package:ihealth_2025_mobile/widget/text_field.dart';
 import 'package:ihealth_2025_mobile/widget/text_form_field.dart';
 import '../pages/auth/forgot_password.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:io';
-import 'package:ihealth_2025_mobile/shared/api_provider.dart';
-import 'package:ihealth_2025_mobile/pages/login_phone.dart';
-import 'package:ihealth_2025_mobile/shared/line.dart';
-import '../shared/apple_firebase.dart';
-import '../shared/facebook_firebase.dart';
-import '../shared/google_firebase.dart';
 
 DateTime now = new DateTime.now();
 void main() {
@@ -64,12 +54,13 @@ class _LoginPageState extends State<LoginPage> {
   late DataUser dataUser;
   late Map<String, dynamic> profile;
 
-  final txtUsername = TextEditingController();
+  final txtEmail = TextEditingController();
   final txtPassword = TextEditingController();
+  String selectFrom = '1';
 
   @override
   void dispose() {
-    txtUsername.dispose();
+    txtEmail.dispose();
     txtPassword.dispose();
 
     super.dispose();
@@ -95,6 +86,75 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
   }
 
+  tabController() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  selectFrom = '1';
+                });
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: selectFrom == '1'
+                      ? AppColors.primary
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Center(
+                  child: Text(
+                    'ผู้รับบริการ',
+                    style: TextStyle(
+                      color:
+                          selectFrom == '1' ? Colors.white : AppColors.textdark,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  selectFrom = '2';
+                });
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: selectFrom == '2'
+                      ? AppColors.primary
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Center(
+                  child: Text(
+                    'หมอนวด',
+                    style: TextStyle(
+                      color:
+                          selectFrom == '2' ? Colors.white : AppColors.textdark,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final loginButton = Material(
@@ -105,8 +165,7 @@ class _LoginPageState extends State<LoginPage> {
         minWidth: MediaQuery.of(context).size.width,
         height: 40,
         onPressed: () {
-          // loginWithGuest();
-          _signInTest();
+          _signIn();
         },
         child: Text(
           'เข้าสู่ระบบ',
@@ -119,7 +178,6 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
@@ -179,6 +237,8 @@ class _LoginPageState extends State<LoginPage> {
                             ],
                           ),
                           SizedBox(height: 20.0),
+                          tabController(),
+                          SizedBox(height: 20.0),
                           labelTextField(
                             'ชื่อผู้ใช้งาน',
                             Icon(
@@ -189,7 +249,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           SizedBox(height: 5.0),
                           ihealtTextFormField(
-                            txtUsername,
+                            txtEmail,
                             'ชื่อผู้ใช้งาน',
                             true,
                             validator: emailValidator,
@@ -432,55 +492,53 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _signIn() async {
     if (_formKey.currentState!.validate()) {
       try {
-        var headers = {'Content-Type': 'application/json'};
-        var dio = Dio();
+        final dioService = DioService();
+        await dioService.init();
+        final dio = dioService.dio;
+        final cookieJar = dioService.cookieJar;
+
         var response = await dio.post(
-          'http://110.78.211.156:3001/api/v1/signin',
-          options: Options(headers: headers),
-          data: json.encode({
-            "username": txtUsername.text,
+          'https://api-ihealth.spl-system.com/api/v1/customer/signin',
+          data: {
+            "email": txtEmail.text,
             "password": txtPassword.text,
-          }),
+          },
         );
-        if (response.statusCode == 200) {
-          var token = response.data["token"];
-          var info_id = response.data['info_id'];
 
-          if (token != null && token is String && token.isNotEmpty) {
-            storage.write(key: 'token', value: token);
+        // ถ้าเข้าได้ตรงนี้ = statusCode 200 แน่นอน
+        var token = response.data["token"];
+        var customer_id = response.data['data']["customer_id"];
 
-            await _readProfile(token: token, info_id: info_id);
-            print('---------------- Start LogIn ------------------');
+        await storage.write(key: 'customer_id', value: customer_id);
 
-            if (profile['affiliation_id'] == 2) {
-              print('---------------masseuse-------------------');
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(
-                    builder: (context) => Menu(
-                          modelprofile: profile,
-                        )),
-                (Route<dynamic> route) => false,
-              );
-            } else if (profile['affiliation_id'] == 6) {
-              print('---------------Client-------------------');
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => MenuClient(),
-                ),
-              );
-            }
+        if (token != null && token.isNotEmpty) {
+          await storage.write(key: 'token', value: token);
+
+          var cookies = await cookieJar.loadForRequest(
+            Uri.parse('https://api-ihealth.spl-system.com'),
+          );
+
+          if (selectFrom == '1') {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (_) => MenuClient()));
           } else {
-            // token เป็น null หรือว่าง -> รหัสผ่านผิด
-            print("❌ SignIn Failed: Invalid credentials");
-            showErrorDialog(
-              context: context,
-              title: "แจ้งเตือน",
-              message: "Username หรือ Password \nของคุณไม่ถูกต้อง",
-              barrierDismissible: true,
-            );
+            Navigator.push(context, MaterialPageRoute(builder: (_) => Menu()));
           }
+        }
+      } on DioException catch (e) {
+        // ดัก error จาก StatusCode = 400 / 401 / 500
+        if (e.response?.statusCode == 401 || e.response?.statusCode == 400) {
+          showErrorDialog(
+            context: context,
+            title: "แจ้งเตือน",
+            message: "Username หรือ Password \nของคุณไม่ถูกต้อง",
+          );
         } else {
-          print("❌ SignIn Failed: ${response.statusMessage}");
+          showErrorDialog(
+            context: context,
+            title: "เกิดข้อผิดพลาด",
+            message: "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้",
+          );
         }
       } catch (e) {
         print("❌ Error in SignIn: $e");
@@ -807,12 +865,11 @@ class _LoginPageState extends State<LoginPage> {
   //     );
   //   }
   // }
-
   // //login guest
   // void loginWithGuest() async {
   //   setState(() {
   //     _category = 'guest';
-  //     _username = txtUsername.text;
+  //     _username = txtEmail.text;
   //     _password = txtPassword.text;
   //     _facebookID = "";
   //     _appleID = "";
@@ -959,41 +1016,41 @@ class _LoginPageState extends State<LoginPage> {
   //   );
   // }
 
-  _signInTest() {
-    var username = txtUsername.text;
-    var password = txtPassword.text;
-    if (username == "spa" && password == "spa1234") {
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-            builder: (context) => Menu(
-                  modelprofile: {
-                    "_id": "68b92e4d93e98ae878b7a3aa",
-                    "uuid": "40e5eba9-3260-4c35-914c-01069106b6c0",
-                    "fullname": "นายทดสอบ นามสมมุติ",
-                    "image": "user-1756966477011-11001613.png",
-                    "role": "ผู้ใช้งาน",
-                    "createdAt": "2025-09-04T06:14:37.066Z",
-                    "updatedAt": "2025-09-04T06:14:37.066Z",
-                    "__v": 0,
-                    "username": "phomha",
-                    "affiliation_id": 4
-                  },
-                )),
-        (Route<dynamic> route) => false,
-      );
-    } else if (username == "guest" && password == "guest1234") {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => MenuClient(),
-        ),
-      );
-    } else {
-      print('---------------Client-------------------');
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => MenuClient(),
-        ),
-      );
-    }
-  }
+  // _signInTest() {
+  //   var username = txtEmail.text;
+  //   var password = txtPassword.text;
+  //   if (username == "spa" && password == "spa1234") {
+  //     Navigator.of(context).pushAndRemoveUntil(
+  //       MaterialPageRoute(
+  //           builder: (context) => Menu(
+  //                 modelprofile: {
+  //                   "_id": "68b92e4d93e98ae878b7a3aa",
+  //                   "uuid": "40e5eba9-3260-4c35-914c-01069106b6c0",
+  //                   "fullname": "นายทดสอบ นามสมมุติ",
+  //                   "image": "user-1756966477011-11001613.png",
+  //                   "role": "ผู้ใช้งาน",
+  //                   "createdAt": "2025-09-04T06:14:37.066Z",
+  //                   "updatedAt": "2025-09-04T06:14:37.066Z",
+  //                   "__v": 0,
+  //                   "username": "phomha",
+  //                   "affiliation_id": 4
+  //                 },
+  //               )),
+  //       (Route<dynamic> route) => false,
+  //     );
+  //   } else if (username == "guest" && password == "guest1234") {
+  //     Navigator.of(context).push(
+  //       MaterialPageRoute(
+  //         builder: (context) => MenuClient(),
+  //       ),
+  //     );
+  //   } else {
+  //     print('---------------Client-------------------');
+  //     Navigator.of(context).push(
+  //       MaterialPageRoute(
+  //         builder: (context) => MenuClient(),
+  //       ),
+  //     );
+  //   }
+  // }
 }

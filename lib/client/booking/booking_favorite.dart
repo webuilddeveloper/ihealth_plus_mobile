@@ -1,7 +1,12 @@
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:ihealth_2025_mobile/client/booking/booking_detail.dart';
 import 'package:ihealth_2025_mobile/client/review.dart';
+import 'package:ihealth_2025_mobile/shared/dio_service.dart';
 
 class Shop {
   final int id;
@@ -54,7 +59,7 @@ final List<Shop> tempData = [
     rating: 4.95,
     reviewCount: 4,
     serviceId: 1,
-    imageUrl: "https://picsum.photos/200/300?random=1", 
+    imageUrl: "https://picsum.photos/200/300?random=1",
   ),
   Shop(
     id: 2,
@@ -70,70 +75,70 @@ final List<Shop> tempData = [
 ];
 
 final List<Map<String, dynamic>> shopData = [
-    {
-      "id": 1,
-      "name": "ร้านบำบัดสุขใจ",
-      "rating": 4.95,
-      "reviewCount": 4,
-      "categories": [
-        {
-          "id": 1,
-          "name": "นวดเพื่อสุขภาพ",
-          "subCategories": [
-            {
-              "id": 1,
-              "name": "นวดน้ำมันและสวีดิช",
-              "services": [
-                {
-                  "id": 1,
-                  "name": "นวดอโรม่า / นวดน้ำมัน",
-                  "price": 750,
-                  "duration": 60,
-                  "imageUrl": "https://picsum.photos/200/300?random=11",
-                  "therapists": [
-                    {"id": 1, "name": "หมอนวดเอ"},
-                    {"id": 2, "name": "หมอนวดบี"},
-                  ],
-                },
-                {
-                  "id": 2,
-                  "name": "นวดสวีดิช",
-                  "price": 850,
-                  "duration": 60,
-                  "imageUrl": "https://picsum.photos/200/300?random=12",
-                  "therapists": [
-                    {"id": 3, "name": "หมอนวดซี"},
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-        {
-          "id": 2,
-          "name": "นวดเสริมความงาม",
-          "subCategories": [
-            {
-              "id": 2,
-              "name": "นวดหน้า",
-              "services": [
-                {
-                  "id": 3,
-                  "name": "นวดหน้าสปา",
-                  "price": 650,
-                  "duration": 45,
-                  "imageUrl": "https://picsum.photos/200/300?random=13",
-                  "therapists": [
-                    {"id": 4, "name": "หมอนวดดี"},
-                  ],
-                }
-              ],
-            }
-          ],
-        }
-      ],
-    }
-  ];
+  {
+    "id": 1,
+    "name": "ร้านบำบัดสุขใจ",
+    "rating": 4.95,
+    "reviewCount": 4,
+    "categories": [
+      {
+        "id": 1,
+        "name": "นวดเพื่อสุขภาพ",
+        "subCategories": [
+          {
+            "id": 1,
+            "name": "นวดน้ำมันและสวีดิช",
+            "services": [
+              {
+                "id": 1,
+                "name": "นวดอโรม่า / นวดน้ำมัน",
+                "price": 750,
+                "duration": 60,
+                "imageUrl": "https://picsum.photos/200/300?random=11",
+                "therapists": [
+                  {"id": 1, "name": "หมอนวดเอ"},
+                  {"id": 2, "name": "หมอนวดบี"},
+                ],
+              },
+              {
+                "id": 2,
+                "name": "นวดสวีดิช",
+                "price": 850,
+                "duration": 60,
+                "imageUrl": "https://picsum.photos/200/300?random=12",
+                "therapists": [
+                  {"id": 3, "name": "หมอนวดซี"},
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        "id": 2,
+        "name": "นวดเสริมความงาม",
+        "subCategories": [
+          {
+            "id": 2,
+            "name": "นวดหน้า",
+            "services": [
+              {
+                "id": 3,
+                "name": "นวดหน้าสปา",
+                "price": 650,
+                "duration": 45,
+                "imageUrl": "https://picsum.photos/200/300?random=13",
+                "therapists": [
+                  {"id": 4, "name": "หมอนวดดี"},
+                ],
+              }
+            ],
+          }
+        ],
+      }
+    ],
+  }
+];
 
 class BookingFavoritePage extends StatefulWidget {
   @override
@@ -144,6 +149,7 @@ class _BookingFavoritePageState extends State<BookingFavoritePage> {
   String? selectedService;
   TextEditingController searchController = TextEditingController();
   List<Shop> filteredData = tempData;
+  List<dynamic> favoritesData = [];
 
   void search() {
     setState(() {
@@ -164,10 +170,57 @@ class _BookingFavoritePageState extends State<BookingFavoritePage> {
     });
   }
 
+  void initState() {
+    super.initState();
+    _Favorites();
+  }
+
+  _Favorites() async {
+    final storage = FlutterSecureStorage();
+    final token = await storage.read(key: 'token');
+    var headers = {'Authorization': 'Bearer $token'};
+
+    final dioService = DioService();
+    await dioService.init();
+    final dio = dioService.dio;
+    final cookieJar = dioService.cookieJar;
+
+    var cookies = await cookieJar.loadForRequest(
+      Uri.parse('https://api-ihealth.spl-system.com'),
+    );
+    print("Cookies: $cookies");
+    // var data = json
+    //     .encode({"massage_info_id": "645c9a68-d89f-41e9-b9d9-414e25c04a7e"});
+    var response = await dio.request(
+      'https://api-ihealth.spl-system.com/api/v1/customer/favorites',
+      options: Options(
+        method: 'GET',
+        headers: headers,
+      ),
+      // data: data,
+    );
+
+    if (response.statusCode == 200) {
+      print('✅ Favorites fetched successfully:');
+      setState(() {
+        favoritesData = response.data['data'];
+      });
+    } else {
+      print(response.statusMessage);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("รายการโปรด")),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: Text(
+          "รายการโปรด",
+        ),
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -219,68 +272,80 @@ class _BookingFavoritePageState extends State<BookingFavoritePage> {
             SizedBox(height: 20),
 
             // แถวสาม Results
-            Expanded(
-              child: ListView.builder(
-                itemCount: filteredData.length,
-                itemBuilder: (context, index) {
-                  final shop = filteredData[index];
-                  return Card(
-                    margin: EdgeInsets.only(bottom: 12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Image.network(shop.imageUrl,
-                            height: 150,
-                            width: double.infinity,
-                            fit: BoxFit.cover),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
+            favoritesData.isEmpty
+                ? Center(
+                    child: Text(
+                      "ไม่มีรายการโปรด",
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                  )
+                : Expanded(
+                    child: ListView.builder(
+                      itemCount: favoritesData.length,
+                      itemBuilder: (context, index) {
+                        final favorites = favoritesData[index];
+                        return Card(
+                          margin: EdgeInsets.only(bottom: 12),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(shop.name,
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16)),
-                              Text("${shop.subDistrict}, ${shop.district}"),
-                              InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => ReviewPage()),
-                                  );
-                                },
-                                child: 
-                             
-                              Row(
-                                children: [
-                                  Icon(Icons.star,
-                                      color: Colors.orange, size: 18),
-                                  Text(
-                                      "${shop.rating} (${shop.reviewCount} รีวิว)"),
-                                ],
-                              ), ),
-                              SizedBox(height: 8),
-                              ElevatedButton(
-                                onPressed: () {
-                                   Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => BookingDetail()),
-                                  );
-                                },
-                                child: Text("ดูรายละเอียด"),
+                              Image.network(
+                                  "https://api-ihealth.spl-system.com/" +
+                                      favorites['image'],
+                                  height: 150,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(favorites['massage_name'],
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16)),
+                                    Text(
+                                        "${favorites['province']}, ${favorites['district']}"),
+                                    InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ReviewPage()),
+                                        );
+                                      },
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.star,
+                                              color: Colors.orange, size: 18),
+                                          Text(
+                                              "${favorites['avg_score']} (${favorites['review_count']} รีวิว)"),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(height: 8),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  BookingDetail()),
+                                        );
+                                      },
+                                      child: Text("ดูรายละเอียด"),
+                                    )
+                                  ],
+                                ),
                               )
                             ],
                           ),
-                        )
-                      ],
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
-            )
+                  )
           ],
         ),
       ),

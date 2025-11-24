@@ -23,13 +23,15 @@ class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
   String selectType = '1';
   final txtLicenseNumber = TextEditingController();
-  final txtUsername = TextEditingController();
+  final txtName = TextEditingController();
+  final txtEmail = TextEditingController();
   final txtPassword = TextEditingController();
   final txtConPassword = TextEditingController();
   @override
   void dispose() {
     txtLicenseNumber.dispose();
-    txtUsername.dispose();
+    txtName.dispose();
+    txtEmail.dispose();
     txtPassword.dispose();
     txtConPassword.dispose();
     super.dispose();
@@ -88,7 +90,7 @@ class _RegisterPageState extends State<RegisterPage> {
         var headers = {'Content-Type': 'application/json'};
         var data = json.encode({
           // "license_number": txtLicenseNumber.text,
-          "username": txtUsername.text,
+          "username": txtName.text,
           "password": txtPassword.text,
           "confirm_password": txtConPassword.text,
           "affiliation_id": 1, // ร้านนวด 1, หมอนวด 2 , ผู้ดำเนินการสปา 3
@@ -104,7 +106,7 @@ class _RegisterPageState extends State<RegisterPage> {
         if (response.statusCode == 200) {
           dialogSuccess();
           // print("✅ SignUp Success: ${response.data}");
-          // await _signIn(txtUsername.text, txtPassword.text);
+          // await _signIn(txtName.text, txtPassword.text);
         } else {
           print("❌ SignUp Failed: ${response.statusMessage}");
         }
@@ -141,6 +143,53 @@ class _RegisterPageState extends State<RegisterPage> {
   //     print("❌ Error in SignIn: $e");
   //   }
   // }
+
+  Future<void> signUpCustomer() async {
+    print('-----------signUpCustomer--------------');
+    print('Email: ${txtEmail.text}');
+    print('Name: ${txtName.text}');
+    print('Password: ${txtPassword.text}');
+
+    if (!_formKey.currentState!.validate()) {
+      print('Form validation failed');
+      return;
+    }
+
+    var headers = {
+      'Content-Type': 'application/json',
+      'Cookie':
+          'sid=s%3AWYIZXxrcS3i4K557SyYJMoImJRVo1Anb.SNIAawcnz05zEL5cuujBAuORyod1Lqf49mrHNwmO6vE'
+    };
+
+    var data = {
+      "email": txtEmail.text,
+      "fullname": txtName.text,
+      "password": txtPassword.text
+    };
+
+    var dio = Dio();
+
+    try {
+      var response = await dio.post(
+        'https://api-ihealth.spl-system.com/api/v1/customer/signup',
+        data: data,
+        options: Options(headers: headers),
+      );
+
+      print('Response status: ${response.statusCode}');
+      print('Response data: ${response.data}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        dialogSuccess();
+      }
+    } on DioException catch (e) {
+      print('DioException: ${e.response?.statusCode} - ${e.response?.data}');
+      // ถ้าอยากโชว์ error ให้ user
+      // dialogError(e.response?.data.toString() ?? 'เกิดข้อผิดพลาด');
+      print(
+          'Error during sign up: ${e.response?.data.toString() ?? 'เกิดข้อผิดพลาด'}');
+    }
+  }
 
   void goBack() async {
     Navigator.of(context).pushAndRemoveUntil(
@@ -203,14 +252,26 @@ class _RegisterPageState extends State<RegisterPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Container(
-                                child: labelTextihealt('* ผู้ใช้งาน'),
+                                child: labelTextihealt('* อีเมล'),
                               ),
                               Container(
                                 child: ihealtTextFormField(
-                                  txtUsername,
-                                  'ชื่อผู้ใช้งาน',
+                                  txtEmail,
+                                  'อีเมล',
                                   true,
                                   validator: emailValidator,
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                              Container(
+                                child: labelTextihealt('* ชื่อผู้ใช้บริการ'),
+                              ),
+                              Container(
+                                child: ihealtTextFormField(
+                                  txtName,
+                                  'ชื่อผู้ใช้บริการ',
+                                  true,
+                                  // validator: passwordValidator,
                                 ),
                               ),
                               SizedBox(height: 8),
@@ -245,6 +306,9 @@ class _RegisterPageState extends State<RegisterPage> {
                                   onTap: () {
                                     print(
                                         '-----------ผู้ใช้บริการ--------------');
+                                    setState(() {
+                                      signUpCustomer();
+                                    });
                                   },
                                   child: Container(
                                     height: 50,
@@ -305,11 +369,11 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                               SizedBox(height: 8),
                               Container(
-                                child: labelTextihealt('* ผู้ใช้งาน'),
+                                child: labelTextihealt('* อีเมล'),
                               ),
                               Container(
                                 child: ihealtTextFormField(
-                                  txtUsername,
+                                  txtName,
                                   'อีเมล',
                                   true,
                                   validator: emailValidator,
@@ -345,7 +409,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               Center(
                                 child: InkWell(
                                   onTap: () {
-                                    _signUp();
+                                    print('-----------หมอนวด--------------');
                                   },
                                   child: Container(
                                     height: 50,

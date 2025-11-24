@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:ihealth_2025_mobile/shared/dio_service.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ihealth_2025_mobile/ihealth/login.dart';
 import 'package:ihealth_2025_mobile/shared/facebook_firebase.dart';
@@ -387,13 +388,53 @@ createStorageApp({dynamic model, required String category}) {
 }
 
 logout(BuildContext context) async {
-  final storage = new FlutterSecureStorage();
-  storage.delete(key: 'token');
+  final storage = FlutterSecureStorage();
+  print('-----logout-----');
+
+  try {
+    final token = await storage.read(key: 'token');
+
+    // ถ้าไม่มี token ให้เด้งไปหน้า Login เลย
+    if (token == null || token.isEmpty) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+        (route) => false,
+      );
+      return;
+    }
+
+    var dio = Dio();
+    var response = await dio.get(
+      'https://api-ihealth.spl-system.com/api/v1/signout',
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      print(json.encode(response.data));
+      await storage.delete(key: 'token'); // clear token
+      await DioService().cookieJar.deleteAll(); // clear cookie
+      print('✅ Logout successful');
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+        (route) => false,
+      );
+    } else {
+      print('❌ Logout failed: ${response.statusMessage}');
+    }
+  } catch (e) {
+    print('❌ Logout error: $e');
+  }
+
   // var profileCategory = await storage.read(key: 'profileCategory');
   // if (profileCategory != '' && profileCategory != null) {
   //   switch (profileCategory) {
   //     case 'facebook':
-  //       // logoutFacebook();
   //       logoutFacebook();
   //       break;
   //     case 'google':
@@ -405,11 +446,6 @@ logout(BuildContext context) async {
   //     default:
   //   }
   // }
-
-  Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => LoginPage()),
-      (Route<dynamic> route) => false);
 
   // Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => LoginPage()), (Route<dynamic> route) => false);
 }
@@ -566,7 +602,6 @@ Future<dynamic> postDioCategoryWeMartNoAll(String url, dynamic criteria) async {
   return Future.value(list);
 }
 
-
 Future<String> uploadImageX(XFile file) async {
   Dio dio = Dio();
   String fileName = file.path.split('/').last;
@@ -579,7 +614,6 @@ Future<String> uploadImageX(XFile file) async {
 
   return response.data['imageUrl'];
 }
-
 
 const splashReadApi = server + 'm/splash/read';
 const profileReadApi = server + 'm/v2/register/read';

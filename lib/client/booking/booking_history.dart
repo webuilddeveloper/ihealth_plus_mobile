@@ -1,10 +1,13 @@
 import 'dart:async';
-import 'dart:math';
-
-import 'package:dropdown_button2/dropdown_button2.dart';
+import 'dart:convert';
+import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
 import 'package:ihealth_2025_mobile/shared/api_provider.dart';
+import 'package:ihealth_2025_mobile/shared/dio_service.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -18,38 +21,42 @@ class BookingHistoryPage extends StatefulWidget {
 class _BookingHistoryPageState extends State<BookingHistoryPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  String? selectedPayment;
-  late XFile _image;
-  dynamic itemImage1 = {"imageUrl": "", "id": "", "imageType": ""};
 
-  final List<Map<String, dynamic>> bookings = [
-    {
-      "shopName": "สมใจสุขใจ",
-      "status": "ไม่ชำระ",
-      "service": "นวดแผนไทย / นวดประคบสมุนไพร",
-      "category": "ฟรี / เดว / สปา",
-      "therapist": "คุณสมชาย",
-      "duration": "2 ชั่วโมง",
-      "date": "25/06/2025",
-      "time": "20:30 น.",
-      "price": "800 บาท",
-      "payment": "",
-      "imageUrl": "",
-    },
-    {
-      "shopName": "ผ่อนคลายสปา",
-      "status": "ไม่ชำระ",
-      "service": "นวดน้ำมันอโรมา",
-      "category": "รีแลกซ์ / เดว / สปา",
-      "therapist": "คุณสมศรี",
-      "duration": "1.5 ชั่วโมง",
-      "date": "23/06/2025",
-      "time": "14:00 น.",
-      "price": "1,200 บาท",
-      "payment": "",
-      "imageUrl": "",
-    },
-  ];
+  final TextEditingController txtcancel = TextEditingController();
+
+  String? selectedPayment;
+  XFile? _image;
+  // dynamic itemImage1 = {"imageUrl": "", "id": "", "imageType": ""};
+  String? imageUrl;
+
+  // final List<Map<String, dynamic>> bookings = [
+  //   {
+  //     "shopName": "สมใจสุขใจ",
+  //     "status": "ไม่ชำระ",
+  //     "service": "นวดแผนไทย / นวดประคบสมุนไพร",
+  //     "category": "ฟรี / เดว / สปา",
+  //     "therapist": "คุณสมชาย",
+  //     "duration": "2 ชั่วโมง",
+  //     "date": "25/06/2025",
+  //     "time": "20:30 น.",
+  //     "price": "800 บาท",
+  //     "payment": "",
+  //     "imageUrl": "",
+  //   },
+  //   {
+  //     "shopName": "ผ่อนคลายสปา",
+  //     "status": "ไม่ชำระ",
+  //     "service": "นวดน้ำมันอโรมา",
+  //     "category": "รีแลกซ์ / เดว / สปา",
+  //     "therapist": "คุณสมศรี",
+  //     "duration": "1.5 ชั่วโมง",
+  //     "date": "23/06/2025",
+  //     "time": "14:00 น.",
+  //     "price": "1,200 บาท",
+  //     "payment": "",
+  //     "imageUrl": "",
+  //   },
+  // ];
 
   final List<Map<String, dynamic>> completedBookings = [
     {
@@ -107,6 +114,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
   @override
   void initState() {
     super.initState();
+    _historymassage();
     _resetRatings();
     _tabController = TabController(length: 2, vsync: this);
   }
@@ -131,7 +139,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(booking["shopName"],
+                  Text(booking['massage_name'],
                       style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -153,18 +161,21 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
               const SizedBox(height: 10),
               SizedBox(height: 5),
               // รายละเอียด
-              buildDetail("ประเภทหลัก", booking["service"]),
+              buildDetail("ประเภทหลัก", booking["category_main"]),
               SizedBox(height: 10),
-              buildDetail("ประเภทย่อย", booking["category"]),
+              buildDetail("ประเภทย่อย", booking["category_sub"]),
               SizedBox(height: 10),
-              buildDetail("หมอนวด", booking["therapist"]),
+              buildDetail("บริการ", booking["service_name"]),
+
               SizedBox(height: 10),
-              buildDetail("ระยะเวลา", booking["duration"]),
+              buildDetail("หมอนวด", booking["therapist_name"]),
               SizedBox(height: 10),
-              buildDetail("วันที่นัดหมาย", booking["date"]),
+              buildDetail("ระยะเวลา", booking["massage_duration"]),
               SizedBox(height: 10),
-              buildDetail("เวลานัดหมาย", booking["time"]),
+              buildDetail("วันที่นัดหมาย", booking["booking_date"]),
               SizedBox(height: 10),
+              buildDetail("เวลานัดหมาย",
+                  booking["start_time"] + "ถึง" + booking["start_time"]),
 
               // แผนที่ + ราคา
               Row(
@@ -187,7 +198,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
               ),
               const SizedBox(height: 20),
               booking['payment'] == 'promptpay'
-                  ? booking['imageUrl'] == "" || booking['imageUrl'] == null
+                  ? imageUrl == "" || imageUrl == null
                       ? Container(
                           width: double.infinity,
                           height: 60,
@@ -203,7 +214,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
                           height: 150,
                           width: double.infinity,
                           child: Image.network(
-                            booking['imageUrl'],
+                            imageUrl!,
                             height: 150,
                             width: 120,
                             fit: BoxFit.fill,
@@ -230,14 +241,12 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
                           _showPickerImage(context, index);
                         },
                         child: const Text(
-                          "แนบสลิป",
+                          "แนบสลิป ",
                           style: TextStyle(color: Color(0xFF07663a)),
                         ),
                       ),
                     )
                   : Container(),
-
-              const SizedBox(height: 10),
 
               const Divider(height: 20),
 
@@ -385,9 +394,10 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
                       ? InkWell(
                           onTap: () {
                             setState(() {
-                              isSubmit = true;
+                              _updateBookingPayment(
+                                  booking, booking['booking_id']);
                             });
-                            _showSuccessDialog();
+                            // _showSuccessDialog();
                           },
                           child: const Column(
                             children: [
@@ -404,7 +414,9 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
                     width: 35,
                   ),
                   InkWell(
-                    onTap: () {},
+                    onTap: () {
+                      _showcancelDialog(booking['booking_id']);
+                    },
                     child: const Column(
                       children: [
                         Icon(Icons.delete_forever, color: Colors.red, size: 40),
@@ -501,7 +513,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
                   onPressed:
                       hasRated ? _showViewRatingDialog : _showRatingDialog,
                   child: Text(
-                    hasRated ? "ดูคะแนน" : "ให้คะแนน",
+                    hasRated ? "ดูคะแนน" : "ให้คะแนน ",
                     style: const TextStyle(color: Colors.white, fontSize: 16),
                   ),
                 ),
@@ -545,9 +557,10 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
               controller: _tabController,
               children: [
                 ListView.builder(
-                  itemCount: bookings.length,
+                  itemCount: historymassage.length,
                   itemBuilder: (context, index) {
-                    return buildBookingCard(bookings[index], index);
+                    return buildBookingCard(
+                        historymassage['data'][index], index);
                   },
                 ),
                 SingleChildScrollView(
@@ -789,19 +802,20 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
                         ),
                       ),
                       onPressed: () {
-                        Navigator.of(context).pop();
+                        Navigator.of(context).pop(); // แล้วค่อยปิด
 
                         setState(() {
                           hasRated = true;
-                          savedRatings = {
-                            "คุณภาพของร้าน": shopQuality,
-                            "ความสะอาดของสถานที่": shopCleanliness,
-                            "ตรงเวลานัดหมาย": shopAccuracy,
-                            "ทักษะของหมอนวด": therapistSkill,
-                            "ความเอาใจใส่หมอนวด": therapistCare,
-                            "ความตรงต่อเวลา": therapistPunctuality,
-                            "ข้อเสนอแนะ": feedbackController.text,
-                          };
+                          // savedRatings = {
+                          //   "คุณภาพของร้าน": shopQuality,
+                          //   "ความสะอาดของสถานที่": shopCleanliness,
+                          //   "ตรงเวลานัดหมาย": shopAccuracy,
+                          //   "ทักษะของหมอนวด": therapistSkill,
+                          //   "ความเอาใจใส่หมอนวด": therapistCare,
+                          //   "ความตรงต่อเวลา": therapistPunctuality,
+                          //   "ข้อเสนอแนะ": feedbackController.text,
+                          // };b
+                          feedback();
                         });
                       },
                       child: const Text("ส่งคะแนน",
@@ -982,16 +996,16 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
     );
   }
 
-  _imgFromCamera(int index) async {
-    final ImagePicker _picker = ImagePicker();
-    // Pick an image
-    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+  // _imgFromCamera(int index) async {
+  //   final ImagePicker _picker = ImagePicker();
+  //   // Pick an image
+  //   final XFile? image = await _picker.pickImage(source: ImageSource.camera);
 
-    setState(() {
-      _image = image!;
-    });
-    _upload(index);
-  }
+  //   setState(() {
+  //     _image = image!;
+  //   });
+  //   _upload(index);
+  // }
 
   _imgFromGallery(int index) async {
     final ImagePicker _picker = ImagePicker();
@@ -1002,21 +1016,257 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
       _image = image!;
     });
     _upload(index);
+
+    print(_image!.path);
   }
 
   void _upload(int index) async {
-    Random random = Random();
-    uploadImageX(_image).then((res) {
-      setState(() {
-        bookings[index]['imageUrl'] = res;
-      });
-
+    uploadImageX(_image!).then((res) {
       // setState(() {
-      //   _imageUrl = res;
+      //   // bookings[index]['imageUrl'] = res;
       // });
+
+      setState(() {
+        imageUrl = res;
+      });
     }).catchError((err) {
       print(err);
     });
+  }
+
+  feedback() async {
+    try {
+      final dioService = DioService();
+      await dioService.init();
+      final dio = dioService.dio;
+      final cookieJar = dioService.cookieJar;
+
+      final storage = FlutterSecureStorage();
+      final token = await storage.read(key: 'token');
+
+      var headers = {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      };
+
+      var data = json.encode({
+        "booking_id": "4ec10c34-9e39-4358-833c-07e9f4656fac",
+        "quality": shopQuality,
+        "cleanliness": shopCleanliness,
+        "punctuality": shopAccuracy,
+        "skill": therapistSkill,
+        "wellbeing": therapistCare,
+        "comfort": therapistPunctuality,
+        "suggestion_text": feedbackController.text.trim()
+      });
+
+      var response = await dio.post(
+        'https://api-ihealth.spl-system.com/api/v1/customer/feedback',
+        data: data,
+        options: Options(headers: headers),
+      );
+
+      if (response.statusCode == 200) {
+        print('✅ Feedback submitted successfully');
+      }
+    } on DioException catch (e) {
+      String errorMessage = e.response?.data["message"] ?? "เกิดข้อผิดพลาด";
+      showErrorDialog(
+        context: context,
+        title: "แจ้งเตือน",
+        message: errorMessage,
+      );
+      print("❌ Dio Error: $errorMessage");
+    } catch (e) {
+      // ดัก error อื่นๆ เช่น null, format ผิด ฯลฯ
+      showErrorDialog(
+        context: context,
+        title: "แจ้งเตือน",
+        message: "เกิดข้อผิดพลาด: $e",
+      );
+      print("❌ Other Error: $e");
+    }
+  }
+
+  _updateBookingPayment(Map<String, dynamic> booking, String bookingid) async {
+    print('====bookingid=====>> ${bookingid}');
+
+    try {
+      final storage = FlutterSecureStorage();
+      final token = await storage.read(key: 'token');
+      var headers = {'Authorization': 'Bearer $token'};
+
+      final dioService = DioService();
+      await dioService.init();
+      final dio = dioService.dio;
+      final cookieJar = dioService.cookieJar;
+
+      var cookies = await cookieJar.loadForRequest(
+        Uri.parse('https://api-ihealth.spl-system.com'),
+      );
+
+      print("Cookies: $cookies");
+
+      String payment_methods = (booking['payment'] ?? "") == "promptpay"
+          ? 'โอนผ่านธนาคาร'
+          : "เงินสด";
+
+      final Map<String, dynamic> data = {
+        "booking_id": bookingid,
+        "payment_methods": payment_methods,
+      };
+
+      if ((booking['payment'] ?? "") == "promptpay") {
+        if (_image == null) {
+          showErrorDialog(
+            context: context,
+            title: "แจ้งเตือน",
+            message: "กรุณาเลือกภาพก่อนอัปโหลด",
+          );
+          return;
+        }
+
+        // เอาไฟล์เฉพาะเมื่อ _image ไม่เป็น null
+        final filePath = _image!.path;
+        final fileName = filePath.split('/').last;
+        final file = await MultipartFile.fromFile(filePath, filename: fileName);
+
+        data["image"] = file;
+      }
+      data.forEach((key, value) async {
+        if (value is MultipartFile) {
+          print("🔹 $key : MultipartFile");
+          print("   filename   : ${value.filename}");
+          print("   contentType: ${value.contentType}");
+        } else {
+          print("$key : $value");
+        }
+      });
+
+      final formData = FormData.fromMap(data);
+
+      final response = await dio.put(
+        'https://api-ihealth.spl-system.com/api/v1/customer/payment',
+        data: formData,
+        options: Options(headers: headers),
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          isSubmit = true;
+        });
+        _showSuccessDialog();
+      }
+    } on DioException catch (e) {
+      String errorMessage = e.response?.data["message"] ?? "เกิดข้อผิดพลาด";
+      showErrorDialog(
+        context: context,
+        title: "แจ้งเตือน",
+        message: errorMessage,
+      );
+    } catch (e) {
+      print("❌ Other ERROR: $e");
+    }
+  }
+
+  _cancelMassage(String bookingid) async {
+    print('--------------_cancelMassage-------------');
+    print('--------_cancelMassage bookingid ${bookingid} ');
+    try {
+      final storage = FlutterSecureStorage();
+      final token = await storage.read(key: 'token');
+      var headers = {'Authorization': 'Bearer $token'};
+
+      final dioService = DioService();
+      await dioService.init();
+      final dio = dioService.dio;
+      final cookieJar = dioService.cookieJar;
+
+      var cookies = await cookieJar.loadForRequest(
+        Uri.parse('https://api-ihealth.spl-system.com'),
+      );
+      var data = json.encode({"cancel_reason": txtcancel.text.trim()});
+
+      print("Cookies: $cookies");
+      final String bookingId = '4ec10c34-9e39-4358-833c-07e9f4656fac';
+
+      var response = await dio.request(
+        'https://api-ihealth.spl-system.com/api/v1/customer/cancel-massage/$bookingId',
+        options: Options(
+          method: 'PUT',
+          headers: headers,
+        ),
+        data: data,
+      );
+
+      if (response.statusCode == 200) {
+        print(json.encode(response.data));
+      } else {
+        print(response.statusMessage);
+      }
+    } on DioException catch (e) {
+      String errorMessage = e.response?.data["message"] ?? "เกิดข้อผิดพลาด";
+      showErrorDialog(
+        context: context,
+        title: "แจ้งเตือน",
+        message: errorMessage,
+      );
+    } catch (e) {
+      print("❌ Other ERROR: $e");
+    }
+  }
+
+  Map<String, dynamic> historymassage = {};
+
+  _historymassage() async {
+    try {
+      final storage = FlutterSecureStorage();
+      final token = await storage.read(key: 'token');
+      var headers = {'Authorization': 'Bearer $token'};
+
+      final dioService = DioService();
+      await dioService.init();
+      final dio = dioService.dio;
+      final cookieJar = dioService.cookieJar;
+
+      var cookies = await cookieJar.loadForRequest(
+        Uri.parse('https://api-ihealth.spl-system.com'),
+      );
+      print("Cookies: $cookies");
+
+      var response = await dio.request(
+        'https://api-ihealth.spl-system.com/api/v1/customer/history-massage',
+        options: Options(
+          method: 'GET',
+          headers: headers,
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        // print(json.encode(response.data));
+        // print('=========== >>> ${response.statusCode}');
+        // print('=========== >>> ${response.data.runtimeType}');
+        // print('=========== >>> ${response.data}');
+        // print('=========== >>> ${response.data['data']}');
+
+        setState(() {
+          historymassage = response.data;
+          print('-------Start historymassage ------');
+          print(historymassage.length);
+          print(historymassage['data'][0]['massage_name']);
+          print(historymassage['data'][0]['service_name']);
+        });
+      }
+    } on DioException catch (e) {
+      String errorMessage = e.response?.data["message"] ?? "เกิดข้อผิดพลาด";
+      showErrorDialog(
+        context: context,
+        title: "แจ้งเตือน",
+        message: errorMessage,
+      );
+    } catch (e) {
+      print("❌ Other ERROR: $e");
+    }
   }
 
   void _resetRatings() {
@@ -1068,5 +1318,194 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
     Timer(const Duration(seconds: 2), () {
       Navigator.of(context).pop(); // ปิด dialog
     });
+  }
+
+  _showcancelDialog(String bookingid) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Dialog(
+              backgroundColor: Colors.white, // พื้นหลังเข้ม
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(22),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Title
+                    const Text(
+                      "ยืนยันการยกเลิกหรือไม่ ?",
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary // สีขาวให้อ่านง่ายบนพื้นเข้ม
+                          ),
+                      textAlign: TextAlign.center,
+                    ),
+
+                    const SizedBox(height: 18),
+
+                    // TextField
+                    TextField(
+                      controller: txtcancel,
+                      minLines: 4,
+                      maxLines: 6,
+                      onChanged: (value) => setState(() {}),
+                      style: const TextStyle(color: Colors.black87),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.grey[100],
+                        contentPadding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
+                        hintText: 'กรุณาระบุเหตุผลการยกเลิก...',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                          borderSide: BorderSide(
+                            color: AppColors.primary,
+                            width: 1.0,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // Buttons Row
+                    Row(
+                      children: [
+                        // Confirm
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: txtcancel.text.isEmpty
+                                ? null
+                                : () {
+                                    _cancelMassage(bookingid);
+                                    Navigator.pop(context);
+                                  },
+                            child: Container(
+                              height: 48,
+                              decoration: BoxDecoration(
+                                color: txtcancel.text.isEmpty
+                                    ? Colors.grey[300]
+                                    : AppColors.primary,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                'ยืนยันการยกเลิก',
+                                style: TextStyle(
+                                  color: txtcancel.text.isEmpty
+                                      ? Colors.grey[400]
+                                      : Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(width: 12),
+
+                        // Close
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => Navigator.pop(context),
+                            child: Container(
+                              height: 48,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade500,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              alignment: Alignment.center,
+                              child: const Text(
+                                'ปิด',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> showErrorDialog({
+    required BuildContext context,
+    required String title,
+    String? message,
+    String confirmText = "ตกลง",
+    VoidCallback? onConfirm,
+    bool barrierDismissible = false,
+  }) {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: barrierDismissible,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: () async => barrierDismissible,
+          child: CupertinoAlertDialog(
+            title: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 16,
+                fontFamily: 'Sarabun',
+                color: Colors.black,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            content: message != null
+                ? Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Text(
+                      message,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontFamily: 'Sarabun',
+                        color: Colors.black87,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  )
+                : null,
+            actions: [
+              CupertinoDialogAction(
+                isDefaultAction: true,
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  onConfirm?.call();
+                },
+                child: Text(
+                  confirmText,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontFamily: 'Sarabun',
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }
