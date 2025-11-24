@@ -3,8 +3,8 @@ import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
 import 'package:ihealth_2025_mobile/ihealth/apply/apply-detail.dart';
 
 class Apply extends StatefulWidget {
-  final List<Map<String, dynamic>> job;
-  const Apply({super.key, required this.job});
+  List<dynamic> job;
+  Apply({super.key, required this.job});
 
   @override
   State<Apply> createState() => _ApplyState();

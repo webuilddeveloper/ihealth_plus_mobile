@@ -35,6 +35,8 @@ const server = '$serverPrefix/khubdeedlt-api/';
 const serverUpload = '$serverPrefix/khubdeedlt-document/upload';
 const serverMW = 'http://122.155.223.63/td-khub-dee-middleware-api/';
 
+const api = 'https://api-ihealth.spl-system.com/';
+
 const sharedApi = server + 'configulation/shared/';
 const registerApi = server + 'm/register/';
 const newsApi = server + 'm/news/';
@@ -613,6 +615,23 @@ Future<String> uploadImageX(XFile file) async {
   var response = await dio.post(serverUpload, data: formData);
 
   return response.data['imageUrl'];
+}
+
+Future get(String url) async {
+
+  var response = await http.get(Uri.parse(url), headers: {
+    "Accept": "application/json",
+    "Content-Type": "application/json",
+    'Cookie': 'sid=s%3A5ibCRluySmnXQw1C4pQwKErfGJM6tStB.yO5sNcOHRBVJRUYrOsaWvOhwmz8qfjWE8%2F8rXIlYRq4'
+  });
+
+  if (response.statusCode == 200) {
+    var data = json.decode(response.body);
+    return Future.value(data['data']);
+  } else {
+    return {"status": "F"};
+  }
+  // return Future.value(data);
 }
 
 const splashReadApi = server + 'm/splash/read';
