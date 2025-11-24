@@ -51,6 +51,8 @@ class _HomeClientState extends State<HomeClient>
   late Future<dynamic> _futureMainPopUp;
   late Future<dynamic> _futureVerifyTicket;
 
+  dynamic profileModel = {};
+
   String profileCode = '';
   String currentLocation = '-';
   final seen = Set<String>();
@@ -92,6 +94,7 @@ class _HomeClientState extends State<HomeClient>
 
     _callReadShop();
     _callReadCourse();
+    _readProfile();
     super.initState();
   }
 
@@ -298,18 +301,43 @@ class _HomeClientState extends State<HomeClient>
           ),
           child: Padding(
             padding: EdgeInsets.all(profilePadding),
-            child: Image.asset(
-              'assets/images/user_not_found.png',
-              color: AppColors.primary,
-              fit: BoxFit.contain,
-            ),
+            child: (profileModel['token'] ?? "") != ""
+                ? Container(
+                    // height: MediaQuery.of(context).size.height * 0.12,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.all(
+                        Radius.circular(10),
+                      ),
+                      // image: DecorationImage(
+                      //   image: AssetImage(shop['imgUrl']),
+                      //   fit: BoxFit.cover,
+                      // ),
+                      image: DecorationImage(
+                        image: NetworkImage(
+                            '${api}/uploads/user/${profileModel['image']}'),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  )
+                //  Image.network(
+                //     '${api}/uploads/user/${profileModel['image']}',
+                //     // color: AppColors.primary,
+                //     fit: BoxFit.contain,
+                //   )
+                : Image.asset(
+                    'assets/images/user_not_found.png',
+                    color: AppColors.primary,
+                    fit: BoxFit.contain,
+                  ),
           ),
         ),
         SizedBox(width: spacing),
 
         // Content Section
         Expanded(
-          child: isLoggedIn == true
+          // child: isLoggedIn == true
+          child: (profileModel['token'] ?? "") != ""
               ? _buildLoggedInContent(isSmallScreen, isMediumScreen)
               : _buildNotLoggedInContent(isSmallScreen, isMediumScreen),
         ),
@@ -331,31 +359,45 @@ class _HomeClientState extends State<HomeClient>
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Flexible(
-          child: RichText(
-            overflow: TextOverflow.ellipsis,
-            maxLines: isSmallScreen ? 2 : 3,
-            text: TextSpan(
-              text: 'หมอนวด',
-              style: TextStyle(
-                fontFamily: 'Sarabun',
-                fontSize: titleFontSize,
-                fontWeight: FontWeight.w700,
-                color: AppColors.primary,
-                height: 1.2,
-                letterSpacing: -0.3,
-              ),
-              children: <TextSpan>[
-                TextSpan(
-                  text: ' รัชชานนท์ ',
+          child: profileModel['loginType'] == "1"
+              ? Text(
+                  profileModel['fullname'],
                   style: TextStyle(
-                    fontSize: subtitleFontSize,
-                    color: AppColors.primary_gold,
+                    fontFamily: 'Sarabun',
+                    fontSize: titleFontSize,
                     fontWeight: FontWeight.w700,
+                    color: AppColors.primary,
+                    height: 1.2,
+                    letterSpacing: -0.3,
+                  ),
+                  maxLines: isSmallScreen ? 2 : 3,
+                  overflow: TextOverflow.ellipsis,
+                )
+              : RichText(
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: isSmallScreen ? 2 : 3,
+                  text: TextSpan(
+                    text: 'หมอนวด',
+                    style: TextStyle(
+                      fontFamily: 'Sarabun',
+                      fontSize: titleFontSize,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primary,
+                      height: 1.2,
+                      letterSpacing: -0.3,
+                    ),
+                    children: <TextSpan>[
+                      TextSpan(
+                        text: ' รัชชานนท์ ',
+                        style: TextStyle(
+                          fontSize: subtitleFontSize,
+                          color: AppColors.primary_gold,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-          ),
         ),
         SizedBox(height: isSmallScreen ? 6 : 8),
         Container(
@@ -369,7 +411,9 @@ class _HomeClientState extends State<HomeClient>
             ),
           ),
           child: Text(
-            'นวดเพื่อสุขภาพ',
+            profileModel['loginType'] == "1"
+                ? 'ผู้รับบริการ'
+                : 'นวดเพื่อสุขภาพ',
             style: TextStyle(
               fontFamily: 'Sarabun',
               fontSize: badgeFontSize,
@@ -724,7 +768,9 @@ class _HomeClientState extends State<HomeClient>
                               topRight: Radius.circular(10),
                             ),
                             image: DecorationImage(
-                              image: NetworkImage(api+'/uploads/school/course/'+course['smallImage']),
+                              image: NetworkImage(api +
+                                  '/uploads/school/course/' +
+                                  course['smallImage']),
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -926,6 +972,24 @@ class _HomeClientState extends State<HomeClient>
         ),
       ],
     );
+  }
+
+  _readProfile() async {
+    await storage.read(key: 'fullname').then((v) => setState(() {
+          profileModel['fullname'] = v;
+        }));
+    await storage.read(key: 'mobile').then((v) => setState(() {
+          profileModel['mobile'] = v;
+        }));
+    await storage.read(key: 'image').then((v) => setState(() {
+          profileModel['image'] = v;
+        }));
+    await storage.read(key: 'token').then((v) => setState(() {
+          profileModel['token'] = v;
+        }));
+    await storage.read(key: 'loginType').then((v) => setState(() {
+          profileModel['loginType'] = v;
+        }));
   }
 
   _read() async {
