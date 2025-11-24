@@ -7,6 +7,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:ihealth_2025_mobile/client/booking/booking.dart';
+import 'package:ihealth_2025_mobile/client/shop_details.dart';
 import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
 import 'package:ihealth_2025_mobile/ihealth/apply/apply-detail.dart';
 import 'package:ihealth_2025_mobile/ihealth/apply/apply.dart';
@@ -589,14 +590,15 @@ class _HomeClientState extends State<HomeClient>
                 final shop = mockShop[index];
                 return GestureDetector(
                   onTap: () {
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (context) => CourseDetail(
-                    //       course: shop,
-                    //     ),
-                    //   ),
-                    // );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ShopDetail(
+                          shopId: shop['uuid'],
+                          // course: shop,
+                        ),
+                      ),
+                    );
                   },
                   child: Container(
                     width: 220,

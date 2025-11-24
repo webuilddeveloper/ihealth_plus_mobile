@@ -1,15 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
+import 'package:ihealth_2025_mobile/ihealth/course/course.dart';
+import 'package:ihealth_2025_mobile/shared/api_provider.dart';
 
-class CourseDetail extends StatefulWidget {
-  const CourseDetail({super.key, required this.course});
-  final Map<String, dynamic> course;
+class ShopDetail extends StatefulWidget {
+  ShopDetail({super.key, required this.shopId});
+
+  String shopId;
 
   @override
-  State<CourseDetail> createState() => _CourseDetailState();
+  State<ShopDetail> createState() => _ShopDetailState();
 }
 
-class _CourseDetailState extends State<CourseDetail> {
+class _ShopDetailState extends State<ShopDetail> {
+
+  dynamic model;
+
+  @override
+  void initState() {
+   _callReadShop();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,16 +54,14 @@ class _CourseDetailState extends State<CourseDetail> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
                     image: DecorationImage(
-                      image: AssetImage(
-                        widget.course['img'],
-                      ),
+                      image: NetworkImage(api + model['image']),
                       fit: BoxFit.cover,
                     ),
                   ),
                 ),
                 SizedBox(height: 16),
                 Text(
-                  widget.course['title'],
+                  model['massage_name'],
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -70,7 +80,7 @@ class _CourseDetailState extends State<CourseDetail> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        widget.course['category'],
+                        model['massage_type'],
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 12,
@@ -79,18 +89,18 @@ class _CourseDetailState extends State<CourseDetail> {
                         ),
                       ),
                     ),
-                    SizedBox(
-                      width: 16,
-                    ),
-                    Text(
-                      '฿ ${widget.course['price']}',
-                      style: TextStyle(
-                        color: AppColors.primary_gold,
-                        fontFamily: "sarabun",
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    )
+                    // SizedBox(
+                    //   width: 16,
+                    // ),
+                    // Text(
+                    //   '฿ ${model['price']}',
+                    //   style: TextStyle(
+                    //     color: AppColors.primary_gold,
+                    //     fontFamily: "sarabun",
+                    //     fontSize: 16,
+                    //     fontWeight: FontWeight.bold,
+                    //   ),
+                    // )
                   ],
                 ),
                 SizedBox(height: 16),
@@ -103,7 +113,7 @@ class _CourseDetailState extends State<CourseDetail> {
                   child: Column(
                     children: [
                       Text(
-                        widget.course['description'],
+                        model['details'],
                         style: TextStyle(
                           fontSize: 14,
                           fontFamily: "sarabun",
@@ -124,7 +134,7 @@ class _CourseDetailState extends State<CourseDetail> {
                     ),
                     SizedBox(width: 8),
                     Text(
-                      'ระยะเวลาการเรียน  ${widget.course['time']}',
+                      'ที่อยู่ร้าน  ${model['time']}',
                       style: TextStyle(
                         color: AppColors.textdark,
                         fontFamily: "sarabun",
@@ -138,7 +148,6 @@ class _CourseDetailState extends State<CourseDetail> {
               ],
             ),
           ),
-        
         ],
       ),
       bottomNavigationBar: Container(
@@ -153,27 +162,69 @@ class _CourseDetailState extends State<CourseDetail> {
             ),
           ],
         ),
-        child: ElevatedButton(
-          onPressed: () {
-            // _launchUrl(job['url']);
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            padding: EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-          child: Text(
-            'สมัครเรียน',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
+        child: SafeArea(
+          child: Row(
+            children: [
+              GestureDetector(
+                onTap: () => {
+                  isFavorite()
+                },
+                child: Icon(
+                  model['is_favorite'] ? Icons.favorite : Icons.favorite_border_outlined,
+                  size: 40,
+                  color: model['is_favorite'] ? Colors.red : AppColors.primary,
+                ),
+              ),
+              SizedBox(width: 20,),
+              Icon(
+                Icons.map_outlined,
+                size: 40,
+                color: AppColors.primary,
+              ),
+              SizedBox(width: 20,),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () {
+                    // _launchUrl(job['url']);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    padding: EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    'จองทันที',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
+
+  _callReadShop() async {
+    // https://api-ihealth.spl-system.com/api/v1/customer/detail-massage?booking_date=&massage_info_id=36b3535f-2458-4105-abe1-e23400e663b9
+    get(api + 'api/v1/customer/detail-massage?booking_date=&massage_info_id=${widget.shopId}').then(
+      (v) => {
+        setState(() {
+          model = v['massage_info'];
+          print('>>>><<<<<< ${v}');
+        }),
+      },
+    );
+  }
+
+  isFavorite() {
+
+  }
+
 }
