@@ -302,6 +302,7 @@ class _ShopDetailState extends State<ShopDetail> {
               SizedBox(
                 width: 20,
               ),
+              (model['is_open'] ?? false) ?
               Expanded(
                 child: ElevatedButton(
                   onPressed: () {
@@ -316,6 +317,27 @@ class _ShopDetailState extends State<ShopDetail> {
                   ),
                   child: Text(
                     'จองทันที',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ) : Expanded(
+                child: ElevatedButton(
+                  onPressed: () {
+                    // _launchUrl(job['url']);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary.withOpacity(0.2),
+                    padding: EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    'ร้านปิดทำการ',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,
