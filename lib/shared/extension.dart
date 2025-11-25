@@ -11,6 +11,20 @@ unfocus(context) {
   }
 }
 
+/// Converts an ISO 8601 date string (e.g., "2025-11-08T04:30:00.000Z")
+/// to a display format "dd-MM-yyyy".
+String isoDateStringToDisplayDate(String? isoDateString) {
+  if (isoDateString == null || isoDateString.isEmpty) {
+    return '';
+  }
+  try {
+    final dateTime = DateTime.parse(isoDateString);
+    return DateFormat('dd-MM-yyyy HH:mm').format(dateTime);
+  } catch (e) {
+    return ''; // Return empty string if parsing fails
+  }
+}
+
 moneyFormat(String price) {
   if (price.length > 2) {
     var value = price;

@@ -1,19 +1,8 @@
 import 'package:ihealth_2025_mobile/client/notification/notification_client_form.dart';
-import 'package:ihealth_2025_mobile/home_v2.dart';
 import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
-import 'package:ihealth_2025_mobile/pages/warning/warning_form.dart';
-import 'package:ihealth_2025_mobile/pages/welfare/welfare_form.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ihealth_2025_mobile/pages/blank_page/blank_loading.dart';
-import 'package:ihealth_2025_mobile/pages/blank_page/toast_fail.dart';
-
-import 'package:ihealth_2025_mobile/pages/knowledge/knowledge_form.dart';
-import 'package:ihealth_2025_mobile/pages/news/news_form.dart';
-import 'package:ihealth_2025_mobile/pages/poi/poi_form.dart';
-import 'package:ihealth_2025_mobile/pages/poll/poll_form.dart';
-import 'package:ihealth_2025_mobile/pages/privilege/privilege_form.dart';
-import 'package:ihealth_2025_mobile/shared/api_provider.dart';
 import 'package:ihealth_2025_mobile/shared/api_provider_ihealth.dart';
 import 'package:ihealth_2025_mobile/shared/extension.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -28,6 +17,47 @@ class NotificationClientList extends StatefulWidget {
 }
 
 class _NotificationClientList extends State<NotificationClientList> {
+  // Future<Map<String, dynamic>?>? _futureModel = Future.value(<String, dynamic>{
+  //   "statusCode": 200,
+  //   "message": "success",
+  //   "data": {
+  //     "count": 2,
+  //     "notifications": [
+  //       {
+  //         "_id": "6730b10e9123456789000002",
+  //         "noti_id": "NOTI-20251108-002",
+  //         "type": "booking_rejected",
+  //         "target_role": "customer",
+  //         "target_id": "47f56cf7-f29c-493d-8af0-b6e8339b23ac",
+  //         "created_by_role": "massage",
+  //         "created_by_id": "645c9a68-d89f-41e9-b9d9-414e25c04a7e",
+  //         "booking_id": "BKG-20251108-002",
+  //         "title": "การจองถูกปฏิเสธ",
+  //         "message": "ร้านไม่สามารถให้บริการได้ในเวลาที่เลือก",
+  //         "is_read": false,
+  //         "read_at": "2025-11-24T15:30:05.082Z",
+  //         "createdAt": "2025-11-08T05:00:00.000Z",
+  //         "updatedAt": "2025-11-24T08:30:05.091Z"
+  //       },
+  //       {
+  //         "_id": "6730b10e9123456789000001",
+  //         "noti_id": "NOTI-20251108-001",
+  //         "type": "booking_approved",
+  //         "target_role": "customer",
+  //         "target_id": "47f56cf7-f29c-493d-8af0-b6e8339b23ac",
+  //         "created_by_role": "massage",
+  //         "created_by_id": "645c9a68-d89f-41e9-b9d9-414e25c04a7e",
+  //         "booking_id": "BKG-20251108-001",
+  //         "title": "การจองได้รับการยืนยัน",
+  //         "message": "ร้าน J-Spa ยืนยันการจองของคุณเวลา 14:00 น.",
+  //         "is_read": false,
+  //         "read_at": "2025-11-24T15:32:11.048Z",
+  //         "createdAt": "2025-11-08T04:30:00.000Z",
+  //         "updatedAt": "2025-11-24T08:32:11.049Z"
+  //       }
+  //     ]
+  //   }
+  // });
   Future<Map<String, dynamic>?>? _futureModel;
 
   @override
@@ -157,7 +187,9 @@ class _NotificationClientList extends State<NotificationClientList> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => NotificationClientForm(url: '', code: '', urlComment: '', urlGallery: '',),
+            builder: (context) => NotificationClientForm(
+              model: model,
+            ),
           ),
         ).then((value) => {_futureModel = _callRead()})
       },
@@ -220,10 +252,24 @@ class _NotificationClientList extends State<NotificationClientList> {
                 ),
               ),
               Container(
+                padding: EdgeInsets.symmetric(horizontal: width * 1 / 100),
+                child: Text(
+                  '${model['message']}',
+                  style: TextStyle(
+                    fontSize: height * 0.0125,
+                    fontFamily: 'Sarabun',
+                    fontWeight: FontWeight.normal,
+                    color: Colors.black,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+              ),
+              Container(
                 padding: EdgeInsets.symmetric(
                     horizontal: width * 5 / 100, vertical: height * 1.5 / 100),
                 child: Text(
-                  '${dateStringToDate(model['createdAt'])}',
+                  '${isoDateStringToDisplayDate(model['createdAt'])}',
                   style: TextStyle(
                     fontSize: (height * 1.7) / 100,
                     fontFamily: 'Sarabun',
