@@ -45,7 +45,7 @@ class _ShopDetailState extends State<ShopDetail> {
         centerTitle: true,
         backgroundColor: AppColors.primary,
       ),
-      body: Column(
+      body: ListView(
         children: [
           Container(
             color: Colors.white,
@@ -63,6 +63,49 @@ class _ShopDetailState extends State<ShopDetail> {
                     ),
                   ),
                 ),
+                SizedBox(
+                  height: 10,
+                ),
+                (model?['images'] ?? []).length > 0
+                    ? SizedBox(
+                        height: 100,
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          // padding: const EdgeInsets.symmetric(horizontal: 16),
+                          itemCount: model?['images'].length,
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(width: 12),
+                          itemBuilder: (context, index) {
+                            final img = model?['images'][index];
+
+                            return GestureDetector(
+                              onTap: () {
+                                // Navigator.push(
+                                //   context,
+                                //   MaterialPageRoute(
+                                //     builder: (_) => FullImageViewer(image: img),
+                                //   ),
+                                // );
+                              },
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.network(
+                                  api + '' + img,
+                                  width: 100,
+                                  height: 100,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => Container(
+                                    width: 100,
+                                    color: Colors.grey[300],
+                                    child: const Icon(Icons.image),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      )
+                    : Container(),
                 SizedBox(height: 16),
                 Text(
                   model?['massage_name'] ?? '',
@@ -92,6 +135,13 @@ class _ShopDetailState extends State<ShopDetail> {
                           fontWeight: FontWeight.w400,
                         ),
                       ),
+                    ),
+                    Row(
+                      children: [
+                        Icon(Icons.star, color: Colors.orange, size: 18),
+                        Text(
+                            "${model?['avg_score'] ?? ''} (${model?['review_count'] ?? ''} รีวิว)"),
+                      ],
                     ),
                   ],
                 ),
@@ -180,7 +230,6 @@ class _ShopDetailState extends State<ShopDetail> {
               ],
             ),
           ),
-        
         ],
       ),
       bottomNavigationBar: Container(
@@ -205,7 +254,9 @@ class _ShopDetailState extends State<ShopDetail> {
                       ? Icons.favorite
                       : Icons.favorite_border_outlined,
                   size: 40,
-                  color: (model['is_favorite'] ?? false) ? Colors.red : AppColors.primary,
+                  color: (model['is_favorite'] ?? false)
+                      ? Colors.red
+                      : AppColors.primary,
                 ),
               ),
               SizedBox(
@@ -245,7 +296,6 @@ class _ShopDetailState extends State<ShopDetail> {
           ),
         ),
       ),
-    
     );
   }
 
