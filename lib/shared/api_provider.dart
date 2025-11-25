@@ -155,47 +155,47 @@ Future<dynamic> postCategory(String url, dynamic criteria) async {
   return Future.value(list);
 }
 
-Future<dynamic> post(String url, dynamic criteria) async {
-  final storage = new FlutterSecureStorage();
-  var value = await storage.read(key: 'dataUserLoginDDPM');
-  var dataUser = json.decode(value!);
-  List<dynamic> dataOrganization = [];
-  dataOrganization =
-      dataUser['countUnit'] != '' ? json.decode(dataUser['countUnit']) : [];
+// Future<dynamic> post(String url, dynamic criteria) async {
+//   final storage = new FlutterSecureStorage();
+//   var value = await storage.read(key: 'dataUserLoginDDPM');
+//   var dataUser = json.decode(value!);
+//   List<dynamic> dataOrganization = [];
+//   dataOrganization =
+//       dataUser['countUnit'] != '' ? json.decode(dataUser['countUnit']) : [];
 
-  var body = json.encode({
-    "permission": "all",
-    "skip": criteria['skip'] != null ? criteria['skip'] : 0,
-    "limit": criteria['limit'] != null ? criteria['limit'] : 1,
-    "code": criteria['code'] != null ? criteria['code'] : '',
-    "reference": criteria['reference'] != null ? criteria['reference'] : '',
-    "description":
-        criteria['description'] != null ? criteria['description'] : '',
-    "category": criteria['category'] != null ? criteria['category'] : '',
-    "keySearch": criteria['keySearch'] != null ? criteria['keySearch'] : '',
-    "username": criteria['username'] != null ? criteria['username'] : '',
-    "firstName": criteria['firstName'] != null ? criteria['firstName'] : '',
-    "lastName": criteria['lastName'] != null ? criteria['lastName'] : '',
-    "title": criteria['title'] != null ? criteria['title'] : '',
-    "answer": criteria['answer'] != null ? criteria['answer'] : '',
-    "isHighlight":
-        criteria['isHighlight'] != null ? criteria['isHighlight'] : false,
-    "createBy": criteria['createBy'] != null ? criteria['createBy'] : '',
-    "isPublic": criteria['isPublic'] != null ? criteria['isPublic'] : false,
-    "language": criteria['language'] != null ? criteria['language'] : 'th',
-    "organization": dataOrganization != null ? dataOrganization : [],
-    "latitude": criteria['latitude'] != null ? criteria['latitude'] : 0,
-    "longitude": criteria['longitude'] != null ? criteria['longitude'] : 0,
-  });
+//   var body = json.encode({
+//     "permission": "all",
+//     "skip": criteria['skip'] != null ? criteria['skip'] : 0,
+//     "limit": criteria['limit'] != null ? criteria['limit'] : 1,
+//     "code": criteria['code'] != null ? criteria['code'] : '',
+//     "reference": criteria['reference'] != null ? criteria['reference'] : '',
+//     "description":
+//         criteria['description'] != null ? criteria['description'] : '',
+//     "category": criteria['category'] != null ? criteria['category'] : '',
+//     "keySearch": criteria['keySearch'] != null ? criteria['keySearch'] : '',
+//     "username": criteria['username'] != null ? criteria['username'] : '',
+//     "firstName": criteria['firstName'] != null ? criteria['firstName'] : '',
+//     "lastName": criteria['lastName'] != null ? criteria['lastName'] : '',
+//     "title": criteria['title'] != null ? criteria['title'] : '',
+//     "answer": criteria['answer'] != null ? criteria['answer'] : '',
+//     "isHighlight":
+//         criteria['isHighlight'] != null ? criteria['isHighlight'] : false,
+//     "createBy": criteria['createBy'] != null ? criteria['createBy'] : '',
+//     "isPublic": criteria['isPublic'] != null ? criteria['isPublic'] : false,
+//     "language": criteria['language'] != null ? criteria['language'] : 'th',
+//     "organization": dataOrganization != null ? dataOrganization : [],
+//     "latitude": criteria['latitude'] != null ? criteria['latitude'] : 0,
+//     "longitude": criteria['longitude'] != null ? criteria['longitude'] : 0,
+//   });
 
-  var response = await http.post(Uri.parse(url), body: body, headers: {
-    "Accept": "application/json",
-    "Content-Type": "application/json"
-  });
+//   var response = await http.post(Uri.parse(url), body: body, headers: {
+//     "Accept": "application/json",
+//     "Content-Type": "application/json"
+//   });
 
-  var data = json.decode(response.body);
-  return Future.value(data['objectData']);
-}
+//   var data = json.decode(response.body);
+//   return Future.value(data['objectData']);
+// }
 
 Future<dynamic> postAny(String url, dynamic criteria) async {
   var body = json.encode({
@@ -621,11 +621,10 @@ Future<String> uploadImageX(XFile file) async {
 }
 
 Future get(String url) async {
-  
   var cookie;
   await storage.read(key: 'cookie').then((v) => {
-    cookie = v,
-  });
+        cookie = v,
+      });
   var response = await http.get(Uri.parse(url), headers: {
     "Accept": "application/json",
     "Content-Type": "application/json",
@@ -639,6 +638,36 @@ Future get(String url) async {
     return {"status": "F"};
   }
   // return Future.value(data);
+}
+
+Future<dynamic> post(String url, dynamic criteria) async {
+  final storage = FlutterSecureStorage();
+  final token = await storage.read(key: 'token');
+  final cookies = await storage.read(key: 'cookie');
+  var headers = {
+    'Authorization': 'Bearer $token',
+    "Accept": "application/json",
+    "Content-Type": "application/json",
+    "Cookie": '$cookies'
+  };
+  var body = json.encode(criteria);
+  // var response = await dio.request(
+  //   '${api}/api/v1/customer/favorites',
+  //   options: Options(
+  //     method: 'POST',
+  //     headers: headers,
+  //   ),
+  //   data: criteria,
+  // );
+  // var response = await dio.post(url, data: criteria);
+  var response = await http.post(Uri.parse(url), body: body, headers: headers);
+  var data = json.decode(response.body);
+  if (response.statusCode == 200) {
+    var data = json.decode(response.body);
+    return Future.value(data['data']);
+  } else {
+    return {"status": "F"};
+  }
 }
 
 const splashReadApi = server + 'm/splash/read';
