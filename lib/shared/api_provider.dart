@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:geolocator/geolocator.dart';
 import 'package:ihealth_2025_mobile/shared/dio_service.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ihealth_2025_mobile/ihealth/login.dart';
@@ -111,6 +112,8 @@ const privilegeSpecialReadApi =
     'http://122.155.223.63/td-we-mart-api/m/privilege/khubdeedlt/read';
 const privilegeSpecialCategoryReadApi =
     'http://122.155.223.63/td-we-mart-api/m/privilege/category/read';
+
+final storage = new FlutterSecureStorage();
 
 Future<dynamic> postCategory(String url, dynamic criteria) async {
   final storage = new FlutterSecureStorage();
@@ -618,11 +621,15 @@ Future<String> uploadImageX(XFile file) async {
 }
 
 Future get(String url) async {
-
+  
+  var cookie;
+  await storage.read(key: 'cookie').then((v) => {
+    cookie = v,
+  });
   var response = await http.get(Uri.parse(url), headers: {
     "Accept": "application/json",
     "Content-Type": "application/json",
-    'Cookie': 'sid=s%3A5ibCRluySmnXQw1C4pQwKErfGJM6tStB.yO5sNcOHRBVJRUYrOsaWvOhwmz8qfjWE8%2F8rXIlYRq4'
+    'Cookie': cookie
   });
 
   if (response.statusCode == 200) {

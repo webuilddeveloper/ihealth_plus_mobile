@@ -128,13 +128,53 @@ class _ShopDetailState extends State<ShopDetail> {
                 Row(
                   children: [
                     Icon(
+                      Icons.location_on_outlined,
+                      color: AppColors.textdark,
+                      size: 20,
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      '${model['house_number']} ${model['moo']} ${model['alley']} ${model['road']} ${model['subdistrict']} ${model['district']} ${model['province']} ${model['postal_code']}',
+                      style: TextStyle(
+                        color: AppColors.textdark,
+                        fontFamily: "sarabun",
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16),
+                Row(
+                  children: [
+                    Icon(
                       Icons.timer_outlined,
                       color: AppColors.textdark,
                       size: 20,
                     ),
                     SizedBox(width: 8),
                     Text(
-                      'ที่อยู่ร้าน  ${model['time']}',
+                      '${model['time_text']}',
+                      style: TextStyle(
+                        color: AppColors.textdark,
+                        fontFamily: "sarabun",
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.calendar_month_outlined,
+                      color: AppColors.textdark,
+                      size: 20,
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      '${model['day_of_week_text']}',
                       style: TextStyle(
                         color: AppColors.textdark,
                         fontFamily: "sarabun",

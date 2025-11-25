@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart'
     as dt_picker;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
 import 'package:ihealth_2025_mobile/ihealth/profile/user_information.dart';
 import 'package:image_picker/image_picker.dart';
@@ -18,7 +19,8 @@ class EditUserInformationClientPage extends StatefulWidget {
       _EditUserInformationClientPageState();
 }
 
-class _EditUserInformationClientPageState extends State<EditUserInformationClientPage> {
+class _EditUserInformationClientPageState
+    extends State<EditUserInformationClientPage> {
   final storage = FlutterSecureStorage();
 
   late String _imageUrl = '';
@@ -52,7 +54,7 @@ class _EditUserInformationClientPageState extends State<EditUserInformationClien
   final txtConPassword = TextEditingController();
 
   final txtPrefixName = TextEditingController();
-  final txtFirstName = TextEditingController();
+  final txtName = TextEditingController();
   final txtLastName = TextEditingController();
 
   final txtPhone = TextEditingController();
@@ -65,6 +67,10 @@ class _EditUserInformationClientPageState extends State<EditUserInformationClien
   final txtMoo = TextEditingController();
   final txtSoi = TextEditingController();
   final txtRoad = TextEditingController();
+
+  String? selectGender;
+  final txtNationality = TextEditingController();
+  final txtMapLink = TextEditingController();
 
   final licensenumber = TextEditingController();
 
@@ -84,12 +90,18 @@ class _EditUserInformationClientPageState extends State<EditUserInformationClien
   int month = 0;
   int day = 0;
 
+  final List<Map<String, String>> genderItems = [
+    {'id': 'male', 'name': 'ชาย'},
+    {'id': 'female', 'name': 'หญิง'},
+    {'id': 'more', 'name': 'อื่นๆ'},
+  ];
+
   @override
   void dispose() {
     txtEmail.dispose();
     txtPassword.dispose();
     txtConPassword.dispose();
-    txtFirstName.dispose();
+    txtName.dispose();
     txtLastName.dispose();
     txtPhone.dispose();
     txtDate.dispose();
@@ -174,72 +186,21 @@ class _EditUserInformationClientPageState extends State<EditUserInformationClien
   }
 
   Future<dynamic> getUser() async {
-    var profileCode = await storage.read(key: 'profileCode3');
+    var profileCode = await storage.read(key: 'customer_id');
 
     if (profileCode != '') {
-      final result =
-          await postObjectData("m/Register/read", {'code': profileCode});
+      final result = await get("${api}/api/v1/customer/user/${profileCode}");
 
-      if (result['status'] == 'S') {
-        await storage.write(
-          key: 'dataUserLoginOPEC',
-          value: jsonEncode(result['objectData'][0]),
-        );
-
-        if (result['objectData'][0]['birthDay'] != '') {
-          if (isValidDate(result['objectData'][0]['birthDay'])) {
-            var date = result['objectData'][0]['birthDay'];
-            var year = date.substring(0, 4);
-            var month = date.substring(4, 6);
-            var day = date.substring(6, 8);
-            DateTime todayDate = DateTime.parse(year + '-' + month + '-' + day);
-            setState(() {
-              _selectedYear = todayDate.year;
-              _selectedMonth = todayDate.month;
-              _selectedDay = todayDate.day;
-              txtDate.text = DateFormat("dd-MM-yyyy").format(todayDate);
-            });
-          }
-        }
-
+      if (result != null) {
         setState(() {
-          _imageUrl = result['objectData'][0]['imageUrl'] ?? '';
-          txtFirstName.text = result['objectData'][0]['firstName'] ?? '';
-          txtLastName.text = result['objectData'][0]['lastName'] ?? '';
-          txtEmail.text = result['objectData'][0]['email'] ?? '';
-          txtPhone.text = result['objectData'][0]['phone'] ?? '';
-          _selectedPrefixName = result['objectData'][0]['prefixName'];
-          txtPhone.text = result['objectData'][0]['phone'] ?? '';
-          txtUsername.text = result['objectData'][0]['username'] ?? '';
-          txtIdCard.text = result['objectData'][0]['idcard'] ?? '';
-          txtLineID.text = result['objectData'][0]['lineID'] ?? '';
-          txtOfficerCode.text = result['objectData'][0]['officerCode'] ?? '';
-          txtAddress.text = result['objectData'][0]['address'] ?? '';
-          txtMoo.text = result['objectData'][0]['moo'] ?? '';
-          txtSoi.text = result['objectData'][0]['soi'] ?? '';
-          txtRoad.text = result['objectData'][0]['road'] ?? '';
-          txtPrefixName.text = result['objectData'][0]['prefixName'] ?? '';
-
-          _selectedProvince = result['objectData'][0]['provinceCode'] ?? '';
-          _selectedDistrict = result['objectData'][0]['amphoeCode'] ?? '';
-          _selectedSubDistrict = result['objectData'][0]['tambonCode'] ?? '';
-          _selectedPostalCode = result['objectData'][0]['postnoCode'] ?? '';
-          _selectedSex = result['objectData'][0]['sex'] ?? '';
+          _imageUrl = '${api}/uploads/user/${result['image']}' ?? '';
+          txtEmail.text = result['username'] ?? '';
+          txtName.text = result['fullname'] ?? '';
+          selectGender = result['gender'] ?? '';
+          txtNationality.text = result['nationality'] ?? '';
+          txtMapLink.text = result['mapLink'] ?? '';
+          txtPhone.text = result['mobile'] ?? '';
         });
-      }
-      if (_selectedProvince != '') {
-        getProvince();
-        getDistrict();
-        getSubDistrict();
-        // setState(() {
-        //   futureModel =
-        getPostalCode();
-        // });
-      } else {
-        // setState(() {
-        //   futureModel =
-        getProvince();
-        // });
       }
     }
   }
@@ -250,7 +211,7 @@ class _EditUserInformationClientPageState extends State<EditUserInformationClien
     user['imageUrl'] = _imageUrl;
     // user['prefixName'] = _selectedPrefixName ?? '';
     user['prefixName'] = txtPrefixName.text;
-    user['firstName'] = txtFirstName.text;
+    user['firstName'] = txtName.text;
     user['lastName'] = txtLastName.text;
     user['email'] = txtEmail.text;
     user['phone'] = txtPhone.text;
@@ -412,7 +373,7 @@ class _EditUserInformationClientPageState extends State<EditUserInformationClien
     if (user['code'] != '') {
       setState(() {
         _imageUrl = user['imageUrl'] ?? '';
-        txtFirstName.text = user['firstName'] ?? '';
+        txtName.text = user['firstName'] ?? '';
         txtLastName.text = user['lastName'] ?? '';
         txtEmail.text = user['email'] ?? '';
         txtPhone.text = user['phone'] ?? '';
@@ -535,70 +496,18 @@ class _EditUserInformationClientPageState extends State<EditUserInformationClien
             //   ),
             // ),
             // SizedBox(height: 5.0),
-            labelTextFormField('* ชื่อผู้ใช้งาน'),
-            textFormField(
-              txtUsername,
-              null,
-              'ชื่อผู้ใช้งาน',
-              'ชื่อผู้ใช้งาน',
-              false,
-              false,
-              false,
-            ),
-            SizedBox(height: 15.0),
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      labelTextFormField('* รหัสผ่านใหม่'),
-                      textFormField(
-                        txtPassword,
-                        null,
-                        'รหัสผ่านใหม่',
-                        'รหัสผ่านใหม่',
-                        true,
-                        false,
-                        false,
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      labelTextFormField('* ยืนยันรหัสผ่าน'),
-                      textFormField(
-                        txtConPassword,
-                        null,
-                        'ยืนยันรหัสผ่าน',
-                        'ยืนยันรหัสผ่าน',
-                        true,
-                        false,
-                        false,
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
-            labelTextFormField('* เลขใบอนุญาต'),
-            textFormField(
-              licensenumber,
-              null,
-              'เลขใบอนุญาต',
-              'เลขใบอนุญาต',
-              true,
+
+            labelTextFormField('อีเมล'),
+            textFormFieldNoValidator(
+              txtEmail,
+              'อีเมล',
               false,
               false,
             ),
 
             labelTextFormField('* ชื่อ'),
             textFormField(
-              txtFirstName,
+              txtName,
               null,
               'ชื่อ',
               'ชื่อ',
@@ -606,15 +515,68 @@ class _EditUserInformationClientPageState extends State<EditUserInformationClien
               false,
               false,
             ),
-            labelTextFormField('* นามสกุล'),
-            textFormField(
-              txtLastName,
-              null,
-              'นามสกุล',
-              'นามสกุล',
+
+            labelTextFormField('เพศ'),
+            dropdownSelect(
+              context,
+              selectGender,
+              (String? newValue) {
+                setState(() {
+                  selectGender = newValue;
+                });
+              },
+              'เลือกเพศ',
+              true,
+              genderItems,
+            ),
+
+            labelTextFormField('สัญชาติ'),
+            textFormFieldNoValidator(
+              txtNationality,
+              'สัญชาติ',
               true,
               false,
-              false,
+            ),
+
+            labelTextFormField('ตำแหน่งที่อยู่'),
+            Row(
+              children: [
+                Expanded(
+                  child: textFormFieldNoValidator(
+                    txtMapLink,
+                    'ตำแหน่งที่อยู่',
+                    true,
+                    false,
+                  ),
+                ),
+                SizedBox(width: 10,),
+                GestureDetector(
+                  onTap: () async {
+                    Position position = await _getCurrentPosition();
+                    print("Lat: ${position.latitude}, Lng: ${position.longitude}");
+                    setState(() {
+                      txtMapLink.text = 'https://www.google.com/maps?q=${position.latitude},${position.longitude}';
+                    });
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 13.0),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: AppColors.primary,
+                    ),
+                    
+                    child: Text(
+                      'ดึงตำแหน่ง',
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        color: Colors.white,
+                        fontWeight: FontWeight.normal,
+                        fontFamily: 'Sarabun',
+                      ),
+                    ),
+                  ),
+                )
+              ],
             ),
 
             labelTextFormField('* เบอร์โทรศัพท์ (10 หลัก)'),
@@ -625,168 +587,7 @@ class _EditUserInformationClientPageState extends State<EditUserInformationClien
               true,
               false,
             ),
-            labelTextFormField('* อีเมล์'),
-            textFormFieldNoValidator(
-              txtEmail,
-              'อีเมล์',
-              false,
-              false,
-            ),
 
-            labelTextFormField('ที่อยู่ปัจจุบัน'),
-            textFormFieldNoValidator(
-              txtAddress,
-              'ที่อยู่ปัจจุบัน',
-              true,
-              false,
-            ),
-            labelTextFormField('หมู่ที่'),
-            textFormFieldNoValidator(
-              txtMoo,
-              'หมู่ที่',
-              true,
-              false,
-            ),
-            labelTextFormField('ซอย'),
-            textFormFieldNoValidator(
-              txtSoi,
-              'ซอย',
-              true,
-              false,
-            ),
-            labelTextFormField('ถนน'),
-            textFormFieldNoValidator(
-              txtRoad,
-              'ถนน',
-              true,
-              false,
-            ),
-            labelTextFormField('ตำบล/แขวง'),
-            textFormFieldNoValidator(
-              txtRoad,
-              'ตำบล/แขวง',
-              true,
-              false,
-            ),
-            labelTextFormField('อำเภอ/เขต'),
-            textFormFieldNoValidator(
-              txtRoad,
-              'อำเภอ/เขต',
-              true,
-              false,
-            ),
-            labelTextFormField('จังหวัด'),
-            textFormFieldNoValidator(
-              txtRoad,
-              'จังหวัด',
-              true,
-              false,
-            ),
-
-            // SizedBox(height: 15),
-            // Container(
-            //   width: 5000.0,
-            //   padding: EdgeInsets.symmetric(
-            //     horizontal: 5,
-            //     vertical: 0,
-            //   ),
-            //   decoration: BoxDecoration(
-            //     color: AppColors.grayligh,
-            //     borderRadius: BorderRadius.circular(
-            //       10,
-            //     ),
-            //   ),
-            //   child: _selectedPostalCode != ''
-            //       ? DropdownButtonFormField(
-            //           decoration: InputDecoration(
-            //             errorStyle: TextStyle(
-            //               fontWeight: FontWeight.normal,
-            //               fontFamily: 'Sarabun',
-            //               fontSize: 10.0,
-            //             ),
-            //             enabledBorder: UnderlineInputBorder(
-            //               borderSide: BorderSide(
-            //                 color: Colors.white,
-            //               ),
-            //             ),
-            //           ),
-            //           validator: (value) => value == '' || value == null
-            //               ? 'กรุณาเลือกรหัสไปรษณีย์'
-            //               : null,
-            //           hint: Text(
-            //             'รหัสไปรษณีย์',
-            //             style: TextStyle(
-            //               fontSize: 15.00,
-            //               fontFamily: 'Sarabun',
-            //             ),
-            //           ),
-            //           value: _selectedPostalCode,
-            //           onChanged: (Value) {
-            //             setState(() {
-            //               _selectedPostalCode = Value as String;
-            //             });
-            //           },
-            //           items: _itemPostalCode.map((item) {
-            //             return DropdownMenuItem(
-            //               child: Text(
-            //                 item['postCode'],
-            //                 style: TextStyle(
-            //                   fontSize: 15.00,
-            //                   fontFamily: 'Sarabun',
-            //                   color: Color(
-            //                     0xFF9A1120,
-            //                   ),
-            //                 ),
-            //               ),
-            //               value: item['code'],
-            //             );
-            //           }).toList(),
-            //         )
-            //       : DropdownButtonFormField(
-            //           decoration: InputDecoration(
-            //             errorStyle: TextStyle(
-            //               fontWeight: FontWeight.normal,
-            //               fontFamily: 'Sarabun',
-            //               fontSize: 10.0,
-            //             ),
-            //             enabledBorder: UnderlineInputBorder(
-            //               borderSide: BorderSide(
-            //                 color: Colors.white,
-            //               ),
-            //             ),
-            //           ),
-            //           validator: (value) => value == '' || value == null
-            //               ? 'กรุณาเลือกรหัสไปรษณีย์'
-            //               : null,
-            //           hint: Text(
-            //             'รหัสไปรษณีย์',
-            //             style: TextStyle(
-            //               fontSize: 15.00,
-            //               fontFamily: 'Sarabun',
-            //             ),
-            //           ),
-            //           onChanged: (Value) {
-            //             setState(() {
-            //               _selectedPostalCode = Value as String;
-            //             });
-            //           },
-            //           items: _itemPostalCode.map((item) {
-            //             return DropdownMenuItem(
-            //               child: Text(
-            //                 item['postCode'],
-            //                 style: TextStyle(
-            //                   fontSize: 15.00,
-            //                   fontFamily: 'Sarabun',
-            //                   color: Color(
-            //                     0xFF9A1120,
-            //                   ),
-            //                 ),
-            //               ),
-            //               value: item['code'],
-            //             );
-            //           }).toList(),
-            //         ),
-            // ),
             Padding(
               padding: EdgeInsets.only(top: 10.0),
             ),
@@ -797,15 +598,15 @@ class _EditUserInformationClientPageState extends State<EditUserInformationClien
                 child: Material(
                   elevation: 2.0,
                   borderRadius: BorderRadius.circular(5.0),
-                  color: AppColors.primary_gold,
+                  color: AppColors.primary,
                   child: MaterialButton(
                     height: 40,
                     onPressed: () {
-                      final form = _formKey.currentState;
-                      if (form!.validate()) {
-                        form.save();
-                        submitUpdateUser();
-                      }
+                      // final form = _formKey.currentState;
+                      // if (form!.validate()) {
+                      //   form.save();
+                      //   submitUpdateUser();
+                      // }
                     },
                     child: Text(
                       'บันทึกข้อมูล',
@@ -954,6 +755,35 @@ class _EditUserInformationClientPageState extends State<EditUserInformationClien
     Navigator.pop(context, false);
   }
 
+  Future<Position> _getCurrentPosition() async {
+  bool serviceEnabled;
+  LocationPermission permission;
+
+  // Check GPS is enabled
+  serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    return Future.error('กรุณาเปิด GPS');
+  }
+
+  // Check permission
+  permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      return Future.error('ปฏิเสธการขอตำแหน่ง');
+    }
+  }
+
+  if (permission == LocationPermission.deniedForever) {
+    return Future.error('ปิดสิทธิ์ถาวร ต้องไปเปิดใน Settings');
+  }
+
+  // Get current position
+  return await Geolocator.getCurrentPosition(
+    desiredAccuracy: LocationAccuracy.high,
+  );
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1066,4 +896,5 @@ class _EditUserInformationClientPageState extends State<EditUserInformationClien
       ),
     );
   }
+
 }
