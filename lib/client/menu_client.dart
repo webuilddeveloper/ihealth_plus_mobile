@@ -49,6 +49,7 @@ class _MenuClientState extends State<MenuClient> {
       BookingFavoritePage(),
       UserInformationClientPage(),
     ];
+    onSetPage();
     super.initState();
   }
 
