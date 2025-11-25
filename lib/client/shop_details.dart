@@ -172,7 +172,7 @@ class _ShopDetailState extends State<ShopDetail> {
                   children: [
                     Icon(
                       Icons.location_on_outlined,
-                      color: AppColors.textdark,
+                      color: AppColors.primary,
                       size: 20,
                     ),
                     SizedBox(width: 8),
@@ -192,7 +192,7 @@ class _ShopDetailState extends State<ShopDetail> {
                   children: [
                     Icon(
                       Icons.timer_outlined,
-                      color: AppColors.textdark,
+                      color: AppColors.primary,
                       size: 20,
                     ),
                     SizedBox(width: 8),
@@ -212,7 +212,7 @@ class _ShopDetailState extends State<ShopDetail> {
                   children: [
                     Icon(
                       Icons.calendar_month_outlined,
-                      color: AppColors.textdark,
+                      color: AppColors.primary,
                       size: 20,
                     ),
                     SizedBox(width: 8),
@@ -228,6 +228,32 @@ class _ShopDetailState extends State<ShopDetail> {
                   ],
                 ),
                 SizedBox(height: 16),
+                Row(
+                  children: [
+                    (model['website'] ?? '') != '' ?
+                    GestureDetector(
+                      onTap: () {
+                        launch(model['website']);
+                      },
+                      child: Container(
+                        height: 30,
+                        child: Image.asset('assets/web.png'),
+                      ),
+                    ) : Container(),
+                    (model['website'] ?? '') != '' ?
+                    SizedBox(width: 16) : Container(),
+                    (model['facebook'] ?? '') != '' ?
+                    GestureDetector(
+                      onTap: () {
+                        launch(model['facebook']);
+                      },
+                      child: Container(
+                        height: 30,
+                        child: Image.asset('assets/facebook.png'),
+                      ),
+                    ) : Container()
+                  ],
+                )
               ],
             ),
           ),
