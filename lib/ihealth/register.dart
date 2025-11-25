@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
+import 'package:ihealth_2025_mobile/shared/api_provider_ihealth.dart';
 import 'package:ihealth_2025_mobile/widget/text_form_field.dart';
 import 'login.dart';
 
@@ -27,6 +28,9 @@ class _RegisterPageState extends State<RegisterPage> {
   final txtEmail = TextEditingController();
   final txtPassword = TextEditingController();
   final txtConPassword = TextEditingController();
+  bool _isPasswordObscured = true;
+  bool _isConfirmPasswordObscured = true;
+
   @override
   void dispose() {
     txtLicenseNumber.dispose();
@@ -84,66 +88,6 @@ class _RegisterPageState extends State<RegisterPage> {
         });
   }
 
-  Future<void> _signUp() async {
-    if (_formKey.currentState!.validate()) {
-      try {
-        var headers = {'Content-Type': 'application/json'};
-        var data = json.encode({
-          // "license_number": txtLicenseNumber.text,
-          "username": txtName.text,
-          "password": txtPassword.text,
-          "confirm_password": txtConPassword.text,
-          "affiliation_id": 1, // ร้านนวด 1, หมอนวด 2 , ผู้ดำเนินการสปา 3
-        });
-
-        var dio = Dio();
-        var response = await dio.post(
-          'http://110.78.211.156:3001/api/v1/signup',
-          options: Options(headers: headers),
-          data: data,
-        );
-
-        if (response.statusCode == 200) {
-          dialogSuccess();
-          // print("✅ SignUp Success: ${response.data}");
-          // await _signIn(txtName.text, txtPassword.text);
-        } else {
-          print("❌ SignUp Failed: ${response.statusMessage}");
-        }
-      } catch (e) {
-        print("❌ Error in SignUp: $e");
-      }
-    }
-  }
-
-  // Future<void> _signIn(String username, String password) async {
-  //   try {
-  //     var headers = {'Content-Type': 'application/json'};
-  //     var dio = Dio();
-  //     var response = await dio.post(
-  //       'http://110.78.211.156:3001/api/v1/signin',
-  //       options: Options(headers: headers),
-  //       data: json.encode({
-  //         "username": username,
-  //         "password": password,
-  //       }),
-  //     );
-  //     if (response.statusCode == 200) {
-  //       print("✅ SignIn Success: ${response.data}");
-  //       String token = response.data["token"];
-  //       storage.write(key: 'token', value: token);
-  //       Navigator.of(context).pushAndRemoveUntil(
-  //         MaterialPageRoute(builder: (context) => Menu()),
-  //         (Route<dynamic> route) => false,
-  //       );
-  //     } else {
-  //       print("❌ SignIn Failed: ${response.statusMessage}");
-  //     }
-  //   } catch (e) {
-  //     print("❌ Error in SignIn: $e");
-  //   }
-  // }
-
   Future<void> signUpCustomer() async {
     print('-----------signUpCustomer--------------');
     print('Email: ${txtEmail.text}');
@@ -155,26 +99,53 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
 
-    var headers = {
-      'Content-Type': 'application/json',
-      'Cookie':
-          'sid=s%3AWYIZXxrcS3i4K557SyYJMoImJRVo1Anb.SNIAawcnz05zEL5cuujBAuORyod1Lqf49mrHNwmO6vE'
-    };
-
     var data = {
       "email": txtEmail.text,
       "fullname": txtName.text,
       "password": txtPassword.text
     };
 
-    var dio = Dio();
+    try {
+      // เปลี่ยนมาใช้ getInstance() ที่เป็น async
+      final apiProvider = await ApiProviderIhealth.getInstance();
+      var response = await apiProvider.post('v1/customer/signup', data: data);
+
+      print('Response status: ${response.statusCode}');
+      print('Response data: ${response.data}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        dialogSuccess();
+      }
+    } on DioException catch (e) {
+      print('DioException: ${e.response?.statusCode} - ${e.response?.data}');
+      // ถ้าอยากโชว์ error ให้ user
+      // dialogError(e.response?.data.toString() ?? 'เกิดข้อผิดพลาด');
+      print(
+          'Error during sign up: ${e.response?.data.toString() ?? 'เกิดข้อผิดพลาด'}');
+    }
+  }
+
+  Future<void> signUpTherapists() async {
+    print('-----------signUpCustomer--------------');
+    print('Email: ${txtLicenseNumber.text}');
+    print('Name: ${txtName.text}');
+    print('Password: ${txtPassword.text}');
+
+    if (!_formKey.currentState!.validate()) {
+      print('Form validation failed');
+      return;
+    }
+
+    var data = {
+      "license_number": txtLicenseNumber.text,
+      "username": txtName.text,
+      "password": txtPassword.text
+    };
 
     try {
-      var response = await dio.post(
-        'https://api-ihealth.spl-system.com/api/v1/customer/signup',
-        data: data,
-        options: Options(headers: headers),
-      );
+      // เปลี่ยนมาใช้ getInstance() ที่เป็น async
+      final apiProvider = await ApiProviderIhealth.getInstance();
+      var response = await apiProvider.post('v1/therapists/signup', data: data);
 
       print('Response status: ${response.statusCode}');
       print('Response data: ${response.data}');
@@ -283,7 +254,19 @@ class _RegisterPageState extends State<RegisterPage> {
                                   txtPassword,
                                   'รหัสผ่าน',
                                   true,
+                                  obscureText: _isPasswordObscured,
                                   validator: passwordValidator,
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      _isPasswordObscured
+                                          ? Icons.visibility_off
+                                          : Icons.visibility,
+                                    ),
+                                    onPressed: () {
+                                      setState(() => _isPasswordObscured =
+                                          !_isPasswordObscured);
+                                    },
+                                  ),
                                 ),
                               ),
                               SizedBox(height: 8),
@@ -295,9 +278,20 @@ class _RegisterPageState extends State<RegisterPage> {
                                   txtConPassword,
                                   'ยืนยันรหัสผ่าน',
                                   true,
+                                  obscureText: _isConfirmPasswordObscured,
                                   validator: (value) =>
                                       confirmPasswordValidator(
                                           value, txtPassword.text),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      _isConfirmPasswordObscured
+                                          ? Icons.visibility_off
+                                          : Icons.visibility,
+                                    ),
+                                    onPressed: () => setState(() =>
+                                        _isConfirmPasswordObscured =
+                                            !_isConfirmPasswordObscured),
+                                  ),
                                 ),
                               ),
                               SizedBox(height: 16),
@@ -369,14 +363,14 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                               SizedBox(height: 8),
                               Container(
-                                child: labelTextihealt('* อีเมล'),
+                                child: labelTextihealt('* ผู้ชื่อใช้'),
                               ),
                               Container(
                                 child: ihealtTextFormField(
                                   txtName,
-                                  'อีเมล',
+                                  'ชื่อผู้ใช้',
                                   true,
-                                  validator: emailValidator,
+                                  // validator: emailValidator,
                                 ),
                               ),
                               SizedBox(height: 8),
@@ -388,7 +382,18 @@ class _RegisterPageState extends State<RegisterPage> {
                                   txtPassword,
                                   'รหัสผ่าน',
                                   true,
+                                  obscureText: _isPasswordObscured,
                                   validator: passwordValidator,
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      _isPasswordObscured
+                                          ? Icons.visibility_off
+                                          : Icons.visibility,
+                                    ),
+                                    onPressed: () => setState(() =>
+                                        _isPasswordObscured =
+                                            !_isPasswordObscured),
+                                  ),
                                 ),
                               ),
                               SizedBox(height: 8),
@@ -400,9 +405,20 @@ class _RegisterPageState extends State<RegisterPage> {
                                   txtConPassword,
                                   'ยืนยันรหัสผ่าน',
                                   true,
+                                  obscureText: _isConfirmPasswordObscured,
                                   validator: (value) =>
                                       confirmPasswordValidator(
                                           value, txtPassword.text),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      _isConfirmPasswordObscured
+                                          ? Icons.visibility_off
+                                          : Icons.visibility,
+                                    ),
+                                    onPressed: () => setState(() =>
+                                        _isConfirmPasswordObscured =
+                                            !_isConfirmPasswordObscured),
+                                  ),
                                 ),
                               ),
                               SizedBox(height: 16),
@@ -410,6 +426,9 @@ class _RegisterPageState extends State<RegisterPage> {
                                 child: InkWell(
                                   onTap: () {
                                     print('-----------หมอนวด--------------');
+                                    setState(() {
+                                      signUpTherapists();
+                                    });
                                   },
                                   child: Container(
                                     height: 50,

@@ -69,7 +69,11 @@ ihealtTextFormField(
         fontSize: 8.0,
         overflow: TextOverflow.ellipsis,
       ),
-      suffixIcon: suffixIcon,
+      suffixIcon: suffixIcon != null
+          ? IconTheme(
+              data: IconThemeData(color: AppColors.primary.withOpacity(0.6)),
+              child: suffixIcon)
+          : null,
     ),
     validator: validator,
     controller: controller,
