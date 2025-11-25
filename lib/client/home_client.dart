@@ -3,9 +3,11 @@
 import 'dart:convert';
 import 'dart:ffi';
 import 'dart:ui';
+import 'package:dio/dio.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:ihealth_2025_mobile/client/booking/booking.dart';
+import 'package:ihealth_2025_mobile/client/shop_details.dart';
 import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
 import 'package:ihealth_2025_mobile/ihealth/apply/apply-detail.dart';
 import 'package:ihealth_2025_mobile/ihealth/apply/apply.dart';
@@ -50,6 +52,8 @@ class _HomeClientState extends State<HomeClient>
   late Future<dynamic> _futureMainPopUp;
   late Future<dynamic> _futureVerifyTicket;
 
+  dynamic profileModel = {};
+
   String profileCode = '';
   String currentLocation = '-';
   final seen = Set<String>();
@@ -90,6 +94,8 @@ class _HomeClientState extends State<HomeClient>
     )..repeat(reverse: true); // กลับไปกลับมา
 
     _callReadShop();
+    _callReadCourse();
+    _readProfile();
     super.initState();
   }
 
@@ -296,18 +302,43 @@ class _HomeClientState extends State<HomeClient>
           ),
           child: Padding(
             padding: EdgeInsets.all(profilePadding),
-            child: Image.asset(
-              'assets/images/user_not_found.png',
-              color: AppColors.primary,
-              fit: BoxFit.contain,
-            ),
+            child: (profileModel['token'] ?? "") != ""
+                ? Container(
+                    // height: MediaQuery.of(context).size.height * 0.12,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.all(
+                        Radius.circular(10),
+                      ),
+                      // image: DecorationImage(
+                      //   image: AssetImage(shop['imgUrl']),
+                      //   fit: BoxFit.cover,
+                      // ),
+                      image: DecorationImage(
+                        image: NetworkImage(
+                            '${api}/uploads/user/${profileModel['image']}'),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  )
+                //  Image.network(
+                //     '${api}/uploads/user/${profileModel['image']}',
+                //     // color: AppColors.primary,
+                //     fit: BoxFit.contain,
+                //   )
+                : Image.asset(
+                    'assets/images/user_not_found.png',
+                    color: AppColors.primary,
+                    fit: BoxFit.contain,
+                  ),
           ),
         ),
         SizedBox(width: spacing),
 
         // Content Section
         Expanded(
-          child: isLoggedIn == true
+          // child: isLoggedIn == true
+          child: (profileModel['token'] ?? "") != ""
               ? _buildLoggedInContent(isSmallScreen, isMediumScreen)
               : _buildNotLoggedInContent(isSmallScreen, isMediumScreen),
         ),
@@ -329,31 +360,45 @@ class _HomeClientState extends State<HomeClient>
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Flexible(
-          child: RichText(
-            overflow: TextOverflow.ellipsis,
-            maxLines: isSmallScreen ? 2 : 3,
-            text: TextSpan(
-              text: 'หมอนวด',
-              style: TextStyle(
-                fontFamily: 'Sarabun',
-                fontSize: titleFontSize,
-                fontWeight: FontWeight.w700,
-                color: AppColors.primary,
-                height: 1.2,
-                letterSpacing: -0.3,
-              ),
-              children: <TextSpan>[
-                TextSpan(
-                  text: ' รัชชานนท์ ',
+          child: profileModel['loginType'] == "1"
+              ? Text(
+                  profileModel['fullname'],
                   style: TextStyle(
-                    fontSize: subtitleFontSize,
-                    color: AppColors.primary_gold,
+                    fontFamily: 'Sarabun',
+                    fontSize: titleFontSize,
                     fontWeight: FontWeight.w700,
+                    color: AppColors.primary,
+                    height: 1.2,
+                    letterSpacing: -0.3,
+                  ),
+                  maxLines: isSmallScreen ? 2 : 3,
+                  overflow: TextOverflow.ellipsis,
+                )
+              : RichText(
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: isSmallScreen ? 2 : 3,
+                  text: TextSpan(
+                    text: 'หมอนวด',
+                    style: TextStyle(
+                      fontFamily: 'Sarabun',
+                      fontSize: titleFontSize,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primary,
+                      height: 1.2,
+                      letterSpacing: -0.3,
+                    ),
+                    children: <TextSpan>[
+                      TextSpan(
+                        text: ' รัชชานนท์ ',
+                        style: TextStyle(
+                          fontSize: subtitleFontSize,
+                          color: AppColors.primary_gold,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-          ),
         ),
         SizedBox(height: isSmallScreen ? 6 : 8),
         Container(
@@ -367,7 +412,9 @@ class _HomeClientState extends State<HomeClient>
             ),
           ),
           child: Text(
-            'นวดเพื่อสุขภาพ',
+            profileModel['loginType'] == "1"
+                ? 'ผู้รับบริการ'
+                : 'นวดเพื่อสุขภาพ',
             style: TextStyle(
               fontFamily: 'Sarabun',
               fontSize: badgeFontSize,
@@ -543,15 +590,15 @@ class _HomeClientState extends State<HomeClient>
                 final shop = mockShop[index];
                 return GestureDetector(
                   onTap: () {
-                    print(mockShop[index]);
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (context) => CourseDetail(
-                    //       course: shop,
-                    //     ),
-                    //   ),
-                    // );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ShopDetail(
+                          shopId: shop['uuid'],
+                          // course: shop,
+                        ),
+                      ),
+                    );
                   },
                   child: Container(
                     width: 220,
@@ -583,26 +630,30 @@ class _HomeClientState extends State<HomeClient>
                                   topLeft: Radius.circular(10),
                                   topRight: Radius.circular(10),
                                 ),
+                                // image: DecorationImage(
+                                //   image: AssetImage(shop['imgUrl']),
+                                //   fit: BoxFit.cover,
+                                // ),
                                 image: DecorationImage(
-                                  image: AssetImage(shop['imgUrl']),
+                                  image: NetworkImage(api + shop['image']),
                                   fit: BoxFit.cover,
                                 ),
                               ),
                             ),
 
-                            if (shop['rank'] == 1)
+                            if (index == 0)
                               Positioned(
                                 top: 5,
                                 right: 5,
                                 child: _buildMedal(Colors.amber, "1"),
                               )
-                            else if (shop['rank'] == 2)
+                            else if (index == 1)
                               Positioned(
                                 top: 5,
                                 right: 5,
                                 child: _buildMedal(Colors.grey, "2"),
                               )
-                            else if (shop['rank'] == 3)
+                            else if (index == 2)
                               Positioned(
                                 top: 5,
                                 right: 5,
@@ -618,7 +669,7 @@ class _HomeClientState extends State<HomeClient>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                shop['title'],
+                                shop['massage_name'],
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
@@ -719,7 +770,9 @@ class _HomeClientState extends State<HomeClient>
                               topRight: Radius.circular(10),
                             ),
                             image: DecorationImage(
-                              image: AssetImage(course['imgUrl']),
+                              image: NetworkImage(api +
+                                  '/uploads/school/course/' +
+                                  course['smallImage']),
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -750,7 +803,7 @@ class _HomeClientState extends State<HomeClient>
                                     size: 16,
                                   ),
                                   const SizedBox(width: 8),
-                                  Text(': ${course['courseTime']} ชั่วโมง'),
+                                  Text(': ${course['hours']} นาที'),
                                 ],
                               ),
                             ],
@@ -921,6 +974,24 @@ class _HomeClientState extends State<HomeClient>
         ),
       ],
     );
+  }
+
+  _readProfile() async {
+    await storage.read(key: 'fullname').then((v) => setState(() {
+          profileModel['fullname'] = v;
+        }));
+    await storage.read(key: 'mobile').then((v) => setState(() {
+          profileModel['mobile'] = v;
+        }));
+    await storage.read(key: 'image').then((v) => setState(() {
+          profileModel['image'] = v;
+        }));
+    await storage.read(key: 'token').then((v) => setState(() {
+          profileModel['token'] = v;
+        }));
+    await storage.read(key: 'loginType').then((v) => setState(() {
+          profileModel['loginType'] = v;
+        }));
   }
 
   _read() async {
@@ -1154,72 +1225,52 @@ class _HomeClientState extends State<HomeClient>
     }
   }
 
-  _callReadShop() {
-    List<Map<String, dynamic>> rankedShop = List.from(mockShop)
-      ..sort((a, b) => b['booking'].compareTo(a['booking']));
-
-    // ใส่อันดับให้แต่ละร้าน
-    for (var i = 0; i < rankedShop.length; i++) {
-      rankedShop[i]['rank'] = i + 1;
-    }
-
-    mockShop = rankedShop;
+  _callReadShop() async {
+    get(api + '/api/v1/shop/featured-shop').then(
+      (v) => {
+        setState(() {
+          mockShop = v;
+        }),
+      },
+    );
   }
 
-  List<Map<String, dynamic>> mockShop = [
-    {
-      "title": "ร้านนวดสบายใจ",
-      "category": "นวดเท้า",
-      "province": "กรุงเทพมหานคร",
-      "district": "บางรัก",
-      "imgUrl": "assets/ihealth/shop1.jpg",
-      "booking": 144
-    },
-    {
-      "title": "ร้านผ่อนคลาย",
-      "category": "นวดอโรมา",
-      "province": "เชียงใหม่",
-      "district": "เมืองเชียงใหม่",
-      "imgUrl": "assets/ihealth/shop2.jpg",
-      "booking": 345
-    },
-    {
-      "title": "ร้านสุขใจ",
-      "category": "นวดไทย",
-      "province": "ภูเก็ต",
-      "district": "เมืองภูเก็ต",
-      "imgUrl": "assets/ihealth/shop3.jpg",
-      "booking": 213
-    },
+  _callReadCourse() async {
+    get(api + '/api/v1/shop/massage-course').then(
+      (v) => {
+        setState(() {
+          mockCourse = v;
+        }),
+      },
+    );
+  }
+
+  List<dynamic> mockShop = [
+    // {
+    //   "title": "ร้านนวดสบายใจ",
+    //   "category": "นวดเท้า",
+    //   "province": "กรุงเทพมหานคร",
+    //   "district": "บางรัก",
+    //   "imgUrl": "assets/ihealth/shop1.jpg",
+    //   "booking": 144
+    // },
+    // {
+    //   "title": "ร้านผ่อนคลาย",
+    //   "category": "นวดอโรมา",
+    //   "province": "เชียงใหม่",
+    //   "district": "เมืองเชียงใหม่",
+    //   "imgUrl": "assets/ihealth/shop2.jpg",
+    //   "booking": 345
+    // },
+    // {
+    //   "title": "ร้านสุขใจ",
+    //   "category": "นวดไทย",
+    //   "province": "ภูเก็ต",
+    //   "district": "เมืองภูเก็ต",
+    //   "imgUrl": "assets/ihealth/shop3.jpg",
+    //   "booking": 213
+    // },
   ];
 
-  final List<Map<String, dynamic>> mockCourse = [
-    {
-      "id": 1,
-      "imgUrl": "assets/ihealth/course1.jpg",
-      "title": "หลักสูตรนวดไทยเพื่อสุขภาพ",
-      "company": "ร้านนวดไทยดี",
-      "type": "นวดเพื่อสุขภาพ",
-      "location": "กรุงเทพฯ",
-      "courseTime": "150",
-    },
-    {
-      "id": 2,
-      "imgUrl": "assets/ihealth/course2.jpg",
-      "title": "หลักสูตรนวดไทยเพื่อสุขภาพ",
-      "company": "ร้านนวดไทยดี",
-      "type": "นวดเพื่อสุขภาพ",
-      "location": "กรุงเทพฯ",
-      "courseTime": "500",
-    },
-    {
-      "id": 3,
-      "imgUrl": "assets/ihealth/course3.jpg",
-      "title": "หลักสูตรนวดไทยเพื่อสุขภาพ",
-      "company": "ร้านนวดไทยดี",
-      "type": "นวดเพื่อสุขภาพ",
-      "location": "กรุงเทพฯ",
-      "courseTime": "60",
-    },
-  ];
+  List<dynamic> mockCourse = [];
 }
