@@ -1,96 +1,130 @@
 import 'package:flutter/material.dart';
-import 'package:ihealth_2025_mobile/component/button_close_back.dart';
-import 'package:ihealth_2025_mobile/component/comment.dart';
-import 'package:ihealth_2025_mobile/component/content.dart';
-import 'package:ihealth_2025_mobile/shared/api_provider.dart';
+import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
+import 'package:ihealth_2025_mobile/shared/api_provider_ihealth.dart';
+import 'package:ihealth_2025_mobile/shared/dio_service.dart';
+import 'package:ihealth_2025_mobile/shared/extension.dart';
+import 'package:intl/intl.dart';
 
 // ignore: must_be_immutable
 class NotificationClientForm extends StatefulWidget {
   NotificationClientForm({
     Key? key,
-    required this.url,
-    required this.code,
     this.model,
-    required this.urlComment,
-    required this.urlGallery,
   }) : super(key: key);
 
-  final String url;
-  final String code;
   final dynamic model;
-  final String urlComment;
-  final String urlGallery;
 
   @override
   _NotificationClientForm createState() => _NotificationClientForm();
 }
 
 class _NotificationClientForm extends State<NotificationClientForm> {
-  late Comment comment;
-  late int _limit;
-
   @override
   void initState() {
-    setState(() {
-      _limit = 10;
-    });
-
-    comment = Comment(
-      code: widget.code,
-      url: widget.urlComment,
-      model: post('${newsCommentApi}read',
-          {'skip': 0, 'limit': _limit, 'code': widget.code}),
-      limit: _limit,
-    );
-
     super.initState();
+    _markAsRead();
+  }
+
+  Future<void> _markAsRead() async {
+    if (widget.model != null && widget.model['noti_id'] != null) {
+      try {
+        final apiProvider = await ApiProviderIhealth.getInstance();
+        var response = await apiProvider.get('v1/notify?role=customer/${widget.model['noti_id']}');
+        print('Notification ${widget.model['noti_id']} marked as read.');
+      } catch (e) {
+        print("Error marking notification as read: $e");
+      }
+    }
+  }
+
+  String formatDateTime(String? dateString) {
+    if (dateString == null) return '';
+    try {
+      final dateTime = DateTime.parse(dateString);
+      final formatter = DateFormat('dd-MM-yyyy HH:mm');
+      return formatter.format(dateTime);
+    } catch (e) {
+      return isoDateStringToDisplayDate(dateString);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: NotificationListener<OverscrollIndicatorNotification>(
-        onNotification: (OverscrollIndicatorNotification overScroll) {
-          overScroll.disallowIndicator();
-          return false;
-        },
-        child: ListView(
-          shrinkWrap: true,
-          children: [
-            // Expanded(
-            //   child:
-            Stack(
-              // fit: StackFit.expand,
-              // alignment: AlignmentDirectional.bottomCenter,
-              // shrinkWrap: true,
-              // physics: ClampingScrollPhysics(),
-              children: [
-                Content(
-                  code: widget.code,
-                  url: widget.url,
-                  model: widget.model,
-                  urlGallery: widget.urlGallery,
-                  pathShare: '',
-                ),
-                Positioned(
-                  right: 0,
-                  top: (height * 0.5 / 100),
-                  child: Container(
-                    child: buttonCloseBack(context),
-                  ),
-                ),
-              ],
-              // overflow: Overflow.clip,
-            ),
-            SizedBox(
-              height: 50,
-            )
-            // ),
-            // widget.urlComment != '' ? comment : Container(),
-          ],
+      appBar: AppBar(
+        title: Text(
+          'รายละเอียดการแจ้งเตือน',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
+        centerTitle: true,
+        backgroundColor: AppColors.primary,
+        iconTheme: IconThemeData(color: Colors.white),
+      ),
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20.0),
+        child: widget.model == null
+            ? Center(child: Text('ไม่พบข้อมูล'))
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.model['title'] ?? 'ไม่มีหัวข้อ',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Icon(Icons.access_time,
+                          color: Colors.grey[600], size: 16),
+                      SizedBox(width: 8),
+                      Text(
+                        formatDateTime(widget.model['createdAt']),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  Divider(),
+                  SizedBox(height: 20),
+                  Text(
+                    'รายละเอียด:',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textdark,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    widget.model['message'] ?? 'ไม่มีข้อความ',
+                    style: TextStyle(
+                      fontSize: 16,
+                      height: 1.5,
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  if (widget.model['booking_id'] != null) ...[
+                    Text(
+                      'รหัสการจอง: ${widget.model['booking_id']}',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[700],
+                      ),
+                    ),
+                  ]
+                ],
+              ),
       ),
     );
   }
