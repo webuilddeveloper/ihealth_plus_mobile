@@ -193,7 +193,7 @@ class _EditUserInformationClientPageState
 
       if (result != null) {
         setState(() {
-          _imageUrl = '${api}/uploads/user/${result['image']}' ?? '';
+          _imageUrl = '${api}${result['image']}' ?? '';
           txtEmail.text = result['username'] ?? '';
           txtName.text = result['fullname'] ?? '';
           selectGender = result['gender'] ?? '';
