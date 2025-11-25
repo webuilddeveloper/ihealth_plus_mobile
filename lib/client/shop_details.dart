@@ -7,6 +7,7 @@ import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
 import 'package:ihealth_2025_mobile/ihealth/course/course.dart';
 import 'package:ihealth_2025_mobile/shared/api_provider.dart';
 import 'package:ihealth_2025_mobile/shared/dio_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ShopDetail extends StatefulWidget {
   ShopDetail({super.key, required this.shopId});
@@ -262,10 +263,15 @@ class _ShopDetailState extends State<ShopDetail> {
               SizedBox(
                 width: 20,
               ),
-              Icon(
-                Icons.map_outlined,
-                size: 40,
-                color: AppColors.primary,
+              GestureDetector(
+                onTap: () => {
+                  launch(model['mapLink'])
+                },
+                child: Icon(
+                  Icons.map_outlined,
+                  size: 40,
+                  color: AppColors.primary,
+                ),
               ),
               SizedBox(
                 width: 20,
