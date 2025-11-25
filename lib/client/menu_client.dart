@@ -3,6 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:ihealth_2025_mobile/client/booking/booking_favorite.dart';
 import 'package:ihealth_2025_mobile/client/booking/booking_history.dart';
 import 'package:ihealth_2025_mobile/client/home_client.dart';
+import 'package:ihealth_2025_mobile/client/notification/notification_client_list.dart';
 import 'package:ihealth_2025_mobile/ihealth/profile/user_information_client.dart';
 import '../shared/api_provider.dart';
 
@@ -42,6 +43,9 @@ class _MenuClientState extends State<MenuClient> {
         changePage: _changePage,
       ),
       BookingHistoryPage(),
+      NotificationClientList(
+        title: 'แจ้งเตือน',
+      ),
       BookingFavoritePage(),
       UserInformationClientPage(),
     ];
@@ -177,12 +181,18 @@ class _MenuClientState extends State<MenuClient> {
             _buildTap(
               2,
               '',
-              icon: 'assets/ihealth/icon/heart1.png',
-              iconActive: 'assets/ihealth/icon/heart_active.png',
+              icon: 'assets/ihealth/icon/noti.png',
+              iconActive: 'assets/ihealth/icon/noti_active.png',
               isNoti: true,
             ),
             _buildTap(
               3,
+              '',
+              icon: 'assets/ihealth/icon/heart1.png',
+              iconActive: 'assets/ihealth/icon/heart_active.png',
+            ),
+            _buildTap(
+              4,
               '',
               icon: 'assets/ihealth/icon/profile.png',
               iconActive: 'assets/ihealth/icon/profile_active.png',
