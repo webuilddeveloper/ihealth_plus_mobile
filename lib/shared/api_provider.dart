@@ -618,11 +618,11 @@ Future<String> uploadImageX(XFile file) async {
 }
 
 Future get(String url) async {
-
   var response = await http.get(Uri.parse(url), headers: {
     "Accept": "application/json",
     "Content-Type": "application/json",
-    'Cookie': 'sid=s%3A5ibCRluySmnXQw1C4pQwKErfGJM6tStB.yO5sNcOHRBVJRUYrOsaWvOhwmz8qfjWE8%2F8rXIlYRq4'
+    'Cookie':
+        'sid=s%3A5ibCRluySmnXQw1C4pQwKErfGJM6tStB.yO5sNcOHRBVJRUYrOsaWvOhwmz8qfjWE8%2F8rXIlYRq4'
   });
 
   if (response.statusCode == 200) {
@@ -631,7 +631,32 @@ Future get(String url) async {
   } else {
     return {"status": "F"};
   }
-  // return Future.value(data);
+}
+
+Future post2(String url, Map<String, dynamic> body) async {
+  try {
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        'Cookie':
+            'sid=s%3A5ibCRluySmnXQw1C4pQwKErfGJM6tStB.yO5sNcOHRBVJRUYrOsaWvOhwmz8qfjWE8%2F8rXIlYRq4'
+      },
+      body: json.encode(body),
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return data['data']; // เหมือนที่คุณใช้
+    } else {
+      print("❗️POST ERROR: ${response.statusCode}");
+      return null;
+    }
+  } catch (e) {
+    print("❗️POST EXCEPTION: $e");
+    return null;
+  }
 }
 
 const splashReadApi = server + 'm/splash/read';

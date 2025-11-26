@@ -178,6 +178,7 @@ class _BookingConfirmState extends State<BookingConfirm> {
                     ],
                   ),
                   const SizedBox(height: 12),
+
                   /// ถ้ามีโปร แสดงกล่อง
                   if (selectedPromo != null)
                     Container(
@@ -219,7 +220,10 @@ class _BookingConfirmState extends State<BookingConfirm> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => BookingDetail(),
+                                builder: (_) => BookingDetail(
+                                  massage_info_id: "",
+                                  booking_date: "",
+                                ),
                               ),
                             );
                           },
@@ -273,7 +277,8 @@ class _BookingConfirmState extends State<BookingConfirm> {
       barrierDismissible: false, // ห้ามกดปิดเอง
       builder: (context) {
         return Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           child: Padding(
             padding: const EdgeInsets.all(24.0),
             child: Column(
@@ -303,7 +308,7 @@ class _BookingConfirmState extends State<BookingConfirm> {
       Navigator.of(context).pop(); // ปิด dialog
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) =>  BookingHistoryPage()),
+        MaterialPageRoute(builder: (context) => BookingHistoryPage()),
       );
     });
   }

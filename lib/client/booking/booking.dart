@@ -24,18 +24,96 @@ class _BookingState extends State<Booking> {
   final TextEditingController dateCtrl = TextEditingController();
   final TextEditingController timeCtrl = TextEditingController();
 
-  // TextEditingController txtDate = TextEditingController();
-
-  // int _selectedDay = DateTime.now().day;
-  // int _selectedMonth = DateTime.now().month;
-  // int _selectedYear = DateTime.now().year;
-
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   TextEditingController txtDate = TextEditingController();
 
   DateTime today = DateTime.now();
+
+  String? selectedProvince;
+
+  String? dateForSend;
+
+  final List<String> provinces = [
+    "กรุงเทพมหานคร",
+    "กระบี่",
+    "กาญจนบุรี",
+    "กาฬสินธุ์",
+    "กำแพงเพชร",
+    "ขอนแก่น",
+    "จันทบุรี",
+    "ฉะเชิงเทรา",
+    "ชลบุรี",
+    "ชัยนาท",
+    "ชัยภูมิ",
+    "ชุมพร",
+    "เชียงราย",
+    "เชียงใหม่",
+    "ตรัง",
+    "ตราด",
+    "ตาก",
+    "นครนายก",
+    "นครปฐม",
+    "นครพนม",
+    "นครราชสีมา",
+    "นครศรีธรรมราช",
+    "นครสวรรค์",
+    "นนทบุรี",
+    "นราธิวาส",
+    "น่าน",
+    "บึงกาฬ",
+    "บุรีรัมย์",
+    "ปทุมธานี",
+    "ประจวบคีรีขันธ์",
+    "ปราจีนบุรี",
+    "ปัตตานี",
+    "พระนครศรีอยุธยา",
+    "พะเยา",
+    "พังงา",
+    "พัทลุง",
+    "พิจิตร",
+    "พิษณุโลก",
+    "เพชรบุรี",
+    "เพชรบูรณ์",
+    "แพร่",
+    "ภูเก็ต",
+    "มหาสารคาม",
+    "มุกดาหาร",
+    "แม่ฮ่องสอน",
+    "ยโสธร",
+    "ยะลา",
+    "ร้อยเอ็ด",
+    "ระนอง",
+    "ระยอง",
+    "ราชบุรี",
+    "ลพบุรี",
+    "ลำปาง",
+    "ลำพูน",
+    "เลย",
+    "ศรีสะเกษ",
+    "สกลนคร",
+    "สงขลา",
+    "สตูล",
+    "สมุทรปราการ",
+    "สมุทรสงคราม",
+    "สมุทรสาคร",
+    "สระแก้ว",
+    "สระบุรี",
+    "สิงห์บุรี",
+    "สุโขทัย",
+    "สุพรรณบุรี",
+    "สุราษฎร์ธานี",
+    "สุรินทร์",
+    "หนองคาย",
+    "หนองบัวลำภู",
+    "อ่างทอง",
+    "อุดรธานี",
+    "อุตรดิตถ์",
+    "อุทัยธานี",
+    "อุบลราชธานี",
+    "อำนาจเจริญ",
+  ];
 
   Future<void> _getCurrentLocation() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -80,8 +158,48 @@ class _BookingState extends State<Booking> {
         child: ListView(
           children: [
             SizedBox(height: 20),
-            // วันที่ต้องการ
+            Text('จังหวัด *'),
+            SizedBox(height: 10),
+            Container(
+              padding: EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.06),
+                    blurRadius: 8,
+                    offset: Offset(0, 4),
+                  )
+                ],
+              ),
+              child: DropdownButtonFormField<String>(
+                decoration: InputDecoration(
+                  labelText: "เลือกจังหวัด",
+                  prefixIcon: Icon(Icons.location_on_outlined),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                value: selectedProvince,
+                isExpanded: true,
+                items: provinces
+                    .map((prov) => DropdownMenuItem(
+                          value: prov,
+                          child: Text(
+                            prov,
+                            style: TextStyle(fontSize: 15),
+                          ),
+                        ))
+                    .toList(),
+                onChanged: (v) => setState(() => selectedProvince = v),
+              ),
+            ),
+            SizedBox(height: 10),
+
             Text('วันที่ต้องการ *'),
+            SizedBox(height: 10),
+
             TableCalendar(
               firstDay: DateTime(2024),
               lastDay: DateTime(2100),
@@ -110,6 +228,7 @@ class _BookingState extends State<Booking> {
                     _selectedDay = selected;
                     _focusedDay = focused;
                     txtDate.text = formatThaiDate(selected);
+                    dateForSend = formatDate(selected);
                   });
                 }
               },
@@ -147,7 +266,7 @@ class _BookingState extends State<Booking> {
                   fontWeight: FontWeight.normal,
                 ),
                 defaultTextStyle: TextStyle(
-                  fontSize: 16, 
+                  fontSize: 16,
                 ),
               ),
             ),
@@ -283,26 +402,104 @@ class _BookingState extends State<Booking> {
             // ),
             SizedBox(height: 30),
 
-            // ปุ่มตกลง
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0XFF07663a),
-                padding: EdgeInsets.symmetric(vertical: 16),
+                backgroundColor: const Color(0XFF07663a),
+                padding: const EdgeInsets.symmetric(vertical: 16),
               ),
               onPressed: () {
+                if (selectedProvince == null || selectedProvince!.isEmpty) {
+                  showCenterDialog(
+                    context,
+                    title: "ยังไม่ได้เลือกจังหวัด",
+                    message: "กรุณาเลือกจังหวัดก่อนทำรายการต่อไป",
+                  );
+                  return;
+                }
+
+                if (_selectedDay == null) {
+                  showCenterDialog(
+                    context,
+                    title: "ยังไม่ได้เลือกวันที่",
+                    message: "กรุณาเลือกวันที่ ที่ต้องการก่อนทำรายการต่อไป",
+                  );
+                  return;
+                }
+
+                String encodedProvince =
+                    Uri.encodeComponent(selectedProvince ?? "");
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => BookingShopPage(),
+                    builder: (context) => BookingShopPage(
+                      province: encodedProvince,
+                      booking_date: dateForSend,
+                    ),
                   ),
                 );
               },
-              child: Text(
+              child: const Text(
                 'ถัดไป',
                 style: TextStyle(fontSize: 16, color: Colors.white),
               ),
-            )
+            ),
           ],
+        ),
+      ),
+    );
+  }
+
+  void showCenterDialog(BuildContext context,
+      {required String title, required String message}) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // บังคับให้กดปุ่ม
+      builder: (_) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.error_outline,
+                color: Color(0xFFB3261E),
+                size: 48,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                message,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 15,
+                ),
+              ),
+              const SizedBox(height: 18),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0XFF07663a),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                ),
+                onPressed: () => Navigator.pop(context),
+                child: const Text(
+                  "ตกลง",
+                  style: TextStyle(color: Colors.white, fontSize: 15),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -419,5 +616,11 @@ class _BookingState extends State<Booking> {
     String monthName = thaiMonths[date.month - 1];
 
     return "${date.day} $monthName $buddhistYear";
+  }
+
+  String formatDate(DateTime date) {
+    return "${date.day.toString().padLeft(2, '0')}-"
+        "${date.month.toString().padLeft(2, '0')}-"
+        "${date.year}";
   }
 }

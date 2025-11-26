@@ -332,7 +332,10 @@ class _BookingFavoritePageState extends State<BookingFavoritePage> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  BookingDetail()),
+                                                  BookingDetail(
+                                                    massage_info_id: "",
+                                                    booking_date: "",
+                                                  )),
                                         );
                                       },
                                       child: Text("ดูรายละเอียด"),
