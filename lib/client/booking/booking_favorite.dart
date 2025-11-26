@@ -340,6 +340,7 @@ class _BookingFavoritePageState extends State<BookingFavoritePage> {
                                                   BookingDetail(
                                                     massage_info_id: "",
                                                     booking_date: "",
+                                                    province: "",
                                                   )),
                                         );
                                       },
