@@ -121,7 +121,7 @@ class _BookingDetailState extends State<BookingDetail> {
     //   print(response.statusMessage);
     // }
 
-    final res = await post2(
+    final res = await post(
       "$api/api/v1/customer/favorites",
       {
         "massage_info_id": massage_info_id,
