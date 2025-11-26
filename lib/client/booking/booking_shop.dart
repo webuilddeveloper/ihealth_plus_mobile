@@ -1,7 +1,12 @@
+import 'dart:async';
+
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:ihealth_2025_mobile/client/booking/booking_detail.dart';
 import 'package:ihealth_2025_mobile/client/review.dart';
+import 'package:ihealth_2025_mobile/shared/api_provider.dart';
 
 class Shop {
   final int id;
@@ -39,120 +44,147 @@ final List<ServiceType> serviceTypes = [
   ServiceType(id: 1, category: "สปา", name: "การแช่น้ำสมุนไพร"),
   ServiceType(id: 2, category: "สปา", name: "การแช่น้ำนม"),
   ServiceType(id: 3, category: "สปา", name: "การแช่อ่างน้ำวน"),
-  ServiceType(id: 4, category: "นวดเสริมความงาม", name: "การพอกตัว"),
-  ServiceType(id: 5, category: "นวดเสริมความงาม", name: "การขัดตัว"),
+  ServiceType(id: 4, category: "สปา", name: "การแช่น้ำแร่"),
+  ServiceType(id: 5, category: "สปา", name: "Vichy shower"),
+  ServiceType(id: 6, category: "สปา", name: "Jet shower"),
+  ServiceType(id: 7, category: "สปา", name: "ออนเซน"),
+  ServiceType(id: 8, category: "สปา", name: "Steam bath"),
+  ServiceType(id: 9, category: "สปา", name: "การขัดผิวกาย"),
+  ServiceType(id: 10, category: "สปา", name: "การขัดผิวหน้า"),
+  ServiceType(id: 11, category: "สปา", name: "การใช้ผ้าห่มร้อน"),
+  ServiceType(id: 12, category: "สปา", name: "การรักษาความสะอาดผิวกาย"),
+  ServiceType(id: 13, category: "สปา", name: "การรักษาความสะอาดผิวหน้า"),
+  ServiceType(id: 14, category: "สปา", name: "การทำสมาธิ"),
+  ServiceType(id: 15, category: "สปา", name: "การนวดหน้า"),
+  ServiceType(
+      id: 16,
+      category: "สปา",
+      name: "การบริการอาหารหรือเครื่องดื่มเพื่อสุขภาพ"),
+  ServiceType(id: 17, category: "สปา", name: "การบำรุงผิวกาย"),
+  ServiceType(id: 18, category: "สปา", name: "การบำรุงผิวหน้า"),
+  ServiceType(id: 19, category: "สปา", name: "การประคบด้วยความเย็น"),
+  ServiceType(id: 20, category: "สปา", name: "การประคบด้วยหินร้อน"),
+  ServiceType(id: 21, category: "สปา", name: "การปรับสภาพผิวหน้า"),
+  ServiceType(id: 22, category: "สปา", name: "การแปรงผิว"),
+  ServiceType(id: 23, category: "สปา", name: "การพอกผิวกาย"),
+  ServiceType(id: 24, category: "สปา", name: "การพอกผิวหน้า"),
+  ServiceType(id: 25, category: "สปา", name: "การพันตัว"),
+  ServiceType(id: 26, category: "สปา", name: "การพันร้อน"),
+  ServiceType(id: 27, category: "สปา", name: "การอบซาวน่า"),
+  ServiceType(id: 28, category: "สปา", name: "การอบไอน้ำ"),
+  ServiceType(id: 29, category: "สปา", name: "การอาบด้วยทรายร้อน"),
+  ServiceType(id: 30, category: "สปา", name: "ชิบอล"),
+  ServiceType(id: 31, category: "สปา", name: "ไทเก๊ก"),
+  ServiceType(id: 32, category: "สปา", name: "ไทชิ"),
+  ServiceType(id: 33, category: "สปา", name: "พิลาทิส"),
+  ServiceType(id: 34, category: "สปา", name: "ฟิตบอล"),
+  ServiceType(id: 35, category: "สปา", name: "โยคะ"),
+  ServiceType(id: 36, category: "สปา", name: "ฤาษีดัดตน"),
+  ServiceType(id: 37, category: "สปา", name: "แอโรบิก"),
+  ServiceType(id: 38, category: "นวดเพื่อสุขภาพ", name: "คอ / บ่า / ไหล่"),
+  ServiceType(id: 39, category: "นวดเพื่อสุขภาพ", name: "หลัง / เอว / สะบัก"),
+  ServiceType(id: 40, category: "นวดเพื่อสุขภาพ", name: "แขน / มือ / ข้อมือ"),
+  ServiceType(id: 41, category: "นวดเพื่อสุขภาพ", name: "ขา / น่อง / เท้า"),
+  ServiceType(id: 42, category: "นวดเพื่อสุขภาพ", name: "ศีรษะ / หน้า"),
+  ServiceType(id: 43, category: "นวดเพื่อสุขภาพ", name: "นวดประคบสมุนไพร"),
+  ServiceType(id: 44, category: "นวดเพื่อสุขภาพ", name: "นวดไทยผ่อนคลาย"),
+  ServiceType(
+      id: 45, category: "นวดเพื่อสุขภาพ", name: "นวดฝ่าเท้าเพื่อสุขภาพ"),
+  ServiceType(
+      id: 46, category: "นวดเพื่อสุขภาพ", name: "นวดอโรม่า / นวดน้ำมัน"),
+  ServiceType(id: 47, category: "นวดเพื่อสุขภาพ", name: "นวดสวีดิช"),
+  ServiceType(id: 48, category: "นวดเพื่อสุขภาพ", name: "นวดหญิงตั้งครรภ์"),
+  ServiceType(id: 49, category: "นวดเพื่อสุขภาพ", name: "นวดผู้สูงอายุ"),
+  ServiceType(id: 50, category: "นวดเพื่อสุขภาพ", name: "นวตอกเส้นเพื่อสุขภาพ"),
+  ServiceType(id: 51, category: "นวดเพื่อสุขภาพ", name: "นวดเพื่อการกีฬา"),
+  ServiceType(id: 52, category: "นวดเพื่อสุขภาพ", name: "นวดสำหรับเด็ก"),
+  ServiceType(
+      id: 53, category: "นวดเพื่อเสริมความงาม", name: "การทำทรีทเม้นท์หน้า"),
+  ServiceType(id: 54, category: "นวดเพื่อเสริมความงาม", name: "การขัดตัว"),
+  ServiceType(
+      id: 55,
+      category: "นวดเพื่อเสริมความงาม",
+      name: "การนวดเซลลูไลท์ (นวดด้วยมือ)"),
+  ServiceType(id: 56, category: "นวดเพื่อเสริมความงาม", name: "การพอกตัว"),
+  ServiceType(id: 57, category: "นวดเพื่อเสริมความงาม", name: "การดูแลเส้นผม"),
+  ServiceType(
+      id: 58,
+      category: "นวดเพื่อเสริมความงาม",
+      name: "การนวดหน้าเพื่อสุขภาพและความงาม"),
+  ServiceType(
+      id: 59, category: "นวดเพื่อเสริมความงาม", name: "การทำความสะอาดผิวหน้า"),
+  ServiceType(
+      id: 60, category: "นวดเพื่อเสริมความงาม", name: "ปรับสภาพผิวหน้า"),
+  ServiceType(id: 61, category: "นวดเพื่อเสริมความงาม", name: "ขัดผิวหน้า"),
+  ServiceType(id: 62, category: "นวดเพื่อเสริมความงาม", name: "นวดหน้า"),
+  ServiceType(id: 63, category: "นวดเพื่อเสริมความงาม", name: "พอกผิวหน้า"),
 ];
-
-// mock ข้อมูลร้าน
-final List<Shop> tempData = [
-  Shop(
-    id: 1,
-    name: "ร้านบำบัดสุขใจ",
-    subDistrict: "แขวงพลับพลา",
-    district: "เขตวังทองหลาง",
-    province: "กรุงเทพฯ",
-    rating: 4.95,
-    reviewCount: 4,
-    serviceId: 1,
-    imageUrl: "https://picsum.photos/200/300?random=1", 
-  ),
-  Shop(
-    id: 2,
-    name: "สปาธรรมชาติ",
-    subDistrict: "แขวงจันทรเกษม",
-    district: "เขตลาดพร้าว",
-    province: "กรุงเทพฯ",
-    rating: 4.8,
-    reviewCount: 4,
-    serviceId: 2,
-    imageUrl: "https://picsum.photos/200/300?random=2",
-  ),
-];
-
-final List<Map<String, dynamic>> shopData = [
-    {
-      "id": 1,
-      "name": "ร้านบำบัดสุขใจ",
-      "rating": 4.95,
-      "reviewCount": 4,
-      "categories": [
-        {
-          "id": 1,
-          "name": "นวดเพื่อสุขภาพ",
-          "subCategories": [
-            {
-              "id": 1,
-              "name": "นวดน้ำมันและสวีดิช",
-              "services": [
-                {
-                  "id": 1,
-                  "name": "นวดอโรม่า / นวดน้ำมัน",
-                  "price": 750,
-                  "duration": 60,
-                  "imageUrl": "https://picsum.photos/200/300?random=11",
-                  "therapists": [
-                    {"id": 1, "name": "หมอนวดเอ"},
-                    {"id": 2, "name": "หมอนวดบี"},
-                  ],
-                },
-                {
-                  "id": 2,
-                  "name": "นวดสวีดิช",
-                  "price": 850,
-                  "duration": 60,
-                  "imageUrl": "https://picsum.photos/200/300?random=12",
-                  "therapists": [
-                    {"id": 3, "name": "หมอนวดซี"},
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-        {
-          "id": 2,
-          "name": "นวดเสริมความงาม",
-          "subCategories": [
-            {
-              "id": 2,
-              "name": "นวดหน้า",
-              "services": [
-                {
-                  "id": 3,
-                  "name": "นวดหน้าสปา",
-                  "price": 650,
-                  "duration": 45,
-                  "imageUrl": "https://picsum.photos/200/300?random=13",
-                  "therapists": [
-                    {"id": 4, "name": "หมอนวดดี"},
-                  ],
-                }
-              ],
-            }
-          ],
-        }
-      ],
-    }
-  ];
 
 class BookingShopPage extends StatefulWidget {
+  final String? province;
+  final String? booking_date;
+
+  const BookingShopPage({
+    required this.province,
+    required this.booking_date,
+    super.key,
+  });
+
   @override
   _BookingShopPageState createState() => _BookingShopPageState();
 }
 
 class _BookingShopPageState extends State<BookingShopPage> {
   String? selectedService;
+  String? selectedServiceName;
+
   TextEditingController searchController = TextEditingController();
-  List<Shop> filteredData = tempData;
+
+  List massageLists = [];
+  List filteredMassageLists = [];
+
+  String? province;
+  String? booking_date;
+
+  String? latLng;
+
+  @override
+  void initState() {
+    super.initState();
+    province = widget.province;
+    booking_date = widget.booking_date;
+    _getCurrentLocation();
+  }
+
+  callRead() {
+    final url = '$api/api/v1/customer/search-massage-step1'
+        '?province=$province'
+        '&mapLink=$latLng'
+        '&booking_date=$booking_date';
+
+
+    get(url).then((v) {
+      setState(() {
+        massageLists = v['massage_lists'];
+        filteredMassageLists = massageLists;
+      });
+    });
+  }
 
   void search() {
-    setState(() {
-      filteredData = tempData.where((shop) {
-        final matchesName = shop.name.contains(searchController.text.trim());
-        final matchesService = selectedService == null ||
-            shop.serviceId.toString() == selectedService;
-        return matchesName && matchesService;
-      }).toList();
+    final encodedService = Uri.encodeComponent(selectedServiceName ?? "");
+
+    final url = '$api/api/v1/customer/search-massage-step1'
+        '?province=$province'
+        '&mapLink=$latLng'
+        '&booking_date=$booking_date'
+        '&name_service=$encodedService';
+
+    get(url).then((v) {
+      setState(() {
+        massageLists = v['massage_lists'];
+        filteredMassageLists = massageLists;
+      });
     });
   }
 
@@ -160,7 +192,23 @@ class _BookingShopPageState extends State<BookingShopPage> {
     setState(() {
       searchController.clear();
       selectedService = null;
-      filteredData = tempData;
+      callRead();
+    });
+  }
+
+  Timer? _timer;
+
+  void filterShops(String text) {
+    _timer?.cancel();
+    _timer = Timer(const Duration(milliseconds: 300), () {
+      setState(() {
+        filteredMassageLists = massageLists.where((shop) {
+          return shop["massage_name"]
+              .toString()
+              .toLowerCase()
+              .contains(text.toLowerCase());
+        }).toList();
+      });
     });
   }
 
@@ -178,100 +226,199 @@ class _BookingShopPageState extends State<BookingShopPage> {
               hint: const Text("เลือกประเภทบริการ"),
               value: selectedService,
               items: buildGroupedItems(serviceTypes),
-              onChanged: (val) => setState(() => selectedService = val),
-              buttonStyleData: const ButtonStyleData(
-                padding: EdgeInsets.symmetric(horizontal: 12),
+              onChanged: (val) {
+                final selected =
+                    serviceTypes.firstWhere((x) => x.id.toString() == val);
+                setState(() {
+                  selectedService = val;
+                  selectedServiceName = selected.name;
+                  search();
+                });
+              },
+              buttonStyleData: ButtonStyleData(
+                height: 48,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: const Color(0xFF07663a),
+                    width: 2,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
               ),
-              dropdownStyleData: const DropdownStyleData(
+              dropdownStyleData: DropdownStyleData(
                 maxHeight: 300,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: const Color(0xFF07663a), // สีเดียวกับปุ่ม
+                    width: 1,
+                  ),
+                ),
               ),
               menuItemStyleData: const MenuItemStyleData(
                 padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               ),
             ),
-
             SizedBox(height: 12),
-
             Row(
               children: [
                 Expanded(
                   child: TextField(
                     controller: searchController,
+                    onChanged: filterShops,
                     decoration: InputDecoration(
                       hintText: "ค้นหาชื่อร้าน",
-                      border: OutlineInputBorder(),
+                      prefixIcon:
+                          const Icon(Icons.search, color: Color(0xFF07663a)),
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 12, horizontal: 16),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                            color: Color(0xFF07663a), width: 1.5),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                            color: Color(0xFF064D2C), width: 2),
+                      ),
                     ),
                   ),
                 ),
-                SizedBox(width: 8),
-                ElevatedButton.icon(
-                  onPressed: search,
-                  icon: Icon(Icons.search),
-                  label: Text("ค้นหา"),
+                const SizedBox(width: 10),
+                SizedBox(
+                  height: 46,
+                  width: 95,
+                  child: OutlinedButton(
+                    onPressed: reset,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFd4af37),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: const Text(
+                      "ล้างข้อมูล",
+                      style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15,
+                          color: Colors.white),
+                    ),
+                  ),
                 ),
-                SizedBox(width: 8),
-                OutlinedButton(
-                  onPressed: reset,
-                  child: Text("รีเซ็ต"),
-                )
               ],
             ),
             SizedBox(height: 20),
-
-            // แถวสาม Results
             Expanded(
               child: ListView.builder(
-                itemCount: filteredData.length,
+                itemCount: filteredMassageLists.length,
                 itemBuilder: (context, index) {
-                  final shop = filteredData[index];
+                  final shop = filteredMassageLists[index];
                   return Card(
-                    margin: EdgeInsets.only(bottom: 12),
+                    margin: const EdgeInsets.only(bottom: 12),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Image.network(shop.imageUrl,
+                        Image.network(
+                          api + "/" + shop["massage_image"],
+                          height: 150,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Container(
                             height: 150,
-                            width: double.infinity,
-                            fit: BoxFit.cover),
+                            color: Colors.grey.shade300,
+                            child: Icon(Icons.image_not_supported),
+                          ),
+                        ),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(shop.name,
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16)),
-                              Text("${shop.subDistrict}, ${shop.district}"),
+                              const SizedBox(height: 8),
+                              Text(
+                                shop["massage_name"],
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                    color: Color(0xFF494949)),
+                              ),
+                              const SizedBox(height: 8),
+                              // ที่อยู่
+                              Text(
+                                shop["address"],
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16,
+                                    color: Color(0xFF07663a)),
+                              ),
+
+                              const SizedBox(height: 8),
+                              // รีวิว
                               InkWell(
                                 onTap: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => ReviewPage()),
+                                      builder: (_) => ReviewPage(),
+                                    ),
                                   );
                                 },
-                                child: 
-                             
-                              Row(
-                                children: [
-                                  Icon(Icons.star,
-                                      color: Colors.orange, size: 18),
-                                  Text(
-                                      "${shop.rating} (${shop.reviewCount} รีวิว)"),
-                                ],
-                              ), ),
-                              SizedBox(height: 8),
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.star,
+                                        color: Colors.orange, size: 18),
+                                    Text(
+                                      "${shop["avg_score"]} (${shop["total_reviews"]} รีวิว)",
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              const SizedBox(height: 15),
                               ElevatedButton(
                                 onPressed: () {
-                                   Navigator.push(
+                                  Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => BookingDetail()),
+                                      builder: (_) => BookingDetail(
+                                          booking_date: widget.booking_date,
+                                          massage_info_id:
+                                              shop['massage_info_id']),
+                                    ),
                                   );
                                 },
-                                child: Text("ดูรายละเอียด"),
-                              )
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF07663a),
+                                  minimumSize: const Size(double.infinity, 46),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  elevation: 4,
+                                  shadowColor: Colors.black.withOpacity(0.25),
+                                ),
+                                child: const Text(
+                                  'ดูรายละเอียด',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 15),
                             ],
                           ),
                         )
@@ -280,7 +427,7 @@ class _BookingShopPageState extends State<BookingShopPage> {
                   );
                 },
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -312,5 +459,26 @@ class _BookingShopPageState extends State<BookingShopPage> {
       }));
     });
     return items;
+  }
+
+  Future<void> _getCurrentLocation() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) return;
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+
+    if (permission == LocationPermission.whileInUse ||
+        permission == LocationPermission.always) {
+      Position position = await Geolocator.getCurrentPosition();
+      setState(() {
+        latLng =
+            "${position.latitude.toStringAsFixed(6)}, ${position.longitude.toStringAsFixed(6)}";
+      });
+    }
+
+    callRead();
   }
 }

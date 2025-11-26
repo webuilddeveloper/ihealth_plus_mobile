@@ -637,7 +637,6 @@ Future get(String url) async {
   } else {
     return {"status": "F"};
   }
-  // return Future.value(data);
 }
 
 Future<dynamic> post(String url, dynamic criteria) async {
