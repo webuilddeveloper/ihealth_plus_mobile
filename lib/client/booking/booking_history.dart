@@ -249,185 +249,225 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
                   : Container(),
 
               const Divider(height: 20),
-
-              Row(
-                children: [
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
+              booking['status'] == 'completed'
+                  ? Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        InkWell(
-                          onTap: () {
-                            setState(() {
-                              booking['payment'] = "promptpay";
-                            });
-
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return Dialog(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
+                        Center(
+                          child: Container(
+                            width: 100,
+                            // margin: EdgeInsets.symmetric(vertical: 50.0),
+                            child: Material(
+                              elevation: 2.0,
+                              borderRadius: BorderRadius.circular(5.0),
+                              color: AppColors.primary,
+                              child: MaterialButton(
+                                height: 40,
+                                onPressed: () {},
+                                child: Text(
+                                  'รีวิว',
+                                  style: TextStyle(
+                                    fontSize: 16.0,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.normal,
+                                    fontFamily: 'Sarabun',
                                   ),
-                                  child: SizedBox(
-                                    width: 320,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(20),
-                                      child: SingleChildScrollView(
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Align(
-                                              alignment: Alignment.centerRight,
-                                              child: IconButton(
-                                                icon: const Icon(Icons.close),
-                                                onPressed: () =>
-                                                    Navigator.of(context).pop(),
-                                              ),
-                                            ),
-                                            const Text(
-                                              "สแกนจ่ายด้วย PromptPay",
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 18,
-                                                color: Color(0xFF07663a),
-                                              ),
-                                            ),
-                                            const SizedBox(height: 16),
-                                            QrImageView(
-                                              data: booking["promptPay"] ??
-                                                  "0123456789",
-                                              version: QrVersions.auto,
-                                              size: 200.0,
-                                            ),
-                                            const SizedBox(height: 12),
-                                            Text(
-                                              booking["shopName"] ?? "",
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 16),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                          child: Column(
-                            children: [
-                              ColorFiltered(
-                                colorFilter: booking['payment'] == "promptpay"
-                                    ? const ColorFilter.mode(
-                                        Colors.transparent, BlendMode.multiply)
-                                    : const ColorFilter.matrix(<double>[
-                                        0.2126, 0.7152, 0.0722, 0, 0, //
-                                        0.2126, 0.7152, 0.0722, 0, 0, //
-                                        0.2126, 0.7152, 0.0722, 0, 0, //
-                                        0, 0, 0, 1, 0, //
-                                      ]),
-                                child: Image.asset(
-                                  'assets/ihealth/promtpay.png',
-                                  width: 40,
-                                  height: 40,
                                 ),
                               ),
-                              Text(
-                                "พร้อมเพย์",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: booking['payment'] == "promptpay"
-                                      ? Colors.black
-                                      : Colors.grey,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 20),
-
-                        // เงินสด
-                        InkWell(
-                          onTap: () {
-                            setState(() {
-                              booking['payment'] = "cash";
-                            });
-                          },
-                          child: Column(
-                            children: [
-                              ColorFiltered(
-                                colorFilter: booking['payment'] == "cash"
-                                    ? const ColorFilter.mode(
-                                        Colors.transparent, BlendMode.multiply)
-                                    : const ColorFilter.matrix(<double>[
-                                        0.2126, 0.7152, 0.0722, 0, 0, //
-                                        0.2126, 0.7152, 0.0722, 0, 0, //
-                                        0.2126, 0.7152, 0.0722, 0, 0, //
-                                        0, 0, 0, 1, 0, //
-                                      ]),
-                                child: Image.asset(
-                                  'assets/ihealth/money.png',
-                                  width: 40,
-                                  height: 40,
-                                ),
-                              ),
-                              Text(
-                                "เงินสด",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: booking['payment'] == "cash"
-                                      ? Colors.black
-                                      : Colors.grey,
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
                         ),
                       ],
-                    ),
-                  ),
-                  booking['payment'] != "" && booking['payment'] != null
-                      ? InkWell(
+                    )
+                  : Row(
+                      children: [
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    booking['payment'] = "promptpay";
+                                  });
+
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return Dialog(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(16),
+                                        ),
+                                        child: SizedBox(
+                                          width: 320,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(20),
+                                            child: SingleChildScrollView(
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Align(
+                                                    alignment:
+                                                        Alignment.centerRight,
+                                                    child: IconButton(
+                                                      icon: const Icon(
+                                                          Icons.close),
+                                                      onPressed: () =>
+                                                          Navigator.of(context)
+                                                              .pop(),
+                                                    ),
+                                                  ),
+                                                  const Text(
+                                                    "สแกนจ่ายด้วย PromptPay",
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 18,
+                                                      color: Color(0xFF07663a),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 16),
+                                                  QrImageView(
+                                                    data:
+                                                        booking["promptPay"] ??
+                                                            "0123456789",
+                                                    version: QrVersions.auto,
+                                                    size: 200.0,
+                                                  ),
+                                                  const SizedBox(height: 12),
+                                                  Text(
+                                                    booking["shopName"] ?? "",
+                                                    style: const TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 16),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                                child: Column(
+                                  children: [
+                                    ColorFiltered(
+                                      colorFilter: booking['payment'] ==
+                                              "promptpay"
+                                          ? const ColorFilter.mode(
+                                              Colors.transparent,
+                                              BlendMode.multiply)
+                                          : const ColorFilter.matrix(<double>[
+                                              0.2126, 0.7152, 0.0722, 0, 0, //
+                                              0.2126, 0.7152, 0.0722, 0, 0, //
+                                              0.2126, 0.7152, 0.0722, 0, 0, //
+                                              0, 0, 0, 1, 0, //
+                                            ]),
+                                      child: Image.asset(
+                                        'assets/ihealth/promtpay.png',
+                                        width: 40,
+                                        height: 40,
+                                      ),
+                                    ),
+                                    Text(
+                                      "พร้อมเพย์",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: booking['payment'] == "promptpay"
+                                            ? Colors.black
+                                            : Colors.grey,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 20),
+
+                              // เงินสด
+                              InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    booking['payment'] = "cash";
+                                  });
+                                },
+                                child: Column(
+                                  children: [
+                                    ColorFiltered(
+                                      colorFilter: booking['payment'] == "cash"
+                                          ? const ColorFilter.mode(
+                                              Colors.transparent,
+                                              BlendMode.multiply)
+                                          : const ColorFilter.matrix(<double>[
+                                              0.2126, 0.7152, 0.0722, 0, 0, //
+                                              0.2126, 0.7152, 0.0722, 0, 0, //
+                                              0.2126, 0.7152, 0.0722, 0, 0, //
+                                              0, 0, 0, 1, 0, //
+                                            ]),
+                                      child: Image.asset(
+                                        'assets/ihealth/money.png',
+                                        width: 40,
+                                        height: 40,
+                                      ),
+                                    ),
+                                    Text(
+                                      "เงินสด",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: booking['payment'] == "cash"
+                                            ? Colors.black
+                                            : Colors.grey,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        booking['payment'] != "" && booking['payment'] != null
+                            ? InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    _updateBookingPayment(
+                                        booking, booking['booking_id']);
+                                  });
+                                  // _showSuccessDialog();
+                                },
+                                child: const Column(
+                                  children: [
+                                    Icon(Icons.add_task,
+                                        color: Colors.green, size: 40),
+                                    Text("บันทึก",
+                                        style: TextStyle(
+                                            fontSize: 14, color: Colors.black)),
+                                  ],
+                                ),
+                              )
+                            : Container(),
+                        SizedBox(
+                          width: 35,
+                        ),
+                        InkWell(
                           onTap: () {
-                            setState(() {
-                              _updateBookingPayment(
-                                  booking, booking['booking_id']);
-                            });
-                            // _showSuccessDialog();
+                            _showcancelDialog(booking['booking_id']);
                           },
                           child: const Column(
                             children: [
-                              Icon(Icons.add_task,
-                                  color: Colors.green, size: 40),
-                              Text("บันทึก",
+                              Icon(Icons.delete_forever,
+                                  color: Colors.red, size: 40),
+                              Text("ยกเลิก",
                                   style: TextStyle(
                                       fontSize: 14, color: Colors.black)),
                             ],
                           ),
-                        )
-                      : Container(),
-                  SizedBox(
-                    width: 35,
-                  ),
-                  InkWell(
-                    onTap: () {
-                      _showcancelDialog(booking['booking_id']);
-                    },
-                    child: const Column(
-                      children: [
-                        Icon(Icons.delete_forever, color: Colors.red, size: 40),
-                        Text("ยกเลิก",
-                            style:
-                                TextStyle(fontSize: 14, color: Colors.black)),
+                        ),
                       ],
                     ),
-                  ),
-                ],
-              ),
             ],
           ),
         ),
@@ -562,13 +602,6 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
             child: TabBarView(
               controller: _tabController,
               children: [
-                ListView.builder(
-                  itemCount: historymassage.length,
-                  itemBuilder: (context, index) {
-                    return buildBookingCard(
-                        historymassage['data'][index], index);
-                  },
-                ),
                 SingleChildScrollView(
                   child: Column(
                     children: [
@@ -673,6 +706,12 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
                       ),
                     ],
                   ),
+                ),
+                ListView.builder(
+                  itemCount: historymassage.length,
+                  itemBuilder: (context, index) {
+                    return buildBookingCard(historymassage[index], index);
+                  },
                 ),
               ],
             ),
@@ -1222,57 +1261,65 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
     }
   }
 
-  Map<String, dynamic> historymassage = {};
+  dynamic historymassage = {};
 
   _historymassage() async {
-    try {
-      final storage = FlutterSecureStorage();
-      final token = await storage.read(key: 'token');
-      var headers = {'Authorization': 'Bearer $token'};
-
-      final dioService = DioService();
-      await dioService.init();
-      final dio = dioService.dio;
-      final cookieJar = dioService.cookieJar;
-
-      var cookies = await cookieJar.loadForRequest(
-        Uri.parse('https://api-ihealth.spl-system.com'),
-      );
-      print("Cookies: $cookies");
-
-      var response = await dio.request(
-        'https://api-ihealth.spl-system.com/api/v1/customer/history-massage',
-        options: Options(
-          method: 'GET',
-          headers: headers,
-        ),
-      );
-
-      if (response.statusCode == 200) {
-        // print(json.encode(response.data));
-        // print('=========== >>> ${response.statusCode}');
-        // print('=========== >>> ${response.data.runtimeType}');
-        // print('=========== >>> ${response.data}');
-        // print('=========== >>> ${response.data['data']}');
-
-        setState(() {
-          historymassage = response.data;
-          print('-------Start historymassage ------');
-          print(historymassage.length);
-          print(historymassage['data'][0]['massage_name']);
-          print(historymassage['data'][0]['service_name']);
+    get(api + 'api/v1/customer/history-massage?year=&status=').then((v) => {
+          setState(() {
+            historymassage = v;
+            print('--==777777777777==-- ${v}');
+          }),
         });
-      }
-    } on DioException catch (e) {
-      String errorMessage = e.response?.data["message"] ?? "เกิดข้อผิดพลาด";
-      showErrorDialog(
-        context: context,
-        title: "แจ้งเตือน",
-        message: errorMessage,
-      );
-    } catch (e) {
-      print("❌ Other ERROR: $e");
-    }
+    // try {
+    // final storage = FlutterSecureStorage();
+    // final token = await storage.read(key: 'token');
+    // var headers = {'Authorization': 'Bearer $token'};
+
+    // final dioService = DioService();
+    // await dioService.init();
+    // final dio = dioService.dio;
+    // final cookieJar = dioService.cookieJar;
+
+    // var cookies = await cookieJar.loadForRequest(
+    //   Uri.parse('https://api-ihealth.spl-system.com'),
+    // );
+    // print("Cookies: $cookies");
+
+    // var response = await dio.request(
+    //   'https://api-ihealth.spl-system.com/api/v1/customer/history-massage',
+    //   options: Options(
+    //     method: 'GET',
+    //     headers: headers,
+    //   ),
+    // );
+
+    // if (response.statusCode == 200) {
+    //   // print(json.encode(response.data));
+    //   // print('=========== >>> ${response.statusCode}');
+    //   // print('=========== >>> ${response.data.runtimeType}');
+    //   // print('=========== >>> ${response.data}');
+    //   // print('=========== >>> ${response.data['data']}');
+
+    //   setState(() {
+    //     historymassage = response.data;
+    //     print('-------Start historymassage ------');
+    //     print(historymassage.length);
+    //     print(historymassage['data'][0]['massage_name']);
+    //     print(historymassage['data'][0]['service_name']);
+    //   });
+    // }
+
+    // );
+    // } on DioException catch (e) {
+    //   String errorMessage = e.response?.data["message"] ?? "เกิดข้อผิดพลาด";
+    //   showErrorDialog(
+    //     context: context,
+    //     title: "แจ้งเตือน",
+    //     message: errorMessage,
+    //   );
+    // } catch (e) {
+    //   print("❌ Other ERROR: $e");
+    // }
   }
 
   void _resetRatings() {

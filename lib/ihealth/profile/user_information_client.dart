@@ -41,7 +41,6 @@ class _UserInformationClientPageState extends State<UserInformationClientPage> {
         future: _futureProfile,
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
           if (snapshot.hasData) {
-            print('--------======------ ${snapshot.data}');
             return card(snapshot.data);
           } else if (snapshot.hasError) {
             return dialogFail(context);
