@@ -162,7 +162,6 @@ class _BookingShopPageState extends State<BookingShopPage> {
         '&mapLink=$latLng'
         '&booking_date=$booking_date';
 
-
     get(url).then((v) {
       setState(() {
         massageLists = v['massage_lists'];
@@ -369,12 +368,12 @@ class _BookingShopPageState extends State<BookingShopPage> {
                               // รีวิว
                               InkWell(
                                 onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => ReviewPage(),
-                                    ),
-                                  );
+                                  // Navigator.push(
+                                  //   context,
+                                  //   MaterialPageRoute(
+                                  //     builder: (_) => ReviewPage(),
+                                  //   ),
+                                  // );
                                 },
                                 child: Row(
                                   children: [
@@ -394,9 +393,11 @@ class _BookingShopPageState extends State<BookingShopPage> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (_) => BookingDetail(
-                                          booking_date: widget.booking_date,
-                                          massage_info_id:
-                                              shop['massage_info_id']),
+                                        booking_date: widget.booking_date,
+                                        massage_info_id:
+                                            shop['massage_info_id'],
+                                        province: province,
+                                      ),
                                     ),
                                   );
                                 },

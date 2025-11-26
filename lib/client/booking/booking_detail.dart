@@ -16,10 +16,12 @@ import 'package:url_launcher/url_launcher.dart';
 class BookingDetail extends StatefulWidget {
   final String? massage_info_id;
   final String? booking_date;
+  final String? province;
 
   const BookingDetail({
     required this.massage_info_id,
     required this.booking_date,
+    required this.province,
     super.key,
   });
 
@@ -27,10 +29,19 @@ class BookingDetail extends StatefulWidget {
   State<BookingDetail> createState() => _BookingDetailState();
 }
 
+extension TimeOfDayExtension on TimeOfDay {
+  static TimeOfDay parse(String input) {
+    final parts = input.split(":");
+    return TimeOfDay(
+      hour: int.parse(parts[0]),
+      minute: int.parse(parts[1]),
+    );
+  }
+}
+
 class _BookingDetailState extends State<BookingDetail> {
   String? selectedCategory;
   String? selectedCourse;
-  String? selectedTherapist;
   bool isSelectedTherapist = false;
 
   dynamic massageInfo;
@@ -42,7 +53,19 @@ class _BookingDetailState extends State<BookingDetail> {
   String? massageBookingDate;
   String? selectedService;
   Map<String, dynamic> servicesLists = {};
+  List<dynamic> therapistsWorkList = [];
+  List<dynamic> therapistWorks = [];
+
+  List<dynamic> therapists = [];
   List<Map<String, dynamic>> allServices = [];
+
+  int currentTab = 1;
+  Map<String, dynamic>? selectedServiceData;
+  dynamic selectedDuration;
+  String? selectedTherapist;
+
+  TextEditingController startTimeCtrl = TextEditingController();
+  TextEditingController endTimeCtrl = TextEditingController();
 
   @override
   void initState() {
@@ -65,6 +88,8 @@ class _BookingDetailState extends State<BookingDetail> {
       massageInfo = v['massage_info'] ?? {};
       massageBookingDate = v['booking_date'] ?? '';
       servicesLists = v['services_lists'] ?? {};
+
+      therapistsWorkList = v['therapists_work'] ?? [];
 
       // 👉 รวม service ทั้งหมด
       allServices.clear();
@@ -271,11 +296,11 @@ class _BookingDetailState extends State<BookingDetail> {
                       ),
                       InkWell(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ReviewPage()),
-                          );
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //       builder: (context) => ReviewPage()),
+                          // );
                         },
                         child: Row(
                           children: [
@@ -451,68 +476,133 @@ class _BookingDetailState extends State<BookingDetail> {
               ),
             ),
             SizedBox(height: 30),
-            _buildSelection(),
-            SizedBox(height: 20),
-            _buildServiceCards(),
-            SizedBox(height: 100),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFFe0e0e0),
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 14), // ✅ เพิ่มความสูง
-                      ),
+            massageInfo['is_open'] == true
+                ? SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => BookingShopPage(
-                                    province: '',
-                                    booking_date: '',
-                                  )),
-                        );
                       },
-                      label: const Text(
-                        "ย้อนกลับ",
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFF4D4D),
+                        foregroundColor: Colors.white, // สีตัวอักษร
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        elevation: 0, // แบบ flat
+                      ),
+                      child: const Text(
+                        "ร้านปิดทำการ",
                         style: TextStyle(
-                          fontSize: 16,
-                          color: Color(0xFF494949),
-                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFF07663a),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => BookingConfirm()),
-                        );
-                      },
-                      label: const Text(
-                        "ถัดไป",
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+                  )
+                : currentTab == 1
+                    ? _tab1()
+                    : _tab2(),
+
+            // Row(
+            //   children: [
+            //     Expanded(
+            //       child: _buildSelection(),
+            //     ),
+            //     const SizedBox(width: 10),
+            //     TextButton.icon(
+            //       onPressed: () {
+            //         setState(() {
+            //           selectedService = null;
+            //         });
+            //       },
+            //       style: TextButton.styleFrom(
+            //         padding: const EdgeInsets.symmetric(
+            //             horizontal: 14, vertical: 17),
+            //         foregroundColor: const Color(0xFF07663a),
+            //         shape: RoundedRectangleBorder(
+            //           borderRadius: BorderRadius.circular(10),
+            //           side: const BorderSide(
+            //               color: Color(0xFF07663a), width: 1.5),
+            //         ),
+            //       ),
+            //       icon: const Icon(Icons.refresh_rounded),
+            //       label: const Text(
+            //         "ล้างข้อมูล",
+            //         style: TextStyle(fontWeight: FontWeight.w600),
+            //       ),
+            //     ),
+            //   ],
+            // ),
+            // SizedBox(height: 20),
+            // _buildServiceCards(),
+            // SizedBox(height: 100),
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            //   child: Row(
+            //     children: [
+            //       Expanded(
+            //         child: ElevatedButton.icon(
+            //           style: ElevatedButton.styleFrom(
+            //             backgroundColor: Color(0xFFe0e0e0),
+            //             padding: const EdgeInsets.symmetric(
+            //                 vertical: 14), // ✅ เพิ่มความสูง
+            //           ),
+            //           onPressed: () {
+            //             Navigator.push(
+            //               context,
+            //               MaterialPageRoute(
+            //                   builder: (context) => BookingShopPage(
+            //                         province: '',
+            //                         booking_date: '',
+            //                       )),
+            //             );
+            //           },
+            //           label: const Text(
+            //             "ย้อนกลับ",
+            //             style: TextStyle(
+            //               fontSize: 16,
+            //               color: Color(0xFF494949),
+            //               fontWeight: FontWeight.bold,
+            //             ),
+            //           ),
+            //         ),
+            //       ),
+            //       const SizedBox(width: 10),
+            //       Expanded(
+            //         child: ElevatedButton.icon(
+            //           style: ElevatedButton.styleFrom(
+            //             backgroundColor: Color(0xFF07663a),
+            //             padding: const EdgeInsets.symmetric(vertical: 14),
+            //           ),
+            //           onPressed: () {
+            //             if (selectedCourse == null || selectedCourse!.isEmpty) {
+            //               showCenterDialog(
+            //                 context,
+            //                 title: "ยังไม่ได้เลือกบริการ",
+            //                 message: "กรุณาเลือกประเภทบริการ",
+            //               );
+            //               return;
+            //             }
+            //             Navigator.push(
+            //               context,
+            //               MaterialPageRoute(
+            //                   builder: (context) => BookingConfirm()),
+            //             );
+            //           },
+            //           label: const Text(
+            //             "ถัดไป",
+            //             style: TextStyle(
+            //               fontSize: 16,
+            //               color: Colors.white,
+            //               fontWeight: FontWeight.bold,
+            //             ),
+            //           ),
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
             SizedBox(height: 30),
           ],
         ),
@@ -536,11 +626,7 @@ class _BookingDetailState extends State<BookingDetail> {
           value: service['service_list_id'],
           child: Row(
             children: [
-              Icon(Icons.check_circle, color: Colors.grey[500], size: 18),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(service['name_service']),
-              ),
+              Expanded(child: Text(service['name_service'])),
             ],
           ),
         );
@@ -550,51 +636,57 @@ class _BookingDetailState extends State<BookingDetail> {
           selectedService = value;
         });
       },
-      dropdownStyleData: const DropdownStyleData(
-        maxHeight: 420,
-      ),
+      dropdownStyleData: const DropdownStyleData(maxHeight: 420),
     );
   }
 
   Widget _buildServiceCards() {
     List<Widget> widgets = [];
 
-    // ถ้าเลือก Category → render category เดียว
-    final categories = selectedCategory == null
-        ? servicesLists.keys.toList()
-        : [selectedCategory!];
-
-    for (final cat in categories) {
-      final items = servicesLists[cat] ?? [];
-
-      widgets.add(Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        child: Text(
-          cat,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
+    if (selectedService == null) {
+      servicesLists.forEach((cat, list) {
+        widgets.add(
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Text(
+              cat,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
           ),
-        ),
-      ));
+        );
 
-      widgets.add(
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: items.map<Widget>((srv) {
-              return _buildServiceCard(srv);
-            }).toList(),
+        widgets.add(
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: list.map<Widget>((srv) {
+                return _buildServiceCard(srv);
+              }).toList(),
+            ),
           ),
-        ),
+        );
+
+        widgets.add(const SizedBox(height: 12));
+      });
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: widgets,
       );
-
-      widgets.add(const SizedBox(height: 12));
     }
 
+    final service = allServices.firstWhere(
+      (e) => e['service_list_id'] == selectedService,
+      orElse: () => {},
+    );
+
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: widgets,
+      children: [
+        _buildServiceCard(service),
+      ],
     );
   }
 
@@ -693,6 +785,600 @@ class _BookingDetailState extends State<BookingDetail> {
     );
   }
 
+  void showCenterDialog(BuildContext context,
+      {required String title, required String message}) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // บังคับให้กดปุ่ม
+      builder: (_) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.error_outline,
+                color: Color(0xFFB3261E),
+                size: 48,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                message,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 15,
+                ),
+              ),
+              const SizedBox(height: 18),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0XFF07663a),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                ),
+                onPressed: () => Navigator.pop(context),
+                child: const Text(
+                  "ตกลง",
+                  style: TextStyle(color: Colors.white, fontSize: 15),
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _tab1() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: 30),
+        Row(
+          children: [
+            Expanded(child: _buildSelection()),
+            const SizedBox(width: 10),
+            TextButton.icon(
+              onPressed: () {
+                setState(() => selectedService = null);
+              },
+              style: TextButton.styleFrom(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                foregroundColor: const Color(0xFF07663a),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  side: const BorderSide(color: Color(0xFF07663a), width: 1.5),
+                ),
+              ),
+              icon: Icon(Icons.refresh_rounded),
+              label: Text("ล้างข้อมูล"),
+            ),
+          ],
+        ),
+        SizedBox(height: 20),
+        _buildServiceCards(),
+        SizedBox(height: 20),
+        _bottomButtons(),
+      ],
+    );
+  }
+
+  Widget _tab2() {
+    if (selectedServiceData == null) {
+      return const Center(
+        child: Text("ยังไม่ได้เลือกบริการ"),
+      );
+    }
+
+    if (selectedServiceData != null) {
+      final durations = selectedServiceData!["durations"];
+      if (durations.isNotEmpty) {
+        selectedDuration = durations.first;
+      }
+    }
+
+    final String nameService = selectedServiceData!["name_service"];
+    final int price = selectedServiceData!["price"];
+    final int minutes = selectedServiceData!["minutes"];
+
+    final List durations = selectedServiceData!["durations"];
+    therapists = selectedServiceData!["therapists_list"];
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // หัวข้อ
+          const Text(
+            "เลือผู้ให้บริการ",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF07663a),
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          Row(
+            children: [
+              const Text(
+                "บริการที่เลือก : ",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              Text(
+                nameService,
+                style: const TextStyle(fontSize: 16),
+              ),
+            ],
+          ),
+          const SizedBox(height: 15),
+          if (selectedTherapist != null)
+            OutlinedButton.icon(
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  shape: RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(18)),
+                  ),
+                  builder: (_) => TherapistScheduleSheet(context),
+                );
+              },
+              icon: Icon(Icons.calendar_month, color: Color(0xFF07663a)),
+              label: Text("ดูตารางงาน"),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Color(0xFF07663a),
+                side: BorderSide(color: Color(0xFF07663a), width: 1.5),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          const SizedBox(height: 15),
+
+          Text(
+            "เลือกผู้ให้บริการ",
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey[700],
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 8),
+
+          // ถ้ามี therapist
+          if (therapists.isNotEmpty)
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: therapists.map((t) {
+                  bool isSelected = selectedTherapist == t["therapist_info_id"];
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedTherapist = t["therapist_info_id"];
+                        filteredTherapistWork();
+                      });
+                    },
+                    child: Container(
+                      width: 180,
+                      margin: const EdgeInsets.only(right: 10),
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isSelected
+                              ? Color(0xFF07663a)
+                              : Colors.grey.shade300,
+                          width: 2,
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                            radius: 35,
+                            backgroundImage: NetworkImage("$api/${t["image"]}"),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            t["fullname"],
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            )
+          else
+            Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey.shade300),
+                  borderRadius: BorderRadius.circular(12)),
+              child: const Text(
+                "ไม่มีตารางงานในวันนี้",
+                textAlign: TextAlign.center,
+              ),
+            ),
+
+          const SizedBox(height: 25),
+
+          /// -----------------------------
+          /// 3️⃣ Section Duration
+          /// -----------------------------
+          Text(
+            "เลือกเวลานวด",
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 8),
+
+          DropdownButtonFormField(
+            value: selectedDuration,
+            isExpanded: true,
+            items: durations.map((d) {
+              return DropdownMenuItem(
+                value: d,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("${d["minutes"]} นาที"),
+                    Text(
+                      "${d["price"]} บาท",
+                      style: const TextStyle(color: Color(0xFF07663a)),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+            onChanged: (v) {
+              setState(() {
+                selectedDuration = v;
+
+                /// คำนวณเวลาสิ้นสุดใหม่ (ถ้าเลือกเวลาแล้ว)
+                if (startTimeCtrl.text.isNotEmpty &&
+                    v is Map &&
+                    v["minutes"] != null) {
+                  final start = TimeOfDayExtension.parse(startTimeCtrl.text);
+                  final mins = v["minutes"] as int;
+                  endTimeCtrl.text = addMinutes(start, mins);
+                }
+              });
+            },
+          ),
+
+          const SizedBox(height: 25),
+          Text("เวลาจอง", style: TextStyle(fontSize: 15)),
+          const SizedBox(height: 8),
+
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: startTimeCtrl,
+                  decoration: const InputDecoration(
+                    labelText: "เริ่ม",
+                    border: OutlineInputBorder(),
+                    suffixIcon: Icon(Icons.access_time),
+                  ),
+                  onTap: () => pickTime("start"),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: TextField(
+                  readOnly: true,
+                  // enabled: false,
+                  controller: endTimeCtrl,
+                  decoration: const InputDecoration(
+                    labelText: "สิ้นสุด",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 40),
+          _bottomButtons(),
+        ],
+      ),
+    );
+  }
+
+  Widget _bottomButtons() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      child: Row(
+        children: [
+          Expanded(
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFFe0e0e0),
+                padding: EdgeInsets.symmetric(vertical: 14),
+              ),
+              onPressed: () {
+                if (currentTab == 1) {
+                  // กลับหน้าแรก
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => BookingShopPage(
+                        province: widget.province,
+                        booking_date: booking_date,
+                      ),
+                    ),
+                  );
+                } else {
+                  // Tab2 → Tab1
+                  setState(() => currentTab = 1);
+                }
+              },
+              child: Text(
+                currentTab == 1 ? "ย้อนกลับ" : "ย้อนกลับ",
+                style: TextStyle(
+                  color: Color(0xFF494949),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: 10),
+          Expanded(
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF07663a),
+                padding: EdgeInsets.symmetric(vertical: 14),
+              ),
+              onPressed: () {
+                if (currentTab == 1) {
+                  /// ต้องเลือกก่อน
+                  if (selectedCourse == null) {
+                    showCenterDialog(
+                      context,
+                      title: "ยังไม่ได้เลือกบริการ",
+                      message: "กรุณาเลือกประเภทบริการ",
+                    );
+                    return;
+                  }
+                  findSelectedService();
+                  setState(() => currentTab = 2);
+                } else {
+                  if (selectedTherapist == null) {
+                    showCenterDialog(
+                      context,
+                      title: "ยังไม่ได้เลือกผู้ให้บริการ",
+                      message: "กรุณาเลือกผู้ให้บริการ",
+                    );
+                    return;
+                  }
+
+                  final bookingData = {
+                    "booking_date": booking_date,
+                    "discount": 0,
+                    "discount_type": "",
+                    "end_time": endTimeCtrl.text,
+                    "massage_duration": selectedDuration['minutes'],
+                    "massage_info_id": massageInfo['uuid'],
+                    "price": selectedDuration['price'],
+                    "price_total": selectedDuration['price'],
+                    "promotion_id": "",
+                    "service_list_id":
+                        selectedServiceData?['service_list_id'] ?? '',
+                    "name_service": selectedServiceData?['name_service'] ?? '',
+                    "category_sub": selectedServiceData?['category_sub'] ?? '',
+                    "start_time": startTimeCtrl.text,
+                    "therapist_info_id": therapists[0]['therapist_info_id'],
+                    "therapist_fullname": therapists[0]['fullname'],
+                    "image": massageInfo['image'],
+                    "massageDate": massageBookingDate,
+                    "massage_name": massageInfo['massage_name'],
+                    "avg_score": massageInfo['avg_score'],
+                    "review_count": massageInfo['review_count'],
+                    "province": widget.province,
+                  };
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => BookingConfirm(model: bookingData),
+                    ),
+                  );
+                }
+              },
+              child: Text(
+                currentTab == 1 ? "ถัดไป" : "ถัดไป",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void findSelectedService() {
+    selectedServiceData = null;
+
+    servicesLists.forEach((cat, list) {
+      for (var s in list) {
+        if (s["service_list_id"] == selectedCourse) {
+          selectedServiceData = s;
+          break;
+        }
+      }
+    });
+  }
+
+  Future pickTime(String type) async {
+    TimeOfDay? time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+      initialEntryMode: TimePickerEntryMode.input,
+    );
+
+    if (time == null) return;
+
+    setState(() {
+      startTimeCtrl.text = time.format(context);
+
+      if (selectedDuration != null) {
+        int mins = selectedDuration["minutes"];
+        endTimeCtrl.text = addMinutes(time, mins);
+      }
+    });
+  }
+
+  String addMinutes(TimeOfDay start, int minutes) {
+    final now = DateTime.now();
+    final startDt = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      start.hour,
+      start.minute,
+    );
+
+    final result = startDt.add(Duration(minutes: minutes));
+
+    return TimeOfDay(
+      hour: result.hour,
+      minute: result.minute,
+    ).format(context);
+  }
+
+  Widget TherapistScheduleSheet(BuildContext context) {
+    return DraggableScrollableSheet(
+      expand: false,
+      initialChildSize: 0.45,
+      minChildSize: 0.35,
+      maxChildSize: 0.90,
+      builder: (_, controller) => Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          boxShadow: [
+            BoxShadow(
+              blurRadius: 8,
+              spreadRadius: 1,
+              color: Colors.black12,
+            )
+          ],
+        ),
+        padding: const EdgeInsets.only(top: 12, left: 20, right: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 50,
+                height: 4,
+                margin: EdgeInsets.only(bottom: 10),
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+            Text(
+              "ตารางงานวันนี้",
+              style: const TextStyle(
+                color: Color(0xFF07663a),
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Expanded(
+              child: therapistWorks.isEmpty
+                  ? _buildEmptySchedule()
+                  : ListView.builder(
+                      controller: controller,
+                      itemCount: therapistWorks.length,
+                      padding: EdgeInsets.only(bottom: 12),
+                      itemBuilder: (_, i) => _buildBusyCard(therapistWorks[i]),
+                    ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBusyCard(Map w) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 14),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        color: Colors.red.withOpacity(0.05),
+        border: Border.all(color: Colors.red.withOpacity(0.30)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.block, color: Colors.red[600]),
+          const SizedBox(width: 10),
+          Text(
+            "${w["start"]} – ${w["end"]}",
+            style: TextStyle(
+              color: Colors.red[700],
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptySchedule() {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.event_available,
+              size: 60, color: Colors.grey.withOpacity(0.4)),
+          const SizedBox(height: 12),
+          Text(
+            "วันนี้ไม่มีตารางงาน 🎉",
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey[600],
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  filteredTherapistWork() {
+    therapistWorks = therapistsWorkList.firstWhere(
+        (x) => x["therapist_info_id"] == selectedTherapist,
+        orElse: () => {"works": []})["works"];
+  }
+
   // Widget buildTherapistSheet() {
   //   return SizedBox(
   //     height: MediaQuery.of(context).size.height * 0.6, // ครึ่งจอ
@@ -788,6 +1474,8 @@ class _BookingDetailState extends State<BookingDetail> {
   //     ),
   //   );
   // }
+
+  reset() {}
 }
 
 class FullscreenImage extends StatelessWidget {

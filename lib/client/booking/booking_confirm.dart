@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:ihealth_2025_mobile/client/booking/booking_coupon.dart';
 import 'package:ihealth_2025_mobile/client/booking/booking_detail.dart';
 import 'package:ihealth_2025_mobile/client/booking/booking_history.dart';
+import 'package:ihealth_2025_mobile/shared/api_provider.dart';
 
 class BookingConfirm extends StatefulWidget {
-  const BookingConfirm({super.key});
+  const BookingConfirm({super.key, required this.model});
 
+  final dynamic model;
   @override
   State<BookingConfirm> createState() => _BookingConfirmState();
 }
@@ -15,37 +17,18 @@ class BookingConfirm extends StatefulWidget {
 class _BookingConfirmState extends State<BookingConfirm> {
   Map<String, dynamic>? selectedPromo; // เก็บโปรที่เลือก
 
-  final Map<String, dynamic> bookingSummary = {
-    "shop": {
-      "id": 1,
-      "name": "ร้านปังปังสุขใจ",
-      "rating": "⭐ 4.95 (4 รีวิว)",
-      "imageUrl": "assets/ihealth/shop1.jpg",
-    },
-    "booking": {
-      "customerName": "คุณอารยา สมศรี",
-      "date": "วันอังคารที่ 15 กันยายน 2568",
-      "time": "10:17",
-      "duration": "60 นาที",
-      "massageType": "นวดอโรมา / นวดน้ำมัน",
-      "therapist": "คุณแนน",
-      "price": 750.00,
-      "currency": "บาท",
-    }
-  };
+  dynamic model;
+  dynamic profileModel = {};
+
+  @override
+  void initState() {
+    super.initState();
+    model = widget.model;
+    _readProfile();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final shop = bookingSummary["shop"];
-
-    final booking = bookingSummary["booking"];
-
-    /// ถ้ามีโปรคำนวณราคาใหม่
-    final double price = booking["price"];
-    final double finalPrice = selectedPromo == null
-        ? price
-        : price - (price * selectedPromo!["discount"]);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("สรุปรายการจอง"),
@@ -56,7 +39,6 @@ class _BookingConfirmState extends State<BookingConfirm> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            /// แสดงรายละเอียดอื่นๆ (ตัดไว้สั้นๆ)
             Expanded(
               child: ListView(
                 children: [
@@ -70,10 +52,10 @@ class _BookingConfirmState extends State<BookingConfirm> {
                         ClipRRect(
                           borderRadius: const BorderRadius.vertical(
                               top: Radius.circular(12)),
-                          child: Image.asset(
-                            shop["imageUrl"],
-                            height: 180,
+                          child: Image.network(
+                            "$api/${model['image']}",
                             width: double.infinity,
+                            height: 240,
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -82,14 +64,37 @@ class _BookingConfirmState extends State<BookingConfirm> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(shop["name"],
+                              Text(model["massage_name"],
                                   style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold)),
                               const SizedBox(height: 4),
-                              Text(shop["rating"],
+                              Text(model["name_service"],
                                   style: const TextStyle(
-                                      fontSize: 14, color: Colors.black54)),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: Color(0xFF07663a))),
+                              const SizedBox(height: 4),
+                              InkWell(
+                                onTap: () {
+                                  // Navigator.push(
+                                  //   context,
+                                  //   MaterialPageRoute(
+                                  //       builder: (context) => ReviewPage()),
+                                  // );
+                                },
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.star,
+                                        color: Colors.orange, size: 18),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      "${model["avg_score"]} (${model["review_count"]} รีวิว)",
+                                      style: const TextStyle(fontSize: 14),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -98,10 +103,15 @@ class _BookingConfirmState extends State<BookingConfirm> {
                   ),
 
                   const SizedBox(height: 20),
-                  buildInfoRow("ชื่อผู้จอง:", booking["customerName"]),
-                  buildInfoRow("วันที่:", booking["date"]),
-                  buildInfoRow("เวลานัดหมาย:", booking["time"]),
-                  buildInfoRow("ประเภทนวด:", booking["massageType"]),
+                  buildInfoRow("ชื่อผู้จอง:", profileModel['fullname'] ?? ""),
+                  buildInfoRow("วันที่:", model["massageDate"]),
+                  buildInfoRow("เวลาเริ่มนวด:",
+                      "${model["start_time"]} น. ถึง ${model["end_time"]} น."),
+                  buildInfoRow(
+                      "ระยะเวลานวด:", "${model["massage_duration"]} นาที"),
+                  buildInfoRow("ประเภทย่อย:", model["category_sub"]),
+                  buildInfoRow(
+                      "ผู้ให้บริการที่เลือก:", model["therapist_fullname"]),
 
                   /// แสดงราคา
                   Container(
@@ -119,7 +129,7 @@ class _BookingConfirmState extends State<BookingConfirm> {
                           children: [
                             if (selectedPromo != null)
                               Text(
-                                "${price.toStringAsFixed(2)} ${booking["currency"]}",
+                                "฿${model['price'].toStringAsFixed(2)}",
                                 style: const TextStyle(
                                   color: Colors.grey,
                                   decoration: TextDecoration.lineThrough,
@@ -127,7 +137,7 @@ class _BookingConfirmState extends State<BookingConfirm> {
                               ),
                             const SizedBox(width: 8),
                             Text(
-                              "${finalPrice.toStringAsFixed(2)} ${booking["currency"]}",
+                              "฿${model['price_total'].toStringAsFixed(2)}",
                               style: const TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.bold),
                             ),
@@ -136,79 +146,48 @@ class _BookingConfirmState extends State<BookingConfirm> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFe8f5e9),
-                            foregroundColor: const Color(0xFF07663a),
-                            elevation: 0,
-                          ),
-                          onPressed: () {},
-                          icon: const Icon(Icons.map),
-                          label: const Text("ดูตำแหน่งใน Google Maps"),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFD4AF37),
-                          foregroundColor: Colors.black,
-                        ),
-                        onPressed: () async {
-                          final promo = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    const BookingCouponPage()),
-                          );
-                          if (promo != null) {
-                            setState(() {
-                              selectedPromo = promo;
-                            });
-                          }
-                        },
-                        child: const Text(
-                          "ใช้โค้ดหรือโปรโมชั่น",
-                          style: TextStyle(color: Color(0xFFFFFFFF)),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 30),
 
-                  /// ถ้ามีโปร แสดงกล่อง
-                  if (selectedPromo != null)
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFE8F5E9),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: const Color(0xFF07663a)),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.local_offer, color: Colors.green),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              "ใช้โปรโมชั่น: ${selectedPromo!["title"]}",
-                              style: const TextStyle(fontSize: 14),
+                  ClipPath(
+                    clipper: TicketShape(),
+                    child: GestureDetector(
+                      onTap: () async {
+                        final promo = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => BookingCouponPage(
+                                  massage_info_id: model['massage_info_id'])),
+                        );
+                        if (promo != null) {
+                          setState(() {
+                            selectedPromo = promo;
+                            final price = (model['price'] ?? 0).toDouble();
+                            final discount =
+                                (promo['discount'] ?? 0).toDouble();
+
+                            model['price_total'] = price - discount;
+                          });
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        color: const Color(0xFFC99B22),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(Icons.discount, color: Colors.white, size: 18),
+                            SizedBox(width: 8),
+                            Text(
+                              "คูปองส่วนลด / โปรโมชั่น",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
                             ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                selectedPromo = null;
-                              });
-                            },
-                            child: const Icon(Icons.close, color: Colors.red),
-                          )
-                        ],
+                          ],
+                        ),
                       ),
                     ),
+                  ),
                   SizedBox(height: 50),
                   Row(
                     children: [
@@ -221,8 +200,9 @@ class _BookingConfirmState extends State<BookingConfirm> {
                               context,
                               MaterialPageRoute(
                                 builder: (_) => BookingDetail(
-                                  massage_info_id: "",
-                                  booking_date: "",
+                                  massage_info_id: model['massage_info_id'],
+                                  booking_date: model['booking_date'],
+                                  province: model['province'],
                                 ),
                               ),
                             );
@@ -236,8 +216,31 @@ class _BookingConfirmState extends State<BookingConfirm> {
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF07663a)),
-                          onPressed: () {
-                            _showSuccessDialog();
+                          onPressed: () async {
+                            if (selectedPromo?.isNotEmpty == true) {
+                              model['discount'] =
+                                  selectedPromo?['discount'] ?? 0;
+                              model['discount_type'] =
+                                  selectedPromo?['discount_type'] ?? "";
+                              model['promotion_id'] =
+                                  selectedPromo?['promotion_id'] ?? "";
+                            }
+
+                            final res = await post(
+                              "$api/api/v1/customer/bookings",
+                              model,
+                            );
+
+                            if (res['status'] == "F") {
+                              showCenterDialog(
+                                context,
+                                title: "จองไม่สำเร็จ",
+                                message: "เนื่องจากช่วงเวลานี้ มีคนจองแล้ว",
+                              );
+                              return;
+                            } else {
+                              _showSuccessDialog();
+                            }
                           },
                           child: const Text("ยืนยันการจอง",
                               style: TextStyle(color: Colors.white)),
@@ -269,6 +272,24 @@ class _BookingConfirmState extends State<BookingConfirm> {
         ],
       ),
     );
+  }
+
+  _readProfile() async {
+    await storage.read(key: 'fullname').then((v) => setState(() {
+          profileModel['fullname'] = v;
+        }));
+    await storage.read(key: 'mobile').then((v) => setState(() {
+          profileModel['mobile'] = v;
+        }));
+    await storage.read(key: 'image').then((v) => setState(() {
+          profileModel['image'] = v;
+        }));
+    await storage.read(key: 'token').then((v) => setState(() {
+          profileModel['token'] = v;
+        }));
+    await storage.read(key: 'loginType').then((v) => setState(() {
+          profileModel['loginType'] = v;
+        }));
   }
 
   _showSuccessDialog() {
@@ -312,4 +333,84 @@ class _BookingConfirmState extends State<BookingConfirm> {
       );
     });
   }
+
+    void showCenterDialog(BuildContext context,
+      {required String title, required String message}) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // บังคับให้กดปุ่ม
+      builder: (_) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.error_outline,
+                color: Color(0xFFB3261E),
+                size: 48,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                message,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 15,
+                ),
+              ),
+              const SizedBox(height: 18),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0XFF07663a),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                ),
+                onPressed: () => Navigator.pop(context),
+                child: const Text(
+                  "ตกลง",
+                  style: TextStyle(color: Colors.white, fontSize: 15),
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class TicketShape extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    const radius = 10.0;
+
+    Path path = Path()
+      ..moveTo(0, radius)
+      ..quadraticBezierTo(0, 0, radius, 0)
+      ..lineTo(size.width - radius, 0)
+      ..quadraticBezierTo(size.width, 0, size.width, radius)
+      ..lineTo(size.width, size.height - radius)
+      ..quadraticBezierTo(
+          size.width, size.height, size.width - radius, size.height)
+      ..lineTo(radius, size.height)
+      ..quadraticBezierTo(0, size.height, 0, size.height - radius)
+      ..close();
+
+    return path;
+  }
+
+  @override
+  bool shouldReclip(TicketShape oldClipper) => false;
 }

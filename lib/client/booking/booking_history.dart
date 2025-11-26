@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:ihealth_2025_mobile/client/menu_client.dart';
 import 'package:ihealth_2025_mobile/component/link_url_out.dart';
 import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
 import 'package:ihealth_2025_mobile/shared/api_provider.dart';
@@ -1001,8 +1002,8 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
+       appBar: AppBar(
+        title: const Text(
           "ประวัติการนวด",
           style: TextStyle(
             color: Colors.white,
@@ -1011,6 +1012,17 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
         ),
         centerTitle: true,
         backgroundColor: AppColors.primary,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (_) => MenuClient(),
+              ),
+            );
+          },
+        ),
       ),
       body: Column(
         children: [

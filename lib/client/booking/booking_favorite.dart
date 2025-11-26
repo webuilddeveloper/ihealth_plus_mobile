@@ -4,9 +4,12 @@ import 'package:dio/dio.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:ihealth_2025_mobile/client/booking/booking_detail.dart';
 import 'package:ihealth_2025_mobile/client/review.dart';
 import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
+import 'package:ihealth_2025_mobile/shared/api_provider.dart';
 import 'package:ihealth_2025_mobile/shared/dio_service.dart';
 
 class Shop {
@@ -177,38 +180,54 @@ class _BookingFavoritePageState extends State<BookingFavoritePage> {
   }
 
   _Favorites() async {
-    final storage = FlutterSecureStorage();
-    final token = await storage.read(key: 'token');
-    var headers = {'Authorization': 'Bearer $token'};
+    // setState(() {
+    //     favoritesData = response.data['data'];
+    //   });
 
-    final dioService = DioService();
-    await dioService.init();
-    final dio = dioService.dio;
-    final cookieJar = dioService.cookieJar;
+    // final storage = FlutterSecureStorage();
+    // final token = await storage.read(key: 'token');
+    // var headers = {'Authorization': 'Bearer $token'};
 
-    var cookies = await cookieJar.loadForRequest(
-      Uri.parse('https://api-ihealth.spl-system.com'),
-    );
-    print("Cookies: $cookies");
-    // var data = json
-    //     .encode({"massage_info_id": "645c9a68-d89f-41e9-b9d9-414e25c04a7e"});
-    var response = await dio.request(
-      'https://api-ihealth.spl-system.com/api/v1/customer/favorites',
-      options: Options(
-        method: 'GET',
-        headers: headers,
-      ),
-      // data: data,
-    );
+    // final dioService = DioService();
+    // await dioService.init();
+    // final dio = dioService.dio;
+    // final cookieJar = dioService.cookieJar;
 
-    if (response.statusCode == 200) {
-      print('✅ Favorites fetched successfully:');
-      setState(() {
-        favoritesData = response.data['data'];
-      });
-    } else {
-      print(response.statusMessage);
-    }
+    // var cookies = await cookieJar.loadForRequest(
+    //   Uri.parse('https://api-ihealth.spl-system.com'),
+    // );
+    // print("Cookies: $cookies");
+    // // var data = json
+    // //     .encode({"massage_info_id": "645c9a68-d89f-41e9-b9d9-414e25c04a7e"});
+    // var response = await dio.request(
+    //   'https://api-ihealth.spl-system.com/api/v1/customer/favorites',
+    //   options: Options(
+    //     method: 'GET',
+    //     headers: headers,
+    //   ),
+    //   // data: data,
+    // );
+
+    // if (response.statusCode == 200) {
+    //   print('✅ Favorites fetched successfully:');
+    //   setState(() {
+    //     favoritesData = response.data['data'];
+    //   });
+    // } else {
+    //   print(response.statusMessage);
+    // }
+
+    final url = '$api/api/v1/customer/favorites';
+
+    final v = await get(url);
+
+    if (v == null) return;
+
+    print('---$v');
+
+    setState(() {
+      favoritesData = v;
+    });
   }
 
   @override
@@ -329,42 +348,59 @@ class _BookingFavoritePageState extends State<BookingFavoritePage> {
                                             "${favorite['avg_score']} (${favorite['review_count']} รีวิว)"),
                                       ],
                                     ),
+                                    SizedBox(height: 15),
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          12, 0, 12, 12),
+                                      child: SizedBox(
+                                        width: double.infinity,
+                                        child: ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor:
+                                                  AppColors.primary,
+                                              foregroundColor: Colors.white,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 12),
+                                            ),
+                                            onPressed: () {
+                                              
+                                              final today =
+                                                  toDate(DateTime.now());
+                                              String encodedProvince =
+                                                  Uri.encodeComponent(
+                                                      favorite['province'] ??
+                                                          "");
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        BookingDetail(
+                                                          massage_info_id: favorite[
+                                                              'massage_info_id'],
+                                                          booking_date: today,
+                                                          province:
+                                                              encodedProvince,
+                                                        )),
+                                              );
+                                            },
+                                            child: const Text(
+                                              "ดูรายละเอียด",
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 14,
+                                                fontFamily: 'Kanit',
+                                              ),
+                                            )),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-                                child: SizedBox(
-                                  width: double.infinity,
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: AppColors.primary,
-                                      foregroundColor: Colors.white,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 12),
-                                    ),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                BookingDetail(massage_info_id: '', booking_date: '',)),
-                                      );
-                                    },
-                                    child: const Text(
-                                      "ดูรายละเอียด",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14,
-                                        fontFamily: 'Kanit',
-                                      ),
-                                    )
-                                  ),
-                                ),
-                              )
                             ],
                           ),
                         );
@@ -375,6 +411,13 @@ class _BookingFavoritePageState extends State<BookingFavoritePage> {
         ),
       ),
     );
+  }
+
+  String toDate(DateTime date) {
+    final d = date.day.toString().padLeft(2, '0');
+    final m = date.month.toString().padLeft(2, '0');
+    final y = date.year.toString();
+    return "$d-$m-$y";
   }
 
   List<DropdownMenuItem<String>> buildGroupedItems(List<ServiceType> data) {

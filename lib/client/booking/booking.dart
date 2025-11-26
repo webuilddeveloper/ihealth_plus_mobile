@@ -115,6 +115,14 @@ class _BookingState extends State<Booking> {
     "อำนาจเจริญ",
   ];
 
+    @override
+  void initState() {
+    super.initState();
+    setState(() {
+      selectedProvince = "กรุงเทพมหานคร";
+    });
+  }
+
   Future<void> _getCurrentLocation() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) return;
