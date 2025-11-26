@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:ihealth_2025_mobile/component/link_url_out.dart';
 import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
 import 'package:ihealth_2025_mobile/shared/api_provider.dart';
 import 'package:ihealth_2025_mobile/shared/dio_service.dart';
@@ -58,18 +59,18 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
   //   },
   // ];
 
-  final List<Map<String, dynamic>> completedBookings = [
-    {
-      "shopName": "ผ่อนคลายสปา",
-      "status": "ชำระแล้ว",
-      "service": "นวดน้ำมันอโรมา",
-      "category": "รีแลกซ์ / เดว / สปา",
-      "therapist": "คุณสมศรี",
-      "duration": "1.5 ชั่วโมง",
-      "date": "23/06/2025",
-      "time": "14:00 น.",
-      "price": "1,200 บาท",
-    },
+  List<dynamic> pendingBookings = [
+    // {
+    //   "shopName": "ผ่อนคลายสปา",
+    //   "status": "ชำระแล้ว",
+    //   "service": "นวดน้ำมันอโรมา",
+    //   "category": "รีแลกซ์ / เดว / สปา",
+    //   "therapist": "คุณสมศรี",
+    //   "duration": "1.5 ชั่วโมง",
+    //   "date": "23/06/2025",
+    //   "time": "14:00 น.",
+    //   "price": "1,200 บาท",
+    // },
   ];
 
   bool hasRated = false;
@@ -86,6 +87,8 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
   double therapistPunctuality = 0;
 
   final TextEditingController feedbackController = TextEditingController();
+
+  final TextEditingController reasonController = TextEditingController();
 
   // state
   String? selectedMonth = "ทุกเดือน";
@@ -115,7 +118,8 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
   void initState() {
     super.initState();
     _historymassage();
-    _resetRatings();
+    _historyMassagePending();
+    // _resetRatings();
     _tabController = TabController(length: 2, vsync: this);
   }
 
@@ -153,8 +157,9 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
                               style: const TextStyle(
                                   color: Colors.green, fontSize: 13))
                           : Text(booking["status"],
-                              style: const TextStyle(
-                                  color: Colors.grey, fontSize: 13)),
+                              style: TextStyle(
+                                  color: booking['status'] == 'completed' ?
+                                  Colors.green : booking['status'] == 'cancelled' ? Colors.red : Colors.grey, fontSize: 14, fontWeight: FontWeight.bold)),
                 ],
               ),
 
@@ -251,7 +256,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
               const Divider(height: 20),
               booking['status'] == 'completed'
                   ? Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Center(
                           child: Container(
@@ -263,9 +268,11 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
                               color: AppColors.primary,
                               child: MaterialButton(
                                 height: 40,
-                                onPressed: () {},
+                                onPressed: () {
+                                  _showRatingDialog2(booking['scores'][0]);
+                                },
                                 child: Text(
-                                  'รีวิว',
+                                  'ดูคะแนน',
                                   style: TextStyle(
                                     fontSize: 16.0,
                                     color: Colors.white,
@@ -279,7 +286,9 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
                         ),
                       ],
                     )
-                  : Row(
+                  : booking['status'] == 'cancelled' ?
+                  Container() :
+                  Row(
                       children: [
                         Expanded(
                           child: Row(
@@ -290,7 +299,6 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
                                   setState(() {
                                     booking['payment'] = "promptpay";
                                   });
-
                                   showDialog(
                                     context: context,
                                     builder: (BuildContext context) {
@@ -475,7 +483,8 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
     );
   }
 
-  Widget buildBookingCardSuccess(Map<String, dynamic> booking) {
+  Widget buildBookingCardPending(dynamic booking, int index) {
+    print('--==777777777777==-- ${booking}');
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -489,30 +498,33 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(booking["shopName"],
-                      style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black)),
-                  Text(booking["status"],
-                      style: const TextStyle(
-                          color: Color(0xFF07663a), fontSize: 13)),
+                  Text(
+                    booking["massage_name"],
+                    style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  // Text(booking["status"],
+                  //     style: const TextStyle(
+                  //         color: Color(0xFF07663a), fontSize: 13)),
                 ],
               ),
-
               const SizedBox(height: 10),
-              SizedBox(height: 5),
-              Text('25/06/2025 เวลา 20:30 น.'),
-              SizedBox(height: 10),
-              buildDetail("ราคา", booking["price"]),
-              SizedBox(height: 5),
-              buildDetail("หมอนวด", booking["therapist"]),
-              SizedBox(height: 10),
-
-              // แผนที่
+              buildDetail("ประเภทหลัก", booking["category_main"]),
+              buildDetail("ประเภทย่อย", booking["category_sub"]),
+              buildDetail("บริการ", booking["service_name"]),
+              buildDetail("ผู้ให้บริการ", booking["therapist_name"]),
+              buildDetail("ระยะเวลา", '${booking["massage_duration"]} นาที'),
+              buildDetail("วันที่นัดหมาย", booking["booking_date"]),
+              buildDetail("เวลานัดหมาย",
+                  '${booking["start_time"]} ถึง ${booking["end_time"]}'),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
+                  buildDetail("พิกัดร้าน", ''),
                   OutlinedButton.icon(
                     icon: const Icon(Icons.map,
                         size: 18, color: Color(0xFF07663a)),
@@ -520,45 +532,81 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
                         style: TextStyle(color: Color(0xFF07663a))),
                     style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: Color(0xFF07663a))),
-                    onPressed: () {},
+                    onPressed: () {
+                      launchURL(booking["massage_map"]);
+                    },
                   ),
                 ],
               ),
+              buildDetail("ราคา", booking["price"]),
               const SizedBox(height: 20),
-              Container(
-                width: double.infinity,
-                height: 60,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade300),
-                    borderRadius: BorderRadius.circular(8)),
-                child: const Text("ไม่มีภาพแนบ",
-                    style: TextStyle(color: Color(0xFF5a5a5a))),
-              ),
-              const SizedBox(height: 10),
-              Container(
-                alignment: Alignment.center,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFd4af37),
-                    minimumSize: const Size(60, 50),
-                    side: const BorderSide(
-                      color: Color(0xFFd4af37),
-                      width: 1,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  onPressed:
-                      hasRated ? _showViewRatingDialog : _showRatingDialog,
-                  child: Text(
-                    hasRated ? "ดูคะแนน" : "ให้คะแนน ",
-                    style: const TextStyle(color: Colors.white, fontSize: 16),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
+              booking["status"] == 'pending'
+                  ? Container(
+                      alignment: Alignment.center,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          minimumSize: const Size(60, 50),
+                          // side: const BorderSide(
+                          //   color: Color(0xFFd4af37),
+                          //   width: 1,
+                          // ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        onPressed: () =>
+                            _showcancelDialog(booking["booking_id"]),
+                        // hasRated
+                        //     ? _showViewRatingDialog
+                        //     : _showRatingDialog,
+                        child: Text(
+                          "ยกเลิกการจอง",
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 16),
+                        ),
+                      ),
+                    )
+                  : Column(
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          height: 60,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey.shade300),
+                              borderRadius: BorderRadius.circular(8)),
+                          child: const Text("ไม่มีภาพแนบ",
+                              style: TextStyle(color: Color(0xFF5a5a5a))),
+                        ),
+                        const SizedBox(height: 10),
+                        Container(
+                          alignment: Alignment.center,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFd4af37),
+                              minimumSize: const Size(60, 50),
+                              side: const BorderSide(
+                                color: Color(0xFFd4af37),
+                                width: 1,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            onPressed: hasRated
+                                ? _showViewRatingDialog
+                                : _showRatingDialog,
+                            child: Text(
+                              hasRated ? "ดูคะแนน" : "ให้คะแนน ",
+                              style: const TextStyle(
+                                  color: Colors.white, fontSize: 16),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                      ],
+                    )
             ],
           ),
         ),
@@ -602,110 +650,111 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
             child: TabBarView(
               controller: _tabController,
               children: [
-                SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      // 🔽 Dropdown Filters อยู่นอก Card
-                      // Padding(
-                      //   padding: const EdgeInsets.symmetric(
-                      //       horizontal: 16, vertical: 10),
-                      //   child: Column(
-                      //     children: [
-                      //       DropdownButtonFormField2<String>(
-                      //         decoration: InputDecoration(
-                      //           labelText: "เดือน",
-                      //           border: OutlineInputBorder(
-                      //             borderRadius: BorderRadius.circular(12),
-                      //           ),
-                      //         ),
-                      //         value: selectedMonth,
-                      //         items: months.map((month) {
-                      //           return DropdownMenuItem<String>(
-                      //             value: month,
-                      //             child: Text(month),
-                      //           );
-                      //         }).toList(),
-                      //         onChanged: (value) {
-                      //           setState(() {
-                      //             selectedMonth = value;
-                      //           });
-                      //         },
-                      //         dropdownStyleData: DropdownStyleData(
-                      //           useSafeArea: true,
-                      //           elevation: 2,
-                      //           offset: const Offset(0, -5),
-                      //         ),
-                      //       ),
-                      //       const SizedBox(height: 16),
+                // SingleChildScrollView(
+                //   child: Column(
+                //     children: [
+                //       // 🔽 Dropdown Filters อยู่นอก Card
+                //       // Padding(
+                //       //   padding: const EdgeInsets.symmetric(
+                //       //       horizontal: 16, vertical: 10),
+                //       //   child: Column(
+                //       //     children: [
+                //       //       DropdownButtonFormField2<String>(
+                //       //         decoration: InputDecoration(
+                //       //           labelText: "เดือน",
+                //       //           border: OutlineInputBorder(
+                //       //             borderRadius: BorderRadius.circular(12),
+                //       //           ),
+                //       //         ),
+                //       //         value: selectedMonth,
+                //       //         items: months.map((month) {
+                //       //           return DropdownMenuItem<String>(
+                //       //             value: month,
+                //       //             child: Text(month),
+                //       //           );
+                //       //         }).toList(),
+                //       //         onChanged: (value) {
+                //       //           setState(() {
+                //       //             selectedMonth = value;
+                //       //           });
+                //       //         },
+                //       //         dropdownStyleData: DropdownStyleData(
+                //       //           useSafeArea: true,
+                //       //           elevation: 2,
+                //       //           offset: const Offset(0, -5),
+                //       //         ),
+                //       //       ),
+                //       //       const SizedBox(height: 16),
 
-                      //       DropdownButtonFormField2<String>(
-                      //         decoration: InputDecoration(
-                      //           labelText: "ปี",
-                      //           border: OutlineInputBorder(
-                      //             borderRadius: BorderRadius.circular(12),
-                      //           ),
-                      //         ),
-                      //         value: selectedYear,
-                      //         items: years.map((year) {
-                      //           return DropdownMenuItem<String>(
-                      //             value: year,
-                      //             child: Text(year),
-                      //           );
-                      //         }).toList(),
-                      //         onChanged: (value) {
-                      //           setState(() {
-                      //             selectedYear = value;
-                      //           });
-                      //         },
-                      //         dropdownStyleData: DropdownStyleData(
-                      //           useSafeArea: true,
-                      //           elevation: 2,
-                      //           offset: const Offset(0, -5),
-                      //         ),
-                      //       ),
-                      //       const SizedBox(height: 16),
+                //       //       DropdownButtonFormField2<String>(
+                //       //         decoration: InputDecoration(
+                //       //           labelText: "ปี",
+                //       //           border: OutlineInputBorder(
+                //       //             borderRadius: BorderRadius.circular(12),
+                //       //           ),
+                //       //         ),
+                //       //         value: selectedYear,
+                //       //         items: years.map((year) {
+                //       //           return DropdownMenuItem<String>(
+                //       //             value: year,
+                //       //             child: Text(year),
+                //       //           );
+                //       //         }).toList(),
+                //       //         onChanged: (value) {
+                //       //           setState(() {
+                //       //             selectedYear = value;
+                //       //           });
+                //       //         },
+                //       //         dropdownStyleData: DropdownStyleData(
+                //       //           useSafeArea: true,
+                //       //           elevation: 2,
+                //       //           offset: const Offset(0, -5),
+                //       //         ),
+                //       //       ),
+                //       //       const SizedBox(height: 16),
 
-                      //       DropdownButtonFormField2<String>(
-                      //         decoration: InputDecoration(
-                      //           labelText: "สถานะ",
-                      //           border: OutlineInputBorder(
-                      //             borderRadius: BorderRadius.circular(12),
-                      //           ),
-                      //         ),
-                      //         value: selectedStatus,
-                      //         items: statuses.map((status) {
-                      //           return DropdownMenuItem<String>(
-                      //             value: status,
-                      //             child: Text(status),
-                      //           );
-                      //         }).toList(),
-                      //         onChanged: (value) {
-                      //           setState(() {
-                      //             selectedStatus = value;
-                      //           });
-                      //         },
-                      //         dropdownStyleData: DropdownStyleData(
-                      //           useSafeArea: true,
-                      //           elevation: 2,
-                      //           offset: const Offset(0, -5),
-                      //         ),
-                      //       ),
-                      //     ],
-                      //   ),
-                      // ),
+                //       //       DropdownButtonFormField2<String>(
+                //       //         decoration: InputDecoration(
+                //       //           labelText: "สถานะ",
+                //       //           border: OutlineInputBorder(
+                //       //             borderRadius: BorderRadius.circular(12),
+                //       //           ),
+                //       //         ),
+                //       //         value: selectedStatus,
+                //       //         items: statuses.map((status) {
+                //       //           return DropdownMenuItem<String>(
+                //       //             value: status,
+                //       //             child: Text(status),
+                //       //           );
+                //       //         }).toList(),
+                //       //         onChanged: (value) {
+                //       //           setState(() {
+                //       //             selectedStatus = value;
+                //       //           });
+                //       //         },
+                //       //         dropdownStyleData: DropdownStyleData(
+                //       //           useSafeArea: true,
+                //       //           elevation: 2,
+                //       //           offset: const Offset(0, -5),
+                //       //         ),
+                //       //       ),
+                //       //     ],
+                //       //   ),
+                //       // ),
 
-                      // 🔽 รายการ Booking Cards
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: completedBookings.length,
-                        itemBuilder: (context, index) {
-                          return buildBookingCardSuccess(
-                              completedBookings[index]);
-                        },
-                      ),
-                    ],
-                  ),
+                //       // 🔽 รายการ Booking Cards
+
+                //     ],
+                //   ),
+                // ),
+                ListView.builder(
+                  // shrinkWrap: true,
+                  // physics: const NeverScrollableScrollPhysics(),
+                  itemCount: pendingBookings.length,
+                  itemBuilder: (context, index) {
+                    return buildBookingCardPending(
+                        pendingBookings[index], index);
+                  },
                 ),
                 ListView.builder(
                   itemCount: historymassage.length,
@@ -974,7 +1023,107 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
     );
   }
 
-  Widget _buildRatingRow(String title, Function(double) onRatingUpdate) {
+  void _showRatingDialog2(dynamic rating) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: SizedBox(
+            width: 350,
+            height: MediaQuery.of(context).size.height * 0.65,
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ),
+                  const Center(
+                    child: Text(
+                      "ให้คะแนนบริการ",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                          color: Color(0xFF07663a)),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // ✅ ส่วนที่ scroll ได้
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Row(
+                            children: [
+                              Icon(Icons.store, color: Colors.green),
+                              SizedBox(width: 6),
+                              Text("ร้านนวด",
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          _buildRatingRow("คุณภาพของร้าน", (value) => null,
+                              rating: rating['quality'].toDouble()),
+                          _buildRatingRow(
+                              "ความสะอาดของสถานที่", (value) => null,
+                              rating: rating['cleanliness'].toDouble()),
+                          _buildRatingRow("ตรงเวลานัดหมาย", (value) => null,
+                              rating: rating['punctuality'].toDouble()),
+                          const SizedBox(height: 20),
+                          const Row(
+                            children: [
+                              Icon(Icons.person, color: Colors.green),
+                              SizedBox(width: 6),
+                              Text("หมอนวด",
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          _buildRatingRow("ทักษะของหมอนวด", (value) => null,
+                              rating: rating['skill'].toDouble()),
+                          _buildRatingRow("ความเอาใจใส่หมอนวด", (value) => null,
+                              rating: rating['wellbeing'].toDouble()),
+                          _buildRatingRow("ความตรงต่อเวลา", (value) => null,
+                              rating: rating['comfort'].toDouble()),
+                          const SizedBox(height: 20),
+                          Text("ข้อเสนอแนะ",
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          Text(rating['suggestion_text'], style: TextStyle()),
+
+                          // TextField(
+                          //   controller: feedbackController,
+                          //   maxLines: 3,
+                          //   decoration: const InputDecoration(
+                          //     hintText: "ข้อเสนอแนะเพิ่มเติม...",
+                          //     border: OutlineInputBorder(),
+                          //   ),
+                          // ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildRatingRow(String title, Function(double) onRatingUpdate,
+      {double rating = 0.0}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Column(
@@ -983,7 +1132,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
           Text(title, style: const TextStyle(fontSize: 14)),
           const SizedBox(height: 4),
           RatingBar.builder(
-            initialRating: 0,
+            initialRating: rating,
             direction: Axis.horizontal,
             itemSize: 28,
             allowHalfRating: false,
@@ -1215,37 +1364,65 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
   }
 
   _cancelMassage(String bookingid) async {
-    print('--------------_cancelMassage-------------');
-    print('--------_cancelMassage bookingid ${bookingid} ');
     try {
-      final storage = FlutterSecureStorage();
-      final token = await storage.read(key: 'token');
-      var headers = {'Authorization': 'Bearer $token'};
+      FormData formData = FormData.fromMap({
+        "cancel_reason": txtcancel.text,
+      });
 
-      final dioService = DioService();
-      await dioService.init();
-      final dio = dioService.dio;
-      final cookieJar = dioService.cookieJar;
-
-      var cookies = await cookieJar.loadForRequest(
-        Uri.parse('https://api-ihealth.spl-system.com'),
-      );
-      var data = json.encode({"cancel_reason": txtcancel.text.trim()});
-
-      print("Cookies: $cookies");
-      final String bookingId = '4ec10c34-9e39-4358-833c-07e9f4656fac';
-
-      var response = await dio.request(
-        'https://api-ihealth.spl-system.com/api/v1/customer/cancel-massage/$bookingId',
-        options: Options(
-          method: 'PUT',
-          headers: headers,
-        ),
-        data: data,
-      );
+      var response = await putUpdateProfile(
+          '${api}/api/v1/customer/cancel-massage/${bookingid}', formData);
 
       if (response.statusCode == 200) {
-        print(json.encode(response.data));
+        return showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return WillPopScope(
+              onWillPop: () {
+                return Future.value(false);
+              },
+              child: CupertinoAlertDialog(
+                title: Text(
+                  'ยกเลิกการจองเรียบร้อยแล้ว',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontFamily: 'Sarabun',
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                content: Text(" "),
+                actions: [
+                  CupertinoDialogAction(
+                    isDefaultAction: true,
+                    child: Text(
+                      "ตกลง",
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontFamily: 'Sarabun',
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                    onPressed: () {
+                      // Navigator.of(context).pushAndRemoveUntil(
+                      //   MaterialPageRoute(
+                      //     builder: (context) => HomePageV2(),
+                      //   ),
+                      //   (Route<dynamic> route) => false,
+                      // );
+                      _historymassage();
+                      _historyMassagePending();
+                      // goBack();
+                      Navigator.of(context).pop();
+                      // Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
+        );
       } else {
         print(response.statusMessage);
       }
@@ -1261,65 +1438,23 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
     }
   }
 
-  dynamic historymassage = {};
+  List<dynamic> historymassage = [];
 
   _historymassage() async {
     get(api + 'api/v1/customer/history-massage?year=&status=').then((v) => {
           setState(() {
             historymassage = v;
-            print('--==777777777777==-- ${v}');
           }),
         });
-    // try {
-    // final storage = FlutterSecureStorage();
-    // final token = await storage.read(key: 'token');
-    // var headers = {'Authorization': 'Bearer $token'};
+  }
 
-    // final dioService = DioService();
-    // await dioService.init();
-    // final dio = dioService.dio;
-    // final cookieJar = dioService.cookieJar;
-
-    // var cookies = await cookieJar.loadForRequest(
-    //   Uri.parse('https://api-ihealth.spl-system.com'),
-    // );
-    // print("Cookies: $cookies");
-
-    // var response = await dio.request(
-    //   'https://api-ihealth.spl-system.com/api/v1/customer/history-massage',
-    //   options: Options(
-    //     method: 'GET',
-    //     headers: headers,
-    //   ),
-    // );
-
-    // if (response.statusCode == 200) {
-    //   // print(json.encode(response.data));
-    //   // print('=========== >>> ${response.statusCode}');
-    //   // print('=========== >>> ${response.data.runtimeType}');
-    //   // print('=========== >>> ${response.data}');
-    //   // print('=========== >>> ${response.data['data']}');
-
-    //   setState(() {
-    //     historymassage = response.data;
-    //     print('-------Start historymassage ------');
-    //     print(historymassage.length);
-    //     print(historymassage['data'][0]['massage_name']);
-    //     print(historymassage['data'][0]['service_name']);
-    //   });
-    // }
-
-    // );
-    // } on DioException catch (e) {
-    //   String errorMessage = e.response?.data["message"] ?? "เกิดข้อผิดพลาด";
-    //   showErrorDialog(
-    //     context: context,
-    //     title: "แจ้งเตือน",
-    //     message: errorMessage,
-    //   );
-    // } catch (e) {
-    //   print("❌ Other ERROR: $e");
-    // }
+  _historyMassagePending() async {
+    get(api + 'api/v1/customer/history-massage?year=&status=pending')
+        .then((v) => {
+              setState(() {
+                pendingBookings = v;
+              }),
+            });
   }
 
   void _resetRatings() {
