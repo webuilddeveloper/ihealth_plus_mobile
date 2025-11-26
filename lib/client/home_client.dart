@@ -317,7 +317,7 @@ class _HomeClientState extends State<HomeClient>
                       // ),
                       image: DecorationImage(
                         image: NetworkImage(
-                            '${api}/uploads/user/${profileModel['image']}'),
+                            '${api}/${profileModel['image']}'),
                         fit: BoxFit.cover,
                       ),
                     ),

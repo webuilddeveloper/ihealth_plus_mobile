@@ -47,7 +47,7 @@ class _MenuClientState extends State<MenuClient> {
         title: 'แจ้งเตือน',
       ),
       BookingFavoritePage(),
-      UserInformationClientPage(),
+      UserInformationClientPage(changePage: _onItemTapped),
     ];
     onSetPage();
     super.initState();

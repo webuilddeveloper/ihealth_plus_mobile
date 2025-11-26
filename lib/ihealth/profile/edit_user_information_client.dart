@@ -227,19 +227,19 @@ class _EditUserInformationClientPageState
     var response = await putUpdateProfile(
         '${api}api/v1/customer/user/${customer_id}', formData);
 
-    print('=======---------- ${response.statusCode}');
+    
     if (response.statusCode == 200) {
       // await storage.write(
       //   key: 'dataUserLoginOPEC',
       //   value: jsonEncode(response['data']),
       // );
 
-      await storage.write(key: 'fullname', value: response.data["fullname"]);
-      await storage.write(key: 'gender', value: response.data["gender"]);
-      await storage.write(key: 'mobile', value: response.data["mobile"]);
-      await storage.write(key: 'nationality', value: response.data["nationality"]);
-      await storage.write(key: 'mapLink', value: response.data["mapLink"]);
-      await storage.write(key: 'image', value: response.data["image"]);
+      await storage.write(key: 'fullname', value: response.data['data']["fullname"]);
+      await storage.write(key: 'gender', value: response.data['data']["gender"]);
+      await storage.write(key: 'mobile', value: response.data['data']["mobile"]);
+      await storage.write(key: 'nationality', value: response.data['data']["nationality"]);
+      await storage.write(key: 'mapLink', value: response.data['data']["mapLink"]);
+      await storage.write(key: 'image', value: response.data['data']["image"]);
 
       // Navigator.pushReplacement(
       //   context,
