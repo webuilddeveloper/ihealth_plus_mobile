@@ -30,7 +30,6 @@ class _NotificationClientForm extends State<NotificationClientForm> {
       try {
         final apiProvider = await ApiProviderIhealth.getInstance();
         var response = await apiProvider.get('v1/notify?role=customer/${widget.model['noti_id']}');
-        print('Notification ${widget.model['noti_id']} marked as read.');
       } catch (e) {
         print("Error marking notification as read: $e");
       }

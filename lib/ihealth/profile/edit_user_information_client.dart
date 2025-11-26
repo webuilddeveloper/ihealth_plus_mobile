@@ -1,10 +1,12 @@
 import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart'
     as dt_picker;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:ihealth_2025_mobile/client/menu_client.dart';
 import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
 import 'package:ihealth_2025_mobile/ihealth/profile/user_information.dart';
 import 'package:image_picker/image_picker.dart';
@@ -12,6 +14,7 @@ import 'package:intl/intl.dart';
 import 'package:ihealth_2025_mobile/pages/blank_page/dialog_fail.dart';
 import 'package:ihealth_2025_mobile/shared/api_provider.dart';
 import 'package:ihealth_2025_mobile/widget/text_form_field.dart';
+import 'package:mime/mime.dart';
 
 class EditUserInformationClientPage extends StatefulWidget {
   @override
@@ -24,6 +27,7 @@ class _EditUserInformationClientPageState
   final storage = FlutterSecureStorage();
 
   late String _imageUrl = '';
+  bool isImageNetwork = true;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -206,54 +210,37 @@ class _EditUserInformationClientPageState
   }
 
   Future<dynamic> submitUpdateUser() async {
-    var value = await storage.read(key: 'dataUserLoginOPEC');
-    var user = json.decode(value!);
-    user['imageUrl'] = _imageUrl;
-    // user['prefixName'] = _selectedPrefixName ?? '';
-    user['prefixName'] = txtPrefixName.text;
-    user['firstName'] = txtName.text;
-    user['lastName'] = txtLastName.text;
-    user['email'] = txtEmail.text;
-    user['phone'] = txtPhone.text;
+    var customer_id = await storage.read(key: 'customer_id');
+    // var user = json.decode(value!);
 
-    user['birthDay'] = DateFormat("yyyyMMdd").format(
-      DateTime(
-        _selectedYear,
-        _selectedMonth,
-        _selectedDay,
-      ),
-    );
-    user['sex'] = _selectedSex;
-    user['address'] = txtAddress.text;
-    user['soi'] = txtSoi.text;
-    user['moo'] = txtMoo.text;
-    user['road'] = txtRoad.text;
-    user['tambon'] = '';
-    user['amphoe'] = '';
-    user['province'] = '';
-    user['postno'] = '';
-    user['tambonCode'] = _selectedSubDistrict;
-    user['amphoeCode'] = _selectedDistrict;
-    user['provinceCode'] = _selectedProvince;
-    user['postnoCode'] = _selectedPostalCode;
-    user['idcard'] = txtIdCard.text;
-    user['officerCode'] = txtOfficerCode.text;
-    user['linkAccount'] =
-        user['linkAccount'] != null ? user['linkAccount'] : '';
-    user['appleID'] = user['appleID'] != null ? user['appleID'] : "";
+    String mime = lookupMimeType(_image.path) ?? 'application/octet-stream';
+    FormData formData = FormData.fromMap({
+      "fullname": txtName.text,
+      "gender": selectGender,
+      "nationality": txtNationality.text,
+      "mobile": txtPhone.text,
+      "mapLink": txtMapLink.text,
+      "image": await MultipartFile.fromFile(_image.path,
+          filename: _image.name, contentType: DioMediaType.parse(mime)),
+    });
 
-    final result = await postObjectData('m/v2/Register/update', user);
+    var response = await putUpdateProfile(
+        '${api}api/v1/customer/user/${customer_id}', formData);
 
-    if (result['status'] == 'S') {
-      await storage.write(
-        key: 'dataUserLoginOPEC',
-        value: jsonEncode(result['objectData']),
-      );
+    
+    if (response.statusCode == 200) {
+      // await storage.write(
+      //   key: 'dataUserLoginOPEC',
+      //   value: jsonEncode(response['data']),
+      // );
 
-      await storage.write(
-        key: 'profileImageUrl',
-        value: _imageUrl,
-      );
+      await storage.write(key: 'fullname', value: response.data['data']["fullname"]);
+      await storage.write(key: 'gender', value: response.data['data']["gender"]);
+      await storage.write(key: 'mobile', value: response.data['data']["mobile"]);
+      await storage.write(key: 'nationality', value: response.data['data']["nationality"]);
+      await storage.write(key: 'mapLink', value: response.data['data']["mapLink"]);
+      await storage.write(key: 'image', value: response.data['data']["image"]);
+
       // Navigator.pushReplacement(
       //   context,
       //   MaterialPageRoute(
@@ -299,15 +286,15 @@ class _EditUserInformationClientPageState
                     //   ),
                     //   (Route<dynamic> route) => false,
                     // );
-                    // Navigator.of(context).pushAndRemoveUntil(
-                    //   MaterialPageRoute(
-                    //     builder: (context) => UserInformationPage(),
-                    //   ),
-                    //   (Route<dynamic> route) => false,
-                    // );
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(
+                        builder: (context) => MenuClient(pageIndex: 4,),
+                      ),
+                      (Route<dynamic> route) => false,
+                    );
                     // goBack();
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pop();
+                    // Navigator.of(context).pop();
+                    // Navigator.of(context).pop();
                   },
                 ),
               ],
@@ -334,7 +321,7 @@ class _EditUserInformationClientPageState
                 ),
               ),
               content: Text(
-                result['message'],
+                response['message'].toString(),
                 style: TextStyle(
                   fontSize: 13,
                   fontFamily: 'Sarabun',
@@ -549,22 +536,26 @@ class _EditUserInformationClientPageState
                     false,
                   ),
                 ),
-                SizedBox(width: 10,),
+                SizedBox(
+                  width: 10,
+                ),
                 GestureDetector(
                   onTap: () async {
                     Position position = await _getCurrentPosition();
-                    print("Lat: ${position.latitude}, Lng: ${position.longitude}");
+                    print(
+                        "Lat: ${position.latitude}, Lng: ${position.longitude}");
                     setState(() {
-                      txtMapLink.text = 'https://www.google.com/maps?q=${position.latitude},${position.longitude}';
+                      txtMapLink.text =
+                          'https://www.google.com/maps?q=${position.latitude},${position.longitude}';
                     });
                   },
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 13.0),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 15.0, vertical: 13.0),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
                       color: AppColors.primary,
                     ),
-                    
                     child: Text(
                       'ดึงตำแหน่ง',
                       style: TextStyle(
@@ -605,7 +596,7 @@ class _EditUserInformationClientPageState
                       // final form = _formKey.currentState;
                       // if (form!.validate()) {
                       //   form.save();
-                      //   submitUpdateUser();
+                      submitUpdateUser();
                       // }
                     },
                     child: Text(
@@ -681,8 +672,10 @@ class _EditUserInformationClientPageState
 
     setState(() {
       _image = image!;
+      _imageUrl = image!.path;
+      isImageNetwork = false;
     });
-    _upload();
+    // _upload();
   }
 
   _imgFromGallery() async {
@@ -692,18 +685,22 @@ class _EditUserInformationClientPageState
 
     setState(() {
       _image = image!;
+      _imageUrl = image!.path;
+      isImageNetwork = false;
+
+      print('======>>>>>> ${_imageUrl}');
     });
-    _upload();
+    // _upload();
   }
 
   void _upload() async {
-    uploadImage(_image).then((res) {
-      setState(() {
-        _imageUrl = res;
-      });
-    }).catchError((err) {
-      print(err);
-    });
+    // uploadImage(_image).then((res) {
+    //   setState(() {
+    //     _imageUrl = res;
+    //   });
+    // }).catchError((err) {
+    //   print(err);
+    // });
   }
 
   void _showPickerImage(context) {
@@ -756,33 +753,33 @@ class _EditUserInformationClientPageState
   }
 
   Future<Position> _getCurrentPosition() async {
-  bool serviceEnabled;
-  LocationPermission permission;
+    bool serviceEnabled;
+    LocationPermission permission;
 
-  // Check GPS is enabled
-  serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  if (!serviceEnabled) {
-    return Future.error('กรุณาเปิด GPS');
-  }
-
-  // Check permission
-  permission = await Geolocator.checkPermission();
-  if (permission == LocationPermission.denied) {
-    permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied) {
-      return Future.error('ปฏิเสธการขอตำแหน่ง');
+    // Check GPS is enabled
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('กรุณาเปิด GPS');
     }
-  }
 
-  if (permission == LocationPermission.deniedForever) {
-    return Future.error('ปิดสิทธิ์ถาวร ต้องไปเปิดใน Settings');
-  }
+    // Check permission
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('ปฏิเสธการขอตำแหน่ง');
+      }
+    }
 
-  // Get current position
-  return await Geolocator.getCurrentPosition(
-    desiredAccuracy: LocationAccuracy.high,
-  );
-}
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error('ปิดสิทธิ์ถาวร ต้องไปเปิดใน Settings');
+    }
+
+    // Get current position
+    return await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -847,9 +844,9 @@ class _EditUserInformationClientPageState
                             child: _imageUrl != ''
                                 ? CircleAvatar(
                                     backgroundColor: Colors.black,
-                                    backgroundImage: _imageUrl != ''
+                                    backgroundImage: isImageNetwork
                                         ? NetworkImage(_imageUrl)
-                                        : null,
+                                        : AssetImage(_imageUrl),
                                   )
                                 : Container(
                                     padding: EdgeInsets.all(10.0),
@@ -896,5 +893,4 @@ class _EditUserInformationClientPageState
       ),
     );
   }
-
 }

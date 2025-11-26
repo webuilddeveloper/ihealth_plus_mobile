@@ -102,7 +102,6 @@ class _NotificationClientList extends State<NotificationClientList> {
         future: _futureModel,
         builder: (context, AsyncSnapshot<dynamic> snapshot) {
           if (snapshot.hasData) {
-            print('-----------${snapshot.data}');
             // แก้ไขการเข้าถึงข้อมูลให้ถูกต้อง
             final List<dynamic> notifications =
                 snapshot.data?['data']?['notifications'] ?? [];

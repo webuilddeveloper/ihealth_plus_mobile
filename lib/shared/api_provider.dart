@@ -620,7 +620,7 @@ Future<String> uploadImageX(XFile file) async {
   return response.data['imageUrl'];
 }
 
-Future get(String url) async {
+Future<dynamic> get(String url) async {
   var cookie;
   await storage.read(key: 'cookie').then((v) => {
         cookie = v,
@@ -667,6 +667,26 @@ Future<dynamic> post(String url, dynamic criteria) async {
   } else {
     return {"status": "F"};
   }
+}
+
+Future<dynamic> putUpdateProfile(String url, FormData formData) async {
+  var cookie;
+  await storage.read(key: 'cookie').then((v) => {
+        cookie = v,
+      });
+  Dio dio = Dio();
+  Response response = await dio.put(
+    url,
+    data: formData,
+    options: Options(
+      contentType: "multipart/form-data",
+      headers: {
+      "Accept": "application/json",
+      'Cookie': cookie
+    },
+    ),
+  );
+ return Future.value(response);
 }
 
 const splashReadApi = server + 'm/splash/read';
