@@ -5,6 +5,7 @@ import 'package:ihealth_2025_mobile/client/booking/booking_history.dart';
 import 'package:ihealth_2025_mobile/client/home_client.dart';
 import 'package:ihealth_2025_mobile/client/notification/notification_client_list.dart';
 import 'package:ihealth_2025_mobile/ihealth/profile/user_information_client.dart';
+import 'package:ihealth_2025_mobile/shared/api_provider_ihealth.dart';
 import '../shared/api_provider.dart';
 
 class MenuClient extends StatefulWidget {
@@ -37,7 +38,7 @@ class _MenuClientState extends State<MenuClient> {
   @override
   void initState() {
     // _callRead();
-    // _callReadNoti();
+    _callReadNoti();
     pages = <Widget>[
       HomeClient(
         changePage: _changePage,
@@ -60,19 +61,19 @@ class _MenuClientState extends State<MenuClient> {
   }
 
   _callReadNoti() async {
-    postDio(
-      '${notificationApi}read',
-      {'skip': 0, 'limit': 1},
-    ).then(
-      (value) async => {
-        setState(
-          () {
-            _ListNotiModel = value;
-            print('>>>>>>>>>> ${_ListNotiModel.length}');
-          },
-        )
-      },
-    );
+    try {
+      final apiProvider = await ApiProviderIhealth.getInstance();
+      var response = await apiProvider.get('v1/notify?role=customer');
+      var data = response.data as Map<String, dynamic>;
+      if (data["statusCode"] == 200) {
+        setState(() {
+          notiCount = data["data"]["count"];
+        });
+      }
+    } catch (e) {
+      print("Error fetching notifications: $e");
+      return null;
+    }
   }
 
   _changePage(index) {
@@ -103,11 +104,11 @@ class _MenuClientState extends State<MenuClient> {
 
   _callRead() async {
     await storage.read(key: 'fullname');
-      await storage.read(key: 'gender');
-      await storage.read(key: 'mobile');
-      await storage.read(key: 'nationality');
-      await storage.read(key: 'mapLink');
-      await storage.read(key: 'image');
+    await storage.read(key: 'gender');
+    await storage.read(key: 'mobile');
+    await storage.read(key: 'nationality');
+    await storage.read(key: 'mapLink');
+    await storage.read(key: 'image');
     // var img = await DCCProvider.getImageProfile();
     // _readNotiCount();
     // setState(() => _imageProfile = img);
@@ -271,13 +272,13 @@ class _MenuClientState extends State<MenuClient> {
                           height: 30,
                           width: 30,
                         ),
-                        if (_ListNotiModel.isNotEmpty)
+                        if (notiCount > 0)
                           Positioned(
                             top: 0,
-                            right: 3,
+                            right: 0,
                             child: Container(
-                              height: 10,
-                              width: 10,
+                              height: 15,
+                              width: 15,
                               decoration: const BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: Color(0xFFE40000),
