@@ -227,7 +227,7 @@ class _BookingFavoritePageState extends State<BookingFavoritePage> {
         backgroundColor: AppColors.primary,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -289,60 +289,80 @@ class _BookingFavoritePageState extends State<BookingFavoritePage> {
                     child: ListView.builder(
                       itemCount: favoritesData.length,
                       itemBuilder: (context, index) {
-                        final favorites = favoritesData[index];
+                        final favorite = favoritesData[index];
                         return Card(
-                          margin: EdgeInsets.only(bottom: 12),
+                          margin: const EdgeInsets.only(bottom: 16),
+                          elevation: 4,
+                          shadowColor: Colors.black.withOpacity(0.1),
+                          clipBehavior: Clip.antiAlias,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Image.network(
                                   "https://api-ihealth.spl-system.com/" +
-                                      favorites['image'],
+                                      favorite['image'],
                                   height: 150,
                                   width: double.infinity,
                                   fit: BoxFit.cover),
                               Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.all(12.0),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(favorites['massage_name'],
-                                        style: TextStyle(
+                                    Text(favorite['massage_name'],
+                                        style: const TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16)),
+                                    const SizedBox(height: 4),
                                     Text(
-                                        "${favorites['province']}, ${favorites['district']}"),
-                                    InkWell(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  ReviewPage()),
-                                        );
-                                      },
-                                      child: Row(
-                                        children: [
-                                          Icon(Icons.star,
-                                              color: Colors.orange, size: 18),
-                                          Text(
-                                              "${favorites['avg_score']} (${favorites['review_count']} รีวิว)"),
-                                        ],
-                                      ),
+                                        "${favorite['province']}, ${favorite['district']}"),
+                                    const SizedBox(height: 8),
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.star,
+                                            color: Colors.orange, size: 18),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                            "${favorite['avg_score']} (${favorite['review_count']} รีวิว)"),
+                                      ],
                                     ),
-                                    SizedBox(height: 8),
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  BookingDetail()),
-                                        );
-                                      },
-                                      child: Text("ดูรายละเอียด"),
-                                    )
                                   ],
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                                child: SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: AppColors.primary,
+                                      foregroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 12),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                BookingDetail()),
+                                      );
+                                    },
+                                    child: const Text(
+                                      "ดูรายละเอียด",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                        fontFamily: 'Kanit',
+                                      ),
+                                    )
+                                  ),
                                 ),
                               )
                             ],
