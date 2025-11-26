@@ -258,6 +258,7 @@ class _HomeClientState extends State<HomeClient>
                   ),
                 ),
               )
+            
             ],
           ),
         );
@@ -362,7 +363,7 @@ class _HomeClientState extends State<HomeClient>
         Flexible(
           child: profileModel['loginType'] == "1"
               ? Text(
-                  profileModel['fullname'],
+                  profileModel['fullname'] ?? '',
                   style: TextStyle(
                     fontFamily: 'Sarabun',
                     fontSize: titleFontSize,

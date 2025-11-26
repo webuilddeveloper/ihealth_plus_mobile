@@ -13,7 +13,8 @@ import 'change_password.dart';
 
 class UserInformationClientPage extends StatefulWidget {
   @override
-  _UserInformationClientPageState createState() => _UserInformationClientPageState();
+  _UserInformationClientPageState createState() =>
+      _UserInformationClientPageState();
 }
 
 class _UserInformationClientPageState extends State<UserInformationClientPage> {
@@ -40,6 +41,7 @@ class _UserInformationClientPageState extends State<UserInformationClientPage> {
         future: _futureProfile,
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
           if (snapshot.hasData) {
+            print('--------======------ ${snapshot.data}');
             return card(snapshot.data);
           } else if (snapshot.hasError) {
             return dialogFail(context);
@@ -52,11 +54,18 @@ class _UserInformationClientPageState extends State<UserInformationClientPage> {
   }
 
   _read() async {
-    var profileCode = await storage.read(key: 'profileCode3');
-    if (profileCode != '' && profileCode != null)
+    // var profileCode = await storage.read(key: 'profileCode3');
+    // if (profileCode != '' && profileCode != null)
+    //   setState(() {
+    //     _futureProfile = post(api+, {"code": profileCode});
+    //   });
+    var profileCode = await storage.read(key: 'customer_id');
+
+    if (profileCode != '') {
       setState(() {
-        _futureProfile = postDio(profileReadApi, {"code": profileCode});
+        _futureProfile = get("${api}/api/v1/customer/user/${profileCode}");
       });
+    }
   }
 
   card(dynamic model) {
@@ -94,12 +103,12 @@ class _UserInformationClientPageState extends State<UserInformationClientPage> {
                 width: 146,
                 margin: EdgeInsets.only(top: 70),
                 padding: EdgeInsets.all(10.0),
-                child: model['imageUrl'] != ''
+                child: model?['image'] != ''
                     ? CircleAvatar(
                         backgroundColor: Colors.white,
-                        backgroundImage: model['imageUrl'] != null
+                        backgroundImage: model?['image'] != null
                             ? NetworkImage(
-                                model['imageUrl'],
+                                api+model?['image'],
                               )
                             : null,
                       )
@@ -127,7 +136,7 @@ class _UserInformationClientPageState extends State<UserInformationClientPage> {
                       child: Container(
                         alignment: Alignment.center,
                         child: Text(
-                          model['firstName'] + ' ' + model['lastName'],
+                          model?['fullname'] ?? '',
                           style: TextStyle(
                             fontFamily: 'Sarabun',
                             fontSize: 25.0,
@@ -142,6 +151,7 @@ class _UserInformationClientPageState extends State<UserInformationClientPage> {
                   ],
                 ),
               ),
+              
               Container(
                 padding: EdgeInsets.all(10),
                 margin: EdgeInsets.only(top: 270.0, bottom: 30.0),
@@ -158,7 +168,8 @@ class _UserInformationClientPageState extends State<UserInformationClientPage> {
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => EditUserInformationClientPage(),
+                            builder: (context) =>
+                                EditUserInformationClientPage(),
                           ),
                         ),
                         child: buttonMenuUser(
@@ -182,7 +193,8 @@ class _UserInformationClientPageState extends State<UserInformationClientPage> {
                           ),
                         ),
                         child: buttonMenuUser(
-                            'assets/ihealth/calendar_icon.png', 'ประวัติการนวด'),
+                            'assets/ihealth/calendar_icon.png',
+                            'ประวัติการนวด'),
                       ),
                       // InkWell(
                       //   onTap: () => Navigator.push(
@@ -261,6 +273,7 @@ class _UserInformationClientPageState extends State<UserInformationClientPage> {
               ),
             ],
           ),
+        
         ],
       ),
     );

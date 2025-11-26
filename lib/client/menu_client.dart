@@ -102,6 +102,12 @@ class _MenuClientState extends State<MenuClient> {
   }
 
   _callRead() async {
+    await storage.read(key: 'fullname');
+      await storage.read(key: 'gender');
+      await storage.read(key: 'mobile');
+      await storage.read(key: 'nationality');
+      await storage.read(key: 'mapLink');
+      await storage.read(key: 'image');
     // var img = await DCCProvider.getImageProfile();
     // _readNotiCount();
     // setState(() => _imageProfile = img);
