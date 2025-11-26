@@ -258,7 +258,6 @@ class _HomeClientState extends State<HomeClient>
                   ),
                 ),
               )
-            
             ],
           ),
         );
@@ -316,8 +315,7 @@ class _HomeClientState extends State<HomeClient>
                       //   fit: BoxFit.cover,
                       // ),
                       image: DecorationImage(
-                        image: NetworkImage(
-                            '${api}/uploads/user/${profileModel['image']}'),
+                        image: NetworkImage('${api}/${profileModel['image']}'),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -985,7 +983,8 @@ class _HomeClientState extends State<HomeClient>
           profileModel['mobile'] = v;
         }));
     await storage.read(key: 'image').then((v) => setState(() {
-          profileModel['image'] = v;
+          profileModel['image'] = v ??
+              'uploads/user/image_picker_59134153-C405-4B7A-A5DB-DD097DAC3FDD-44179-000000520CA52D69-1764139168877-370813615.jpg';
         }));
     await storage.read(key: 'token').then((v) => setState(() {
           profileModel['token'] = v;

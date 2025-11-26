@@ -12,6 +12,9 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'change_password.dart';
 
 class UserInformationClientPage extends StatefulWidget {
+  final Function(int)? changePage;
+  const UserInformationClientPage({Key? key, this.changePage})
+      : super(key: key);
   @override
   _UserInformationClientPageState createState() =>
       _UserInformationClientPageState();
@@ -107,7 +110,7 @@ class _UserInformationClientPageState extends State<UserInformationClientPage> {
                         backgroundColor: Colors.white,
                         backgroundImage: model?['image'] != null
                             ? NetworkImage(
-                                api+model?['image'],
+                                api + model?['image'],
                               )
                             : null,
                       )
@@ -150,7 +153,6 @@ class _UserInformationClientPageState extends State<UserInformationClientPage> {
                   ],
                 ),
               ),
-              
               Container(
                 padding: EdgeInsets.all(10),
                 margin: EdgeInsets.only(top: 270.0, bottom: 30.0),
@@ -175,22 +177,20 @@ class _UserInformationClientPageState extends State<UserInformationClientPage> {
                             'assets/icons/person.png', 'ข้อมูลผู้ใช้งาน'),
                       ),
                       InkWell(
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => MenuClient(pageIndex: 3),
-                          ),
-                        ),
+                        onTap: () {
+                          if (widget.changePage != null) {
+                            widget.changePage!(3);
+                          }
+                        },
                         child: buttonMenuUser(
                             'assets/ihealth/icon/heart1.png', 'รายการโปรด'),
                       ),
                       InkWell(
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => MenuClient(pageIndex: 1),
-                          ),
-                        ),
+                        onTap: () {
+                          if (widget.changePage != null) {
+                            widget.changePage!(1);
+                          }
+                        },
                         child: buttonMenuUser(
                             'assets/ihealth/calendar_icon.png',
                             'ประวัติการนวด'),
@@ -272,7 +272,6 @@ class _UserInformationClientPageState extends State<UserInformationClientPage> {
               ),
             ],
           ),
-        
         ],
       ),
     );
