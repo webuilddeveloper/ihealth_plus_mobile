@@ -1512,7 +1512,6 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
     });
     // _upload(index);
 
-    print(_image!.path);
   }
 
   void _upload(int index) async {
@@ -1770,7 +1769,6 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
           },
         );
       } else {
-        print(response.statusMessage);
       }
     } on DioException catch (e) {
       String errorMessage = e.response?.data["message"] ?? "เกิดข้อผิดพลาด";
