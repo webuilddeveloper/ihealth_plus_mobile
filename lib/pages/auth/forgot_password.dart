@@ -25,48 +25,61 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     super.initState();
   }
 
-  Future<dynamic> submitForgotPassword() async {
-    postObjectData('m/Register/forgot/password', {
+  Future<void> submitForgotPassword() async {
+    await postObjectData('m/Register/forgot/password', {
       'email': txtEmail.text,
     });
 
-    setState(() {
-      txtEmail.text = '';
-    });
-    return showDialog(
+    if (!mounted) return;
+
+    showDialog(
       context: context,
       builder: (BuildContext context) {
-        return CupertinoAlertDialog(
-          title: new Text(
-            'เปลี่ยนรหัสผ่านเรียบร้อยแล้ว',
-            style: TextStyle(
-              fontSize: 16,
-              fontFamily: 'Sarabun',
-              color: Colors.black,
-              fontWeight: FontWeight.normal,
-            ),
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
           ),
-          content: Text(" "),
+          title: Text(
+            'ส่งคำขอสำเร็จ',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontFamily: 'Sarabun', fontWeight: FontWeight.w600),
+          ),
+          content: Text(
+            'เราได้ส่งรหัสผ่านใหม่ไปที่อีเมล\n${txtEmail.text}\nเรียบร้อยแล้ว',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontFamily: 'Sarabun', fontSize: 14),
+          ),
           actions: [
-            CupertinoDialogAction(
-              isDefaultAction: true,
-              child: new Text(
-                "ตกลง",
-                style: TextStyle(
-                  fontSize: 13,
-                  fontFamily: 'Sarabun',
-                  color: Color(0xFF000070),
-                  fontWeight: FontWeight.normal,
+            Center(
+              child: TextButton(
+                style: TextButton.styleFrom(
+                  backgroundColor: Theme.of(context).primaryColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 40),
                 ),
+                child: Text(
+                  "ตกลง",
+                  style: TextStyle(
+                      fontFamily: 'Sarabun',
+                      color: Colors.white,
+                      fontSize: 16),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                  Navigator.of(context).pop(); // Go back to the previous page
+                },
               ),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
             ),
           ],
+          actionsAlignment: MainAxisAlignment.center,
         );
       },
     );
+    setState(() {
+      txtEmail.text = '';
+    });
   }
 
   void goBack() async {
@@ -121,14 +134,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                   ),
                                 ),
                                 labelTextFormField('อีเมล'),
-                                textFormField(
+                                ihealtTextFormField(
                                   txtEmail,
-                                  null,
-                                  'อีเมล',
-                                  'อีเมล',
+                                  'กรอกอีเมล',
                                   true,
-                                  false,
-                                  true,
+                                  validator: emailValidator,
                                 ),
                                 Center(
                                   child: Container(
