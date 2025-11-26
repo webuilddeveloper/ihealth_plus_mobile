@@ -476,8 +476,33 @@ class _BookingDetailState extends State<BookingDetail> {
               ),
             ),
             SizedBox(height: 30),
-
-            currentTab == 1 ? _tab1() : _tab2(),
+            massageInfo['is_open'] == true
+                ? SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton(
+                      onPressed: () {
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFF4D4D),
+                        foregroundColor: Colors.white, // สีตัวอักษร
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        elevation: 0, // แบบ flat
+                      ),
+                      child: const Text(
+                        "ร้านปิดทำการ",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  )
+                : currentTab == 1
+                    ? _tab1()
+                    : _tab2(),
 
             // Row(
             //   children: [
@@ -1171,13 +1196,10 @@ class _BookingDetailState extends State<BookingDetail> {
                     "province": widget.province,
                   };
 
-
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => BookingConfirm(
-                        model : bookingData
-                      ),
+                      builder: (context) => BookingConfirm(model: bookingData),
                     ),
                   );
                 }

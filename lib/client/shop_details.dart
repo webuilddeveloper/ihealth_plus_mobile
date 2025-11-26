@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:ihealth_2025_mobile/client/booking/booking_detail.dart';
 import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
 import 'package:ihealth_2025_mobile/ihealth/course/course.dart';
 import 'package:ihealth_2025_mobile/shared/api_provider.dart';
@@ -230,28 +231,31 @@ class _ShopDetailState extends State<ShopDetail> {
                 SizedBox(height: 16),
                 Row(
                   children: [
-                    (model['website'] ?? '') != '' ?
-                    GestureDetector(
-                      onTap: () {
-                        launch(model['website']);
-                      },
-                      child: Container(
-                        height: 30,
-                        child: Image.asset('assets/web.png'),
-                      ),
-                    ) : Container(),
-                    (model['website'] ?? '') != '' ?
-                    SizedBox(width: 16) : Container(),
-                    (model['facebook'] ?? '') != '' ?
-                    GestureDetector(
-                      onTap: () {
-                        launch(model['facebook']);
-                      },
-                      child: Container(
-                        height: 30,
-                        child: Image.asset('assets/facebook.png'),
-                      ),
-                    ) : Container()
+                    (model['website'] ?? '') != ''
+                        ? GestureDetector(
+                            onTap: () {
+                              launch(model['website']);
+                            },
+                            child: Container(
+                              height: 30,
+                              child: Image.asset('assets/web.png'),
+                            ),
+                          )
+                        : Container(),
+                    (model['website'] ?? '') != ''
+                        ? SizedBox(width: 16)
+                        : Container(),
+                    (model['facebook'] ?? '') != ''
+                        ? GestureDetector(
+                            onTap: () {
+                              launch(model['facebook']);
+                            },
+                            child: Container(
+                              height: 30,
+                              child: Image.asset('assets/facebook.png'),
+                            ),
+                          )
+                        : Container()
                   ],
                 )
               ],
@@ -290,9 +294,7 @@ class _ShopDetailState extends State<ShopDetail> {
                 width: 20,
               ),
               GestureDetector(
-                onTap: () => {
-                  launch(model['mapLink'])
-                },
+                onTap: () => {launch(model['mapLink'])},
                 child: Icon(
                   Icons.map_outlined,
                   size: 40,
@@ -302,50 +304,64 @@ class _ShopDetailState extends State<ShopDetail> {
               SizedBox(
                 width: 20,
               ),
-              (model['is_open'] ?? false) ?
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {
-                    // _launchUrl(job['url']);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    padding: EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+              (model['is_open'] ?? false)
+                  ? Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          final today = toDate(DateTime.now());
+                          String encodedProvince =
+                              Uri.encodeComponent(model['province'] ?? "");
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => BookingDetail(
+                                      massage_info_id:
+                                          model['uuid'],
+                                      booking_date: today,
+                                      province: encodedProvince,
+                                    )),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          padding: EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          'จองทันที',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    )
+                  : Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          // _launchUrl(job['url']);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary.withOpacity(0.2),
+                          padding: EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          'ร้านปิดทำการ',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                  child: Text(
-                    'จองทันที',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ) : Expanded(
-                child: ElevatedButton(
-                  onPressed: () {
-                    // _launchUrl(job['url']);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary.withOpacity(0.2),
-                    padding: EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: Text(
-                    'ร้านปิดทำการ',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
             ],
           ),
         ),
@@ -365,6 +381,13 @@ class _ShopDetailState extends State<ShopDetail> {
         }),
       },
     );
+  }
+
+  String toDate(DateTime date) {
+    final d = date.day.toString().padLeft(2, '0');
+    final m = date.month.toString().padLeft(2, '0');
+    final y = date.year.toString();
+    return "$d-$m-$y";
   }
 
   isFavorite() async {
