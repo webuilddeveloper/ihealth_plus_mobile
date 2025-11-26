@@ -484,7 +484,6 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
   }
 
   Widget buildBookingCardPending(dynamic booking, int index) {
-    print('--==777777777777==-- ${booking}');
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -643,6 +642,9 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
                 Tab(text: "อยู่ระหว่างดำเนินการ"),
                 Tab(text: "ดำเนินการเสร็จสิ้น"),
               ],
+              onTap: (idx) => {
+                idx == 0 ? _historyMassagePending() : _historymassage()
+              }
             ),
           ),
           SizedBox(height: 10),
