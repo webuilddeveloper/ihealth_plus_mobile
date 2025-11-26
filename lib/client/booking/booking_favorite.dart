@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:ihealth_2025_mobile/client/booking/booking_detail.dart';
 import 'package:ihealth_2025_mobile/client/review.dart';
+import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
 import 'package:ihealth_2025_mobile/shared/dio_service.dart';
 
 class Shop {
@@ -217,9 +218,13 @@ class _BookingFavoritePageState extends State<BookingFavoritePage> {
       appBar: AppBar(
         title: Text(
           "รายการโปรด",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.transparent,
+        centerTitle: true,
+        backgroundColor: AppColors.primary,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),

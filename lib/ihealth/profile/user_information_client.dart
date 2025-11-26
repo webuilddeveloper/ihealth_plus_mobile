@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:ihealth_2025_mobile/client/menu_client.dart';
 import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
 import 'package:ihealth_2025_mobile/ihealth/profile/edit_user_information_client.dart';
 import 'package:ihealth_2025_mobile/ihealth/profile/personalskills.dart';
@@ -163,6 +164,26 @@ class _UserInformationClientPageState extends State<UserInformationClientPage> {
                         child: buttonMenuUser(
                             'assets/icons/person.png', 'ข้อมูลผู้ใช้งาน'),
                       ),
+                      InkWell(
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MenuClient(pageIndex: 3),
+                          ),
+                        ),
+                        child: buttonMenuUser(
+                            'assets/ihealth/icon/heart1.png', 'รายการโปรด'),
+                      ),
+                      InkWell(
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MenuClient(pageIndex: 1),
+                          ),
+                        ),
+                        child: buttonMenuUser(
+                            'assets/ihealth/calendar_icon.png', 'ประวัติการนวด'),
+                      ),
                       // InkWell(
                       //   onTap: () => Navigator.push(
                       //     context,
@@ -182,16 +203,17 @@ class _UserInformationClientPageState extends State<UserInformationClientPage> {
                       //   child: buttonMenuUser(
                       //       'assets/icons/service_7.png', 'สถานประกอบการ'),
                       // ),
-                      InkWell(
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ChangePasswordPage(),
-                          ),
-                        ),
-                        child: buttonMenuUser(
-                            'assets/icons/lock.png', 'เปลี่ยนรหัสผ่าน'),
-                      ),
+
+                      // InkWell(
+                      //   onTap: () => Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //       builder: (context) => ChangePasswordPage(),
+                      //     ),
+                      //   ),
+                      //   child: buttonMenuUser(
+                      //       'assets/icons/lock.png', 'เปลี่ยนรหัสผ่าน'),
+                      // ),
                       Container(
                         alignment: Alignment.centerRight,
                         child: Text(

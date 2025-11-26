@@ -1,24 +1,29 @@
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
 import 'package:ihealth_2025_mobile/ihealth/course/course.dart';
 import 'package:ihealth_2025_mobile/shared/api_provider.dart';
+import 'package:ihealth_2025_mobile/shared/dio_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ShopDetail extends StatefulWidget {
   ShopDetail({super.key, required this.shopId});
 
-  String shopId;
+  String? shopId;
 
   @override
   State<ShopDetail> createState() => _ShopDetailState();
 }
 
 class _ShopDetailState extends State<ShopDetail> {
-
-  dynamic model;
+  dynamic model = {};
 
   @override
   void initState() {
-   _callReadShop();
+    _callReadShop();
     super.initState();
   }
 
@@ -41,7 +46,7 @@ class _ShopDetailState extends State<ShopDetail> {
         centerTitle: true,
         backgroundColor: AppColors.primary,
       ),
-      body: Column(
+      body: ListView(
         children: [
           Container(
             color: Colors.white,
@@ -54,14 +59,57 @@ class _ShopDetailState extends State<ShopDetail> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
                     image: DecorationImage(
-                      image: NetworkImage(api + model['image']),
+                      image: NetworkImage(api + (model?['image'] ?? '')),
                       fit: BoxFit.cover,
                     ),
                   ),
                 ),
+                SizedBox(
+                  height: 10,
+                ),
+                (model?['images'] ?? []).length > 0
+                    ? SizedBox(
+                        height: 100,
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          // padding: const EdgeInsets.symmetric(horizontal: 16),
+                          itemCount: model?['images'].length,
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(width: 12),
+                          itemBuilder: (context, index) {
+                            final img = model?['images'][index];
+
+                            return GestureDetector(
+                              onTap: () {
+                                // Navigator.push(
+                                //   context,
+                                //   MaterialPageRoute(
+                                //     builder: (_) => FullImageViewer(image: img),
+                                //   ),
+                                // );
+                              },
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.network(
+                                  api + '' + img,
+                                  width: 100,
+                                  height: 100,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => Container(
+                                    width: 100,
+                                    color: Colors.grey[300],
+                                    child: const Icon(Icons.image),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      )
+                    : Container(),
                 SizedBox(height: 16),
                 Text(
-                  model['massage_name'],
+                  model?['massage_name'] ?? '',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -80,7 +128,7 @@ class _ShopDetailState extends State<ShopDetail> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        model['massage_type'],
+                        model?['massage_type'] ?? '',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 12,
@@ -89,18 +137,13 @@ class _ShopDetailState extends State<ShopDetail> {
                         ),
                       ),
                     ),
-                    // SizedBox(
-                    //   width: 16,
-                    // ),
-                    // Text(
-                    //   '฿ ${model['price']}',
-                    //   style: TextStyle(
-                    //     color: AppColors.primary_gold,
-                    //     fontFamily: "sarabun",
-                    //     fontSize: 16,
-                    //     fontWeight: FontWeight.bold,
-                    //   ),
-                    // )
+                    Row(
+                      children: [
+                        Icon(Icons.star, color: Colors.orange, size: 18),
+                        Text(
+                            "${model?['avg_score'] ?? ''} (${model?['review_count'] ?? ''} รีวิว)"),
+                      ],
+                    ),
                   ],
                 ),
                 SizedBox(height: 16),
@@ -113,7 +156,7 @@ class _ShopDetailState extends State<ShopDetail> {
                   child: Column(
                     children: [
                       Text(
-                        model['details'],
+                        model?['details'] ?? '',
                         style: TextStyle(
                           fontSize: 14,
                           fontFamily: "sarabun",
@@ -128,13 +171,13 @@ class _ShopDetailState extends State<ShopDetail> {
                 Row(
                   children: [
                     Icon(
-                      Icons.timer_outlined,
-                      color: AppColors.textdark,
+                      Icons.location_on_outlined,
+                      color: AppColors.primary,
                       size: 20,
                     ),
                     SizedBox(width: 8),
                     Text(
-                      'ที่อยู่ร้าน  ${model['time']}',
+                      '${model?['house_number'] ?? ''} ${model?['moo'] ?? ''} ${model?['alley'] ?? ''} ${model?['road'] ?? ''} ${model?['subdistrict'] ?? ''} ${model?['district'] ?? ''} ${model?['province'] ?? ''} ${model?['postal_code'] ?? ''}',
                       style: TextStyle(
                         color: AppColors.textdark,
                         fontFamily: "sarabun",
@@ -145,6 +188,72 @@ class _ShopDetailState extends State<ShopDetail> {
                   ],
                 ),
                 SizedBox(height: 16),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.timer_outlined,
+                      color: AppColors.primary,
+                      size: 20,
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      '${model?['time_text'] ?? ''}',
+                      style: TextStyle(
+                        color: AppColors.textdark,
+                        fontFamily: "sarabun",
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.calendar_month_outlined,
+                      color: AppColors.primary,
+                      size: 20,
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      '${model?['day_of_week_text'] ?? ''}',
+                      style: TextStyle(
+                        color: AppColors.textdark,
+                        fontFamily: "sarabun",
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16),
+                Row(
+                  children: [
+                    (model['website'] ?? '') != '' ?
+                    GestureDetector(
+                      onTap: () {
+                        launch(model['website']);
+                      },
+                      child: Container(
+                        height: 30,
+                        child: Image.asset('assets/web.png'),
+                      ),
+                    ) : Container(),
+                    (model['website'] ?? '') != '' ?
+                    SizedBox(width: 16) : Container(),
+                    (model['facebook'] ?? '') != '' ?
+                    GestureDetector(
+                      onTap: () {
+                        launch(model['facebook']);
+                      },
+                      child: Container(
+                        height: 30,
+                        child: Image.asset('assets/facebook.png'),
+                      ),
+                    ) : Container()
+                  ],
+                )
               ],
             ),
           ),
@@ -166,22 +275,34 @@ class _ShopDetailState extends State<ShopDetail> {
           child: Row(
             children: [
               GestureDetector(
-                onTap: () => {
-                  isFavorite()
-                },
+                onTap: () => {isFavorite()},
                 child: Icon(
-                  model['is_favorite'] ? Icons.favorite : Icons.favorite_border_outlined,
+                  (model['is_favorite'] ?? false)
+                      ? Icons.favorite
+                      : Icons.favorite_border_outlined,
                   size: 40,
-                  color: model['is_favorite'] ? Colors.red : AppColors.primary,
+                  color: (model['is_favorite'] ?? false)
+                      ? Colors.red
+                      : AppColors.primary,
                 ),
               ),
-              SizedBox(width: 20,),
-              Icon(
-                Icons.map_outlined,
-                size: 40,
-                color: AppColors.primary,
+              SizedBox(
+                width: 20,
               ),
-              SizedBox(width: 20,),
+              GestureDetector(
+                onTap: () => {
+                  launch(model['mapLink'])
+                },
+                child: Icon(
+                  Icons.map_outlined,
+                  size: 40,
+                  color: AppColors.primary,
+                ),
+              ),
+              SizedBox(
+                width: 20,
+              ),
+              (model['is_open'] ?? false) ?
               Expanded(
                 child: ElevatedButton(
                   onPressed: () {
@@ -203,6 +324,27 @@ class _ShopDetailState extends State<ShopDetail> {
                     ),
                   ),
                 ),
+              ) : Expanded(
+                child: ElevatedButton(
+                  onPressed: () {
+                    // _launchUrl(job['url']);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary.withOpacity(0.2),
+                    padding: EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    'ร้านปิดทำการ',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
@@ -213,7 +355,9 @@ class _ShopDetailState extends State<ShopDetail> {
 
   _callReadShop() async {
     // https://api-ihealth.spl-system.com/api/v1/customer/detail-massage?booking_date=&massage_info_id=36b3535f-2458-4105-abe1-e23400e663b9
-    get(api + 'api/v1/customer/detail-massage?booking_date=&massage_info_id=${widget.shopId}').then(
+    get(api +
+            'api/v1/customer/detail-massage?booking_date=&massage_info_id=${widget.shopId}')
+        .then(
       (v) => {
         setState(() {
           model = v['massage_info'];
@@ -223,8 +367,26 @@ class _ShopDetailState extends State<ShopDetail> {
     );
   }
 
-  isFavorite() {
+  isFavorite() async {
+    post(api + '/api/v1/customer/favorites', {'massage_info_id': model['uuid']})
+        .then(
+      (v) => {
+        setState(() {
+          model['is_favorite'] = v['isFavorite'];
+        }),
+      },
+    );
+    // final dioService = DioService();
+    // await dioService.init();
+    // final dio = dioService.dio;
 
+    // var response = await dio.request(
+    //   'https://api-ihealth.spl-system.com/api/v1/customer/favorites',
+    //   options: Options(
+    //     method: 'POST',
+    //     headers: headers,
+    //   ),
+    //   data: data,
+    // );
   }
-
 }

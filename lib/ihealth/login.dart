@@ -511,16 +511,25 @@ class _LoginPageState extends State<LoginPage> {
         var customer_id = response.data['data']["customer_id"];
 
         await storage.write(key: 'customer_id', value: customer_id);
-        await storage.write(key: 'fullname', value: response.data['data']["fullname"]);
-        await storage.write(key: 'mobile', value: response.data['data']["mobile"]);
-        await storage.write(key: 'image', value: response.data['data']["image"]);
+        await storage.write(
+            key: 'fullname', value: response.data['data']["fullname"]);
+        await storage.write(
+            key: 'mobile', value: response.data['data']["mobile"]);
+        await storage.write(
+            key: 'image', value: response.data['data']["image"]);
 
         if (token != null && token.isNotEmpty) {
           await storage.write(key: 'token', value: token);
 
-          var cookies = await cookieJar.loadForRequest(
-            Uri.parse(api),
-          );
+          final cookies = await cookieJar.loadForRequest(Uri.parse(api));
+
+          if (cookies.isNotEmpty) {
+            final cookieString = cookies[0].toString();
+            final sidValue = cookieString.split(';').first;
+            await storage.write(key: 'cookie', value: sidValue);
+          } else {
+            print("No cookies found");
+          }
 
           if (selectFrom == '1') {
             await storage.write(key: 'loginType', value: '1');

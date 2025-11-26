@@ -530,9 +530,15 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.green[800],
-        title: const Text("ประวัติการจอง"),
+        title: Text(
+          "ประวัติการนวด",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         centerTitle: true,
+        backgroundColor: AppColors.primary,
       ),
       body: Column(
         children: [
