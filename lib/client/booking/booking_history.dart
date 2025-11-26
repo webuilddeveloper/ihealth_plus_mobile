@@ -59,19 +59,9 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
   //   },
   // ];
 
-  List<dynamic> pendingBookings = [
-    // {
-    //   "shopName": "ผ่อนคลายสปา",
-    //   "status": "ชำระแล้ว",
-    //   "service": "นวดน้ำมันอโรมา",
-    //   "category": "รีแลกซ์ / เดว / สปา",
-    //   "therapist": "คุณสมศรี",
-    //   "duration": "1.5 ชั่วโมง",
-    //   "date": "23/06/2025",
-    //   "time": "14:00 น.",
-    //   "price": "1,200 บาท",
-    // },
-  ];
+  List<dynamic> pendingBookings = [];
+
+  List<dynamic> confirmedBookings = [];
 
   bool hasRated = false;
   Map<String, dynamic> savedRatings = {};
@@ -119,8 +109,9 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
     super.initState();
     _historymassage();
     _historyMassagePending();
+    _historyMassageConfirmed();
     // _resetRatings();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -158,8 +149,13 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
                                   color: Colors.green, fontSize: 13))
                           : Text(booking["status"],
                               style: TextStyle(
-                                  color: booking['status'] == 'completed' ?
-                                  Colors.green : booking['status'] == 'cancelled' ? Colors.red : Colors.grey, fontSize: 14, fontWeight: FontWeight.bold)),
+                                  color: booking['status'] == 'completed'
+                                      ? Colors.green
+                                      : booking['status'] == 'cancelled'
+                                          ? Colors.red
+                                          : Colors.grey,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold)),
                 ],
               ),
 
@@ -180,7 +176,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
               buildDetail("วันที่นัดหมาย", booking["booking_date"]),
               SizedBox(height: 10),
               buildDetail("เวลานัดหมาย",
-                  booking["start_time"] + "ถึง" + booking["start_time"]),
+                  booking["start_time"] + " ถึง " + booking["end_time"]),
 
               // แผนที่ + ราคา
               Row(
@@ -218,7 +214,415 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
                           alignment: Alignment.center,
                           height: 150,
                           width: double.infinity,
-                          child: Image.network(
+                          child: Image.asset(
+                            imageUrl!,
+                            height: 150,
+                            width: 120,
+                            fit: BoxFit.fill,
+                          ),
+                        )
+                  : Container(),
+              const SizedBox(height: 10),
+              booking['payment'] == 'promptpay'
+                  ? Container(
+                      alignment: Alignment.center,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFFFFFFF),
+                          minimumSize: const Size(60, 50),
+                          side: const BorderSide(
+                            color: Color(0xFFE0E0E0),
+                            width: 2,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        onPressed: () {
+                          _showPickerImage(context, index);
+                        },
+                        child: const Text(
+                          "แนบสลิป ",
+                          style: TextStyle(color: Color(0xFF07663a)),
+                        ),
+                      ),
+                    )
+                  : Container(),
+
+              const Divider(height: 20),
+              booking['status'] == 'completed'
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        booking['scores'].length > 0
+                            ? Center(
+                                child: Container(
+                                  width: 100,
+                                  // margin: EdgeInsets.symmetric(vertical: 50.0),
+                                  child: Material(
+                                    elevation: 2.0,
+                                    borderRadius: BorderRadius.circular(5.0),
+                                    color: AppColors.primary,
+                                    child: MaterialButton(
+                                      height: 40,
+                                      onPressed: () {
+                                        _showRatingDialog2(
+                                            booking['scores'][0]);
+                                      },
+                                      child: Text(
+                                        'ดูคะแนน',
+                                        style: TextStyle(
+                                          fontSize: 16.0,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.normal,
+                                          fontFamily: 'Sarabun',
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : Center(
+                                child: Container(
+                                  width: 100,
+                                  // margin: EdgeInsets.symmetric(vertical: 50.0),
+                                  child: Material(
+                                    elevation: 2.0,
+                                    borderRadius: BorderRadius.circular(5.0),
+                                    color: Colors.amber,
+                                    child: MaterialButton(
+                                      height: 40,
+                                      onPressed: () {
+                                        _showRatingDialog(
+                                            booking["booking_id"]);
+                                      },
+                                      child: Text(
+                                        'ให้คะแนน',
+                                        style: TextStyle(
+                                          fontSize: 16.0,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.normal,
+                                          fontFamily: 'Sarabun',
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              )
+                      ],
+                    )
+                  : booking['status'] == 'cancelled'
+                      ? Container()
+                      : Row(
+                          children: [
+                            Expanded(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        booking['payment'] = "promptpay";
+                                      });
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return Dialog(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                            ),
+                                            child: SizedBox(
+                                              width: 320,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(20),
+                                                child: SingleChildScrollView(
+                                                  child: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      Align(
+                                                        alignment: Alignment
+                                                            .centerRight,
+                                                        child: IconButton(
+                                                          icon: const Icon(
+                                                              Icons.close),
+                                                          onPressed: () =>
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop(),
+                                                        ),
+                                                      ),
+                                                      const Text(
+                                                        "สแกนจ่ายด้วย PromptPay",
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 18,
+                                                          color:
+                                                              Color(0xFF07663a),
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                          height: 16),
+                                                      Image.network(
+                                                        booking[
+                                                            'payment_image'],
+                                                        width: 200,
+                                                        height: 200,
+                                                      ),
+                                                      const SizedBox(
+                                                          height: 12),
+                                                      Text(
+                                                        booking["shopName"] ??
+                                                            "",
+                                                        style: const TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                          height: 16),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    },
+                                    child: Column(
+                                      children: [
+                                        ColorFiltered(
+                                          colorFilter:
+                                              booking['payment'] == "promptpay"
+                                                  ? const ColorFilter.mode(
+                                                      Colors.transparent,
+                                                      BlendMode.multiply)
+                                                  : const ColorFilter
+                                                      .matrix(<double>[
+                                                      0.2126, 0.7152, 0.0722, 0,
+                                                      0, //
+                                                      0.2126, 0.7152, 0.0722, 0,
+                                                      0, //
+                                                      0.2126, 0.7152, 0.0722, 0,
+                                                      0, //
+                                                      0, 0, 0, 1, 0, //
+                                                    ]),
+                                          child: Image.asset(
+                                            'assets/ihealth/promtpay.png',
+                                            width: 40,
+                                            height: 40,
+                                          ),
+                                        ),
+                                        Text(
+                                          "พร้อมเพย์",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: booking['payment'] ==
+                                                    "promptpay"
+                                                ? Colors.black
+                                                : Colors.grey,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 20),
+
+                                  // เงินสด
+                                  InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        booking['payment'] = "cash";
+                                      });
+                                    },
+                                    child: Column(
+                                      children: [
+                                        ColorFiltered(
+                                          colorFilter:
+                                              booking['payment'] == "cash"
+                                                  ? const ColorFilter.mode(
+                                                      Colors.transparent,
+                                                      BlendMode.multiply)
+                                                  : const ColorFilter
+                                                      .matrix(<double>[
+                                                      0.2126, 0.7152, 0.0722, 0,
+                                                      0, //
+                                                      0.2126, 0.7152, 0.0722, 0,
+                                                      0, //
+                                                      0.2126, 0.7152, 0.0722, 0,
+                                                      0, //
+                                                      0, 0, 0, 1, 0, //
+                                                    ]),
+                                          child: Image.asset(
+                                            'assets/ihealth/money.png',
+                                            width: 40,
+                                            height: 40,
+                                          ),
+                                        ),
+                                        Text(
+                                          "เงินสด",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: booking['payment'] == "cash"
+                                                ? Colors.black
+                                                : Colors.grey,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            booking['payment'] != "" &&
+                                    booking['payment'] != null
+                                ? InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        _updateBookingPayment(
+                                            booking, booking['booking_id']);
+                                      });
+                                      // _showSuccessDialog();
+                                    },
+                                    child: const Column(
+                                      children: [
+                                        Icon(Icons.add_task,
+                                            color: Colors.green, size: 40),
+                                        Text("บันทึก",
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.black)),
+                                      ],
+                                    ),
+                                  )
+                                : Container(),
+                            SizedBox(
+                              width: 35,
+                            ),
+                            InkWell(
+                              onTap: () {
+                                _showcancelDialog(booking['booking_id']);
+                              },
+                              child: const Column(
+                                children: [
+                                  Icon(Icons.delete_forever,
+                                      color: Colors.red, size: 40),
+                                  Text("ยกเลิก",
+                                      style: TextStyle(
+                                          fontSize: 14, color: Colors.black)),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildBookingCardConfirmed(Map<String, dynamic> booking, int index) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(14.0),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(booking['massage_name'],
+                      style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green)),
+                  Text(booking["status"],
+                      style: TextStyle(
+                          color: booking['status'] == 'completed'
+                              ? Colors.green
+                              : booking['status'] == 'cancelled'
+                                  ? Colors.red
+                                  : Colors.grey,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold)),
+                  // booking['payment'] == "promptpay" && isSubmit == true
+                  //     ? Text('ชำระแล้ว',
+                  //         style: const TextStyle(
+                  //             color: Colors.green, fontSize: 13))
+                  //     : booking['payment'] == "cash" && isSubmit == true
+                  //         ? Text('ชำระปลายทาง',
+                  //             style: const TextStyle(
+                  //                 color: Colors.green, fontSize: 13))
+                  //         : ),
+                ],
+              ),
+
+              const SizedBox(height: 10),
+              SizedBox(height: 5),
+              // รายละเอียด
+              buildDetail("ประเภทหลัก", booking["category_main"]),
+              SizedBox(height: 10),
+              buildDetail("ประเภทย่อย", booking["category_sub"]),
+              SizedBox(height: 10),
+              buildDetail("บริการ", booking["service_name"]),
+
+              SizedBox(height: 10),
+              buildDetail("หมอนวด", booking["therapist_name"]),
+              SizedBox(height: 10),
+              buildDetail("ระยะเวลา", booking["massage_duration"]),
+              SizedBox(height: 10),
+              buildDetail("วันที่นัดหมาย", booking["booking_date"]),
+              SizedBox(height: 10),
+              buildDetail("เวลานัดหมาย",
+                  booking["start_time"] + " ถึง " + booking["end_time"]),
+
+              // แผนที่ + ราคา
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  OutlinedButton.icon(
+                    icon: const Icon(Icons.map,
+                        size: 18, color: Color(0xFF07663a)),
+                    label: const Text("เปิดบน Google Maps",
+                        style: TextStyle(color: Color(0xFF07663a))),
+                    style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Color(0xFF07663a))),
+                    onPressed: () {},
+                  ),
+                  Text("ราคา: ${booking["price"]}",
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF07663a))),
+                ],
+              ),
+              const SizedBox(height: 20),
+              booking['payment'] == 'promptpay'
+                  ? imageUrl == "" || imageUrl == null
+                      ? Container(
+                          width: double.infinity,
+                          height: 60,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey.shade300),
+                              borderRadius: BorderRadius.circular(8)),
+                          child: const Text("ยังไม่มีสลิป",
+                              style: TextStyle(color: Color(0xFF5a5a5a))),
+                        )
+                      : Container(
+                          alignment: Alignment.center,
+                          height: 150,
+                          width: double.infinity,
+                          child: Image.asset(
                             imageUrl!,
                             height: 150,
                             width: 120,
@@ -286,196 +690,216 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
                         ),
                       ],
                     )
-                  : booking['status'] == 'cancelled' ?
-                  Container() :
-                  Row(
-                      children: [
-                        Expanded(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              InkWell(
-                                onTap: () {
-                                  setState(() {
-                                    booking['payment'] = "promptpay";
-                                  });
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return Dialog(
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(16),
-                                        ),
-                                        child: SizedBox(
-                                          width: 320,
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(20),
-                                            child: SingleChildScrollView(
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Align(
-                                                    alignment:
-                                                        Alignment.centerRight,
-                                                    child: IconButton(
-                                                      icon: const Icon(
-                                                          Icons.close),
-                                                      onPressed: () =>
-                                                          Navigator.of(context)
-                                                              .pop(),
-                                                    ),
+                  : booking['status'] == 'cancelled'
+                      ? Container()
+                      : Row(
+                          children: [
+                            Expanded(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        booking['payment'] = "promptpay";
+                                      });
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return Dialog(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                            ),
+                                            child: SizedBox(
+                                              width: 320,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(20),
+                                                child: SingleChildScrollView(
+                                                  child: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      Align(
+                                                        alignment: Alignment
+                                                            .centerRight,
+                                                        child: IconButton(
+                                                          icon: const Icon(
+                                                              Icons.close),
+                                                          onPressed: () =>
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop(),
+                                                        ),
+                                                      ),
+                                                      const Text(
+                                                        "สแกนจ่ายด้วย PromptPay",
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 18,
+                                                          color:
+                                                              Color(0xFF07663a),
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                          height: 16),
+                                                      Image.network(
+                                                        api +
+                                                            booking[
+                                                                'payment_image'],
+                                                        width: 300,
+                                                        height: 300,
+                                                      ),
+                                                      const SizedBox(
+                                                          height: 12),
+                                                      Text(
+                                                        booking["shopName"] ??
+                                                            "",
+                                                        style: const TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                          height: 16),
+                                                    ],
                                                   ),
-                                                  const Text(
-                                                    "สแกนจ่ายด้วย PromptPay",
-                                                    style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 18,
-                                                      color: Color(0xFF07663a),
-                                                    ),
-                                                  ),
-                                                  const SizedBox(height: 16),
-                                                  QrImageView(
-                                                    data:
-                                                        booking["promptPay"] ??
-                                                            "0123456789",
-                                                    version: QrVersions.auto,
-                                                    size: 200.0,
-                                                  ),
-                                                  const SizedBox(height: 12),
-                                                  Text(
-                                                    booking["shopName"] ?? "",
-                                                    style: const TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(height: 16),
-                                                ],
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                        ),
+                                          );
+                                        },
                                       );
                                     },
-                                  );
-                                },
-                                child: Column(
-                                  children: [
-                                    ColorFiltered(
-                                      colorFilter: booking['payment'] ==
-                                              "promptpay"
-                                          ? const ColorFilter.mode(
-                                              Colors.transparent,
-                                              BlendMode.multiply)
-                                          : const ColorFilter.matrix(<double>[
-                                              0.2126, 0.7152, 0.0722, 0, 0, //
-                                              0.2126, 0.7152, 0.0722, 0, 0, //
-                                              0.2126, 0.7152, 0.0722, 0, 0, //
-                                              0, 0, 0, 1, 0, //
-                                            ]),
-                                      child: Image.asset(
-                                        'assets/ihealth/promtpay.png',
-                                        width: 40,
-                                        height: 40,
-                                      ),
+                                    child: Column(
+                                      children: [
+                                        ColorFiltered(
+                                          colorFilter:
+                                              booking['payment'] == "promptpay"
+                                                  ? const ColorFilter.mode(
+                                                      Colors.transparent,
+                                                      BlendMode.multiply)
+                                                  : const ColorFilter
+                                                      .matrix(<double>[
+                                                      0.2126, 0.7152, 0.0722, 0,
+                                                      0, //
+                                                      0.2126, 0.7152, 0.0722, 0,
+                                                      0, //
+                                                      0.2126, 0.7152, 0.0722, 0,
+                                                      0, //
+                                                      0, 0, 0, 1, 0, //
+                                                    ]),
+                                          child: Image.asset(
+                                            'assets/ihealth/promtpay.png',
+                                            width: 40,
+                                            height: 40,
+                                          ),
+                                        ),
+                                        Text(
+                                          "พร้อมเพย์",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: booking['payment'] ==
+                                                    "promptpay"
+                                                ? Colors.black
+                                                : Colors.grey,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    Text(
-                                      "พร้อมเพย์",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: booking['payment'] == "promptpay"
-                                            ? Colors.black
-                                            : Colors.grey,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(width: 20),
+                                  ),
+                                  const SizedBox(width: 20),
 
-                              // เงินสด
-                              InkWell(
-                                onTap: () {
-                                  setState(() {
-                                    booking['payment'] = "cash";
-                                  });
-                                },
-                                child: Column(
-                                  children: [
-                                    ColorFiltered(
-                                      colorFilter: booking['payment'] == "cash"
-                                          ? const ColorFilter.mode(
-                                              Colors.transparent,
-                                              BlendMode.multiply)
-                                          : const ColorFilter.matrix(<double>[
-                                              0.2126, 0.7152, 0.0722, 0, 0, //
-                                              0.2126, 0.7152, 0.0722, 0, 0, //
-                                              0.2126, 0.7152, 0.0722, 0, 0, //
-                                              0, 0, 0, 1, 0, //
-                                            ]),
-                                      child: Image.asset(
-                                        'assets/ihealth/money.png',
-                                        width: 40,
-                                        height: 40,
-                                      ),
+                                  // เงินสด
+                                  InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        booking['payment'] = "cash";
+                                      });
+                                    },
+                                    child: Column(
+                                      children: [
+                                        ColorFiltered(
+                                          colorFilter:
+                                              booking['payment'] == "cash"
+                                                  ? const ColorFilter.mode(
+                                                      Colors.transparent,
+                                                      BlendMode.multiply)
+                                                  : const ColorFilter
+                                                      .matrix(<double>[
+                                                      0.2126, 0.7152, 0.0722, 0,
+                                                      0, //
+                                                      0.2126, 0.7152, 0.0722, 0,
+                                                      0, //
+                                                      0.2126, 0.7152, 0.0722, 0,
+                                                      0, //
+                                                      0, 0, 0, 1, 0, //
+                                                    ]),
+                                          child: Image.asset(
+                                            'assets/ihealth/money.png',
+                                            width: 40,
+                                            height: 40,
+                                          ),
+                                        ),
+                                        Text(
+                                          "เงินสด",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: booking['payment'] == "cash"
+                                                ? Colors.black
+                                                : Colors.grey,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    Text(
-                                      "เงินสด",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: booking['payment'] == "cash"
-                                            ? Colors.black
-                                            : Colors.grey,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
+                            ),
+                            booking['payment'] != "" &&
+                                    booking['payment'] != null
+                                ? InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        _updateBookingPayment(
+                                            booking, booking['booking_id']);
+                                      });
+                                      // _showSuccessDialog();
+                                    },
+                                    child: const Column(
+                                      children: [
+                                        Icon(Icons.add_task,
+                                            color: Colors.green, size: 40),
+                                        Text("บันทึก",
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.black)),
+                                      ],
+                                    ),
+                                  )
+                                : Container(),
+                            SizedBox(
+                              width: 35,
+                            ),
+                            InkWell(
+                              onTap: () {
+                                _showcancelDialog(booking['booking_id']);
+                              },
+                              child: const Column(
+                                children: [
+                                  Icon(Icons.delete_forever,
+                                      color: Colors.red, size: 40),
+                                  Text("ยกเลิก",
+                                      style: TextStyle(
+                                          fontSize: 14, color: Colors.black)),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                        booking['payment'] != "" && booking['payment'] != null
-                            ? InkWell(
-                                onTap: () {
-                                  setState(() {
-                                    _updateBookingPayment(
-                                        booking, booking['booking_id']);
-                                  });
-                                  // _showSuccessDialog();
-                                },
-                                child: const Column(
-                                  children: [
-                                    Icon(Icons.add_task,
-                                        color: Colors.green, size: 40),
-                                    Text("บันทึก",
-                                        style: TextStyle(
-                                            fontSize: 14, color: Colors.black)),
-                                  ],
-                                ),
-                              )
-                            : Container(),
-                        SizedBox(
-                          width: 35,
-                        ),
-                        InkWell(
-                          onTap: () {
-                            _showcancelDialog(booking['booking_id']);
-                          },
-                          child: const Column(
-                            children: [
-                              Icon(Icons.delete_forever,
-                                  color: Colors.red, size: 40),
-                              Text("ยกเลิก",
-                                  style: TextStyle(
-                                      fontSize: 14, color: Colors.black)),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
             ],
           ),
         ),
@@ -566,46 +990,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
                         ),
                       ),
                     )
-                  : Column(
-                      children: [
-                        Container(
-                          width: double.infinity,
-                          height: 60,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey.shade300),
-                              borderRadius: BorderRadius.circular(8)),
-                          child: const Text("ไม่มีภาพแนบ",
-                              style: TextStyle(color: Color(0xFF5a5a5a))),
-                        ),
-                        const SizedBox(height: 10),
-                        Container(
-                          alignment: Alignment.center,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFd4af37),
-                              minimumSize: const Size(60, 50),
-                              side: const BorderSide(
-                                color: Color(0xFFd4af37),
-                                width: 1,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            onPressed: hasRated
-                                ? _showViewRatingDialog
-                                : _showRatingDialog,
-                            child: Text(
-                              hasRated ? "ดูคะแนน" : "ให้คะแนน ",
-                              style: const TextStyle(
-                                  color: Colors.white, fontSize: 16),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                      ],
-                    )
+                  : Container()
             ],
           ),
         ),
@@ -632,138 +1017,62 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
           Container(
             color: Colors.white,
             child: TabBar(
-              controller: _tabController,
-              labelColor: Color(0xFF07663a),
-              unselectedLabelColor: Colors.grey,
-              indicatorColor: Color(0xFF07663a),
-              indicatorWeight: 3,
-              indicatorSize: TabBarIndicatorSize.tab,
-              tabs: const [
-                Tab(text: "อยู่ระหว่างดำเนินการ"),
-                Tab(text: "ดำเนินการเสร็จสิ้น"),
-              ],
-              onTap: (idx) => {
-                idx == 0 ? _historyMassagePending() : _historymassage()
-              }
-            ),
+                controller: _tabController,
+                labelColor: Color(0xFF07663a),
+                unselectedLabelColor: Colors.grey,
+                indicatorColor: Color(0xFF07663a),
+                indicatorWeight: 3,
+                indicatorSize: TabBarIndicatorSize.tab,
+                tabs: const [
+                  Tab(text: "อยู่ระหว่างดำเนินการ"),
+                  Tab(text: "รอชำระเงิน"),
+                  Tab(text: "ดำเนินการเสร็จสิ้น"),
+                ],
+                onTap: (idx) => {
+                      idx == 0
+                          ? _historyMassagePending()
+                          : idx == 1
+                              ? _historyMassageConfirmed()
+                              : _historymassage()
+                    }),
           ),
           SizedBox(height: 10),
           Expanded(
             child: TabBarView(
               controller: _tabController,
               children: [
-                // SingleChildScrollView(
-                //   child: Column(
-                //     children: [
-                //       // 🔽 Dropdown Filters อยู่นอก Card
-                //       // Padding(
-                //       //   padding: const EdgeInsets.symmetric(
-                //       //       horizontal: 16, vertical: 10),
-                //       //   child: Column(
-                //       //     children: [
-                //       //       DropdownButtonFormField2<String>(
-                //       //         decoration: InputDecoration(
-                //       //           labelText: "เดือน",
-                //       //           border: OutlineInputBorder(
-                //       //             borderRadius: BorderRadius.circular(12),
-                //       //           ),
-                //       //         ),
-                //       //         value: selectedMonth,
-                //       //         items: months.map((month) {
-                //       //           return DropdownMenuItem<String>(
-                //       //             value: month,
-                //       //             child: Text(month),
-                //       //           );
-                //       //         }).toList(),
-                //       //         onChanged: (value) {
-                //       //           setState(() {
-                //       //             selectedMonth = value;
-                //       //           });
-                //       //         },
-                //       //         dropdownStyleData: DropdownStyleData(
-                //       //           useSafeArea: true,
-                //       //           elevation: 2,
-                //       //           offset: const Offset(0, -5),
-                //       //         ),
-                //       //       ),
-                //       //       const SizedBox(height: 16),
-
-                //       //       DropdownButtonFormField2<String>(
-                //       //         decoration: InputDecoration(
-                //       //           labelText: "ปี",
-                //       //           border: OutlineInputBorder(
-                //       //             borderRadius: BorderRadius.circular(12),
-                //       //           ),
-                //       //         ),
-                //       //         value: selectedYear,
-                //       //         items: years.map((year) {
-                //       //           return DropdownMenuItem<String>(
-                //       //             value: year,
-                //       //             child: Text(year),
-                //       //           );
-                //       //         }).toList(),
-                //       //         onChanged: (value) {
-                //       //           setState(() {
-                //       //             selectedYear = value;
-                //       //           });
-                //       //         },
-                //       //         dropdownStyleData: DropdownStyleData(
-                //       //           useSafeArea: true,
-                //       //           elevation: 2,
-                //       //           offset: const Offset(0, -5),
-                //       //         ),
-                //       //       ),
-                //       //       const SizedBox(height: 16),
-
-                //       //       DropdownButtonFormField2<String>(
-                //       //         decoration: InputDecoration(
-                //       //           labelText: "สถานะ",
-                //       //           border: OutlineInputBorder(
-                //       //             borderRadius: BorderRadius.circular(12),
-                //       //           ),
-                //       //         ),
-                //       //         value: selectedStatus,
-                //       //         items: statuses.map((status) {
-                //       //           return DropdownMenuItem<String>(
-                //       //             value: status,
-                //       //             child: Text(status),
-                //       //           );
-                //       //         }).toList(),
-                //       //         onChanged: (value) {
-                //       //           setState(() {
-                //       //             selectedStatus = value;
-                //       //           });
-                //       //         },
-                //       //         dropdownStyleData: DropdownStyleData(
-                //       //           useSafeArea: true,
-                //       //           elevation: 2,
-                //       //           offset: const Offset(0, -5),
-                //       //         ),
-                //       //       ),
-                //       //     ],
-                //       //   ),
-                //       // ),
-
-                //       // 🔽 รายการ Booking Cards
-
-                //     ],
-                //   ),
-                // ),
-                ListView.builder(
-                  // shrinkWrap: true,
-                  // physics: const NeverScrollableScrollPhysics(),
-                  itemCount: pendingBookings.length,
-                  itemBuilder: (context, index) {
-                    return buildBookingCardPending(
-                        pendingBookings[index], index);
-                  },
-                ),
-                ListView.builder(
-                  itemCount: historymassage.length,
-                  itemBuilder: (context, index) {
-                    return buildBookingCard(historymassage[index], index);
-                  },
-                ),
+                pendingBookings.isNotEmpty
+                    ? ListView.builder(
+                        itemCount: pendingBookings.length,
+                        itemBuilder: (context, index) {
+                          return buildBookingCardPending(
+                              pendingBookings[index], index);
+                        },
+                      )
+                    : Center(
+                        child: Text('ไม่มีรายการข้อมูล'),
+                      ),
+                confirmedBookings.isNotEmpty
+                    ? ListView.builder(
+                        itemCount: confirmedBookings.length,
+                        itemBuilder: (context, index) {
+                          return buildBookingCardConfirmed(
+                              confirmedBookings[index], index);
+                        },
+                      )
+                    : Center(
+                        child: Text('ไม่มีรายการข้อมูล'),
+                      ),
+                historymassage.isNotEmpty
+                    ? ListView.builder(
+                        itemCount: historymassage.length,
+                        itemBuilder: (context, index) {
+                          return buildBookingCard(historymassage[index], index);
+                        },
+                      )
+                    : Center(
+                        child: Text('ไม่มีรายการข้อมูล'),
+                      ),
               ],
             ),
           ),
@@ -793,7 +1102,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
     );
   }
 
-  void _showRatingDialog() {
+  void _showRatingDialog(String booking_id) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -911,7 +1220,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
                           //   "ความตรงต่อเวลา": therapistPunctuality,
                           //   "ข้อเสนอแนะ": feedbackController.text,
                           // };b
-                          feedback();
+                          feedback(booking_id);
                         });
                       },
                       child: const Text("ส่งคะแนน",
@@ -1192,17 +1501,6 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
     );
   }
 
-  // _imgFromCamera(int index) async {
-  //   final ImagePicker _picker = ImagePicker();
-  //   // Pick an image
-  //   final XFile? image = await _picker.pickImage(source: ImageSource.camera);
-
-  //   setState(() {
-  //     _image = image!;
-  //   });
-  //   _upload(index);
-  // }
-
   _imgFromGallery(int index) async {
     final ImagePicker _picker = ImagePicker();
     // Pick an image
@@ -1210,8 +1508,9 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
 
     setState(() {
       _image = image!;
+      imageUrl = image.path;
     });
-    _upload(index);
+    // _upload(index);
 
     print(_image!.path);
   }
@@ -1230,7 +1529,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
     });
   }
 
-  feedback() async {
+  feedback(String booking_id) async {
     try {
       final dioService = DioService();
       await dioService.init();
@@ -1244,9 +1543,8 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       };
-
       var data = json.encode({
-        "booking_id": "4ec10c34-9e39-4358-833c-07e9f4656fac",
+        "booking_id": booking_id,
         "quality": shopQuality,
         "cleanliness": shopCleanliness,
         "punctuality": shopAccuracy,
@@ -1261,9 +1559,52 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
         data: data,
         options: Options(headers: headers),
       );
-
+      
       if (response.statusCode == 200) {
-        print('✅ Feedback submitted successfully');
+        return showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return WillPopScope(
+              onWillPop: () {
+                return Future.value(false);
+              },
+              child: CupertinoAlertDialog(
+                title: Text(
+                  'ให้คะแนนเรียบร้อยแล้ว',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontFamily: 'Sarabun',
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                content: Text(" "),
+                actions: [
+                  CupertinoDialogAction(
+                    isDefaultAction: true,
+                    child: Text(
+                      "ตกลง",
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontFamily: 'Sarabun',
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                    onPressed: () {
+                     
+                      _historymassage();
+                      // goBack();
+                      Navigator.of(context).pop();
+                      // Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
+        );
       }
     } on DioException catch (e) {
       String errorMessage = e.response?.data["message"] ?? "เกิดข้อผิดพลาด";
@@ -1352,6 +1693,8 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
           isSubmit = true;
         });
         _showSuccessDialog();
+        _historyMassageConfirmed();
+        imageUrl = '';
       }
     } on DioException catch (e) {
       String errorMessage = e.response?.data["message"] ?? "เกิดข้อผิดพลาด";
@@ -1415,6 +1758,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
                       // );
                       _historymassage();
                       _historyMassagePending();
+                      _historyMassageConfirmed();
                       // goBack();
                       Navigator.of(context).pop();
                       // Navigator.of(context).pop();
@@ -1445,7 +1789,11 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
   _historymassage() async {
     get(api + 'api/v1/customer/history-massage?year=&status=').then((v) => {
           setState(() {
-            historymassage = v;
+            if (v is Map && v.containsKey('status')) {
+              historymassage = [];
+            } else {
+              historymassage = v;
+            }
           }),
         });
   }
@@ -1454,7 +1802,24 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
     get(api + 'api/v1/customer/history-massage?year=&status=pending')
         .then((v) => {
               setState(() {
-                pendingBookings = v;
+                if (v is Map && v.containsKey('status')) {
+                  pendingBookings = [];
+                } else {
+                  pendingBookings = v;
+                }
+              }),
+            });
+  }
+
+  _historyMassageConfirmed() async {
+    get(api + 'api/v1/customer/history-massage?year=&status=confirmed')
+        .then((v) => {
+              setState(() {
+                if (v is Map && v.containsKey('status')) {
+                  confirmedBookings = [];
+                } else {
+                  confirmedBookings = v;
+                }
               }),
             });
   }

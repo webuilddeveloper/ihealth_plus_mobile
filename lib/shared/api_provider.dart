@@ -630,9 +630,9 @@ Future<dynamic> get(String url) async {
     "Content-Type": "application/json",
     'Cookie': cookie
   });
-
   if (response.statusCode == 200) {
     var data = json.decode(response.body);
+    
     return Future.value(data['data']);
   } else {
     return {"status": "F"};
