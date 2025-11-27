@@ -177,13 +177,16 @@ class _ShopDetailState extends State<ShopDetail> {
                       size: 20,
                     ),
                     SizedBox(width: 8),
-                    Text(
-                      '${model?['house_number'] ?? ''} ${model?['moo'] ?? ''} ${model?['alley'] ?? ''} ${model?['road'] ?? ''} ${model?['subdistrict'] ?? ''} ${model?['district'] ?? ''} ${model?['province'] ?? ''} ${model?['postal_code'] ?? ''}',
-                      style: TextStyle(
-                        color: AppColors.textdark,
-                        fontFamily: "sarabun",
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
+                    Expanded(
+                      child: Text(
+                        '${model?['house_number'] ?? ''} ${model?['moo'] ?? ''} ${model?['alley'] ?? ''} ${model?['road'] ?? ''} ${model?['subdistrict'] ?? ''} ${model?['district'] ?? ''} ${model?['province'] ?? ''} ${model?['postal_code'] ?? ''}',
+                        style: TextStyle(
+                          color: AppColors.textdark,
+                          fontFamily: "sarabun",
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                        ),
+                        maxLines: 3,
                       ),
                     ),
                   ],
@@ -316,8 +319,7 @@ class _ShopDetailState extends State<ShopDetail> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) => BookingDetail(
-                                      massage_info_id:
-                                          model['uuid'],
+                                      massage_info_id: model['uuid'],
                                       booking_date: today,
                                       province: encodedProvince,
                                     )),
