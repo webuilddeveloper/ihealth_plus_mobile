@@ -1,0 +1,2 @@
+/Users/panuwitchaiton/webuild/ihealth_plus/ihealth_plus_mobile/android/app/.cxx/RelWithDebInfo/5i2w7049/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/panuwitchaiton/webuild/ihealth_plus/ihealth_plus_mobile/android/app/.cxx/RelWithDebInfo/5i2w7049/armeabi-v7a/CMakeFiles/rebuild_cache.dir

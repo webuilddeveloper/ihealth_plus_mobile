@@ -1,0 +1,1 @@
+/Users/panuwitchaiton/webuild/ihealth_plus/ihealth_plus_mobile/build/app/intermediates/cxx/RelWithDebInfo/5i2w7049/obj/arm64-v8a
