@@ -145,11 +145,12 @@ final List<Map<String, dynamic>> shopData = [
 ];
 
 class BookingFavoritePage extends StatefulWidget {
+  const BookingFavoritePage({Key? key}) : super(key: key);
   @override
-  _BookingFavoritePageState createState() => _BookingFavoritePageState();
+  BookingFavoritePageState createState() => BookingFavoritePageState();
 }
 
-class _BookingFavoritePageState extends State<BookingFavoritePage> {
+class BookingFavoritePageState extends State<BookingFavoritePage> {
   String? selectedService;
   TextEditingController searchController = TextEditingController();
   List<Shop> filteredData = tempData;
@@ -175,11 +176,11 @@ class _BookingFavoritePageState extends State<BookingFavoritePage> {
   }
 
   void initState() {
+    callFavorite();
     super.initState();
-    _Favorites();
   }
 
-  _Favorites() async {
+  void callFavorite() async {
     // setState(() {
     //     favoritesData = response.data['data'];
     //   });
@@ -223,7 +224,7 @@ class _BookingFavoritePageState extends State<BookingFavoritePage> {
 
     if (v == null) return;
 
-    print('---$v');
+    print('------ favorite -----$v');
 
     setState(() {
       favoritesData = v;
@@ -367,15 +368,15 @@ class _BookingFavoritePageState extends State<BookingFavoritePage> {
                                                   const EdgeInsets.symmetric(
                                                       vertical: 12),
                                             ),
-                                            onPressed: () {
-                                              
+                                            onPressed: () async {
                                               final today =
                                                   toDate(DateTime.now());
                                               String encodedProvince =
                                                   Uri.encodeComponent(
                                                       favorite['province'] ??
                                                           "");
-                                              Navigator.push(
+                                              final result =
+                                                  await Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
                                                     builder: (context) =>
@@ -387,6 +388,10 @@ class _BookingFavoritePageState extends State<BookingFavoritePage> {
                                                               encodedProvince,
                                                         )),
                                               );
+
+                                              if (result == true) {
+                                                callFavorite(); // เรียกฟังก์ชันหลังกลับมาจาก DetailPage
+                                              }
                                             },
                                             child: const Text(
                                               "ดูรายละเอียด",

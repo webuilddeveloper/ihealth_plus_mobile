@@ -9,15 +9,17 @@ import 'package:ihealth_2025_mobile/shared/api_provider_ihealth.dart';
 import '../shared/api_provider.dart';
 
 class MenuClient extends StatefulWidget {
-  const MenuClient({super.key, this.pageIndex, this.modelprofile});
+  const MenuClient({Key? key, this.pageIndex, this.modelprofile})
+      : super(key: key);
+
   final int? pageIndex;
   final modelprofile;
 
   @override
-  State<MenuClient> createState() => _MenuClientState();
+  MenuClientState createState() => MenuClientState();
 }
 
-class _MenuClientState extends State<MenuClient> {
+class MenuClientState extends State<MenuClient> {
   DateTime? currentBackPressTime;
   dynamic futureNotificationTire;
   int notiCount = 0;
@@ -35,25 +37,33 @@ class _MenuClientState extends State<MenuClient> {
     'imageUrl': '',
   };
 
+  GlobalKey<BookingFavoritePageState> favoritePageKey =
+      GlobalKey<BookingFavoritePageState>();
+  GlobalKey<NotificationClientListState> notificationPageKey =
+      GlobalKey<NotificationClientListState>();
+
   @override
   void initState() {
     // _callRead();
     _readProfile();
-    _callReadNoti();
+    callReadNoti();
     pages = <Widget>[
       HomeClient(
         changePage: _changePage,
       ),
       BookingHistoryPage(),
-      NotificationClientList(
-        title: 'แจ้งเตือน',
-      ),
-      BookingFavoritePage(),
+      NotificationClientList(title: 'แจ้งเตือน', key: notificationPageKey, onReadAll: readAll),
+      BookingFavoritePage(key: favoritePageKey),
       UserInformationClientPage(changePage: _onItemTapped),
     ];
     onSetPage();
-    
+
     super.initState();
+  }
+
+  void readAll() {
+    print("=========== -------- readAll() ถูกเรียกจาก NotificationPage");
+    callReadNoti();
   }
 
   // MyQrCode(),
@@ -62,7 +72,7 @@ class _MenuClientState extends State<MenuClient> {
     super.dispose();
   }
 
-  _callReadNoti() async {
+  callReadNoti() async {
     try {
       final apiProvider = await ApiProviderIhealth.getInstance();
       var response = await apiProvider.get('v1/notify?role=customer');
@@ -99,8 +109,17 @@ class _MenuClientState extends State<MenuClient> {
       if (index == 0 && _currentPage == 0) {
         _callRead();
       }
-
+      // เรียกฟังก์ชันในหน้า
       _currentPage = index;
+    });
+    callReadNoti();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (index == 2) {
+        notificationPageKey.currentState?.readNotiFromExPage();
+      }
+      if (index == 3) {
+        favoritePageKey.currentState?.callFavorite();
+      }
     });
   }
 
@@ -125,14 +144,10 @@ class _MenuClientState extends State<MenuClient> {
     await storage.read(key: 'customer_id').then((cus_id) => {
           get(api + 'api/v1/customer/user/${cus_id}').then(
             (v) async {
-              await storage.write(
-                  key: 'fullname', value: v["fullname"]);
-              await storage.write(
-                  key: 'mobile', value: v["mobile"]);
-              await storage.write(
-                  key: 'image', value: v["image"]);
-              await storage.write(
-                  key: 'gender', value: v["gender"]);
+              await storage.write(key: 'fullname', value: v["fullname"]);
+              await storage.write(key: 'mobile', value: v["mobile"]);
+              await storage.write(key: 'image', value: v["image"]);
+              await storage.write(key: 'gender', value: v["gender"]);
             },
           ),
         });

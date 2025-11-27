@@ -199,6 +199,12 @@ class _BookingDetailState extends State<BookingDetail> {
         title: const Text("จองบริการนวด"),
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios),
+          onPressed: () {
+            Navigator.of(context).pop(true);
+          },
+        ),
       ),
       body: buildContent(),
     );

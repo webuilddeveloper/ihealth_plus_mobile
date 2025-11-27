@@ -1,22 +1,26 @@
+import 'package:dio/dio.dart';
 import 'package:ihealth_2025_mobile/client/notification/notification_client_form.dart';
 import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ihealth_2025_mobile/pages/blank_page/blank_loading.dart';
+import 'package:ihealth_2025_mobile/shared/api_provider.dart';
 import 'package:ihealth_2025_mobile/shared/api_provider_ihealth.dart';
 import 'package:ihealth_2025_mobile/shared/extension.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 class NotificationClientList extends StatefulWidget {
-  NotificationClientList({Key? key, required this.title}) : super(key: key);
+  const NotificationClientList({Key? key, required this.title, this.onReadAll})
+      : super(key: key);
 
   final String title;
+  final VoidCallback? onReadAll;
 
   @override
-  _NotificationClientList createState() => _NotificationClientList();
+  NotificationClientListState createState() => NotificationClientListState();
 }
 
-class _NotificationClientList extends State<NotificationClientList> {
+class NotificationClientListState extends State<NotificationClientList> {
   // Future<Map<String, dynamic>?>? _futureModel = Future.value(<String, dynamic>{
   //   "statusCode": 200,
   //   "message": "success",
@@ -63,7 +67,13 @@ class _NotificationClientList extends State<NotificationClientList> {
   @override
   void initState() {
     super.initState();
-    _futureModel = _callRead();
+   _futureModel = _callRead();
+  }
+
+  void readNotiFromExPage() {
+    setState(() {
+       _futureModel = _callRead();
+    });
   }
 
   Future<Map<String, dynamic>?> _callRead() async {
@@ -74,6 +84,21 @@ class _NotificationClientList extends State<NotificationClientList> {
     } catch (e) {
       print("Error fetching notifications: $e");
       return null;
+    }
+  }
+
+  readAll() async {
+    FormData formData = FormData.fromMap({});
+    var response = await putUpdateProfile(
+        '${api}/api/v1/notify/read-all?role=customer', formData);
+
+    if (response.statusCode == 200) {
+      setState(() {
+        widget.onReadAll?.call();
+      });
+      print('read all is true');
+    } else {
+      print('read all is false');
     }
   }
 
@@ -88,12 +113,32 @@ class _NotificationClientList extends State<NotificationClientList> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          widget.title,
+          widget.title!,
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
         ),
+        actions: [
+          PopupMenuButton<String>(
+            iconColor: Colors.white,
+            offset: const Offset(0, 40),
+            padding: EdgeInsets.zero,
+            onSelected: (value) {
+              if (value == 'readAll') {
+                readAll();
+              }
+            },
+            itemBuilder: (BuildContext context) {
+              return [
+                PopupMenuItem(
+                  value: 'readAll',
+                  child: Text('อ่านทั้งหมด'),
+                ),
+              ];
+            },
+          ),
+        ],
         centerTitle: true,
         backgroundColor: AppColors.primary,
       ),
