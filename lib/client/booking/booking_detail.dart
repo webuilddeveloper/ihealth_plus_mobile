@@ -195,7 +195,11 @@ class _BookingDetailState extends State<BookingDetail> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text("จองบริการนวด")),
+      appBar: AppBar(
+        title: const Text("จองบริการนวด"),
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+      ),
       body: buildContent(),
     );
   }
@@ -437,39 +441,55 @@ class _BookingDetailState extends State<BookingDetail> {
             const SizedBox(height: 20),
 
             // ปุ่ม
+
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0),
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
               child: Row(
                 children: [
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      final url = massageInfo['mapLink'];
-                      if (url != null && url.toString().isNotEmpty) {
-                        launchUrl(Uri.parse(url));
-                      }
-                    },
-                    icon: const Icon(Icons.map),
-                    label: const Text("ดูตำแหน่งร้าน"),
+                  Expanded(
+                    flex: 3,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        final url = massageInfo['mapLink'];
+                        if (url != null && url.toString().isNotEmpty) {
+                          launchUrl(Uri.parse(url));
+                        }
+                      },
+                      icon: const Icon(Icons.map),
+                      label: const Text(
+                        "ดูตำแหน่งร้าน",
+                        maxLines: 2,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
                   ),
-                  const SizedBox(width: 10),
-                  ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: massageInfo?['is_favorite'] == true
-                          ? Colors.grey.shade600 // ถ้าเคย fav = ปุ่มสีเทา
-                          : Colors.red, // ถ้ายังไม่ fav = เขียวหลัก
-                    ),
-                    onPressed: _toggleFavorite,
-                    icon: Icon(
-                      massageInfo?['is_favorite'] == true
-                          ? Icons.favorite
-                          : Icons.favorite_border,
-                      color: Colors.white,
-                    ),
-                    label: Text(
-                      massageInfo?['is_favorite'] == true
-                          ? "เอาออกจากรายการโปรด"
-                          : "เพิ่มลงรายการโปรด",
-                      style: const TextStyle(color: Colors.white),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    flex: 4,
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: massageInfo?['is_favorite'] == true
+                            ? const Color.fromARGB(
+                                255, 174, 5, 5) // ถ้าเคย fav = ปุ่มสีเทา
+                            : Colors.red, // ถ้ายังไม่ fav = เขียวหลัก
+                      ),
+                      onPressed: _toggleFavorite,
+                      icon: Icon(
+                        massageInfo?['is_favorite'] == true
+                            ? Icons.favorite
+                            : Icons.favorite_border,
+                        color: Colors.white,
+                      ),
+                      label: Text(
+                        massageInfo?['is_favorite'] == true
+                            ? "เอาออกจากรายการโปรด"
+                            : "เพิ่มลงรายการโปรด",
+                        style: const TextStyle(
+                          color: Colors.white,
+                        ),
+                        maxLines: 2,
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   )
                 ],
@@ -481,8 +501,7 @@ class _BookingDetailState extends State<BookingDetail> {
                     width: double.infinity,
                     height: 48,
                     child: ElevatedButton(
-                      onPressed: () {
-                      },
+                      onPressed: () {},
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFFF4D4D),
                         foregroundColor: Colors.white, // สีตัวอักษร

@@ -922,14 +922,16 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    booking["massage_name"],
-                    style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
+                  Expanded(
+                    child: Text(
+                      booking["massage_name"],
+                      style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                   // Text(booking["status"],
                   //     style: const TextStyle(
@@ -1002,7 +1004,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       appBar: AppBar(
+      appBar: AppBar(
         title: const Text(
           "ประวัติการนวด",
           style: TextStyle(
@@ -1523,7 +1525,6 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
       imageUrl = image.path;
     });
     // _upload(index);
-
   }
 
   void _upload(int index) async {
@@ -1570,7 +1571,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
         data: data,
         options: Options(headers: headers),
       );
-      
+
       if (response.statusCode == 200) {
         return showDialog(
           barrierDismissible: false,
@@ -1604,7 +1605,6 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
                       ),
                     ),
                     onPressed: () {
-                     
                       _historymassage();
                       // goBack();
                       Navigator.of(context).pop();
@@ -1780,8 +1780,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage>
             );
           },
         );
-      } else {
-      }
+      } else {}
     } on DioException catch (e) {
       String errorMessage = e.response?.data["message"] ?? "เกิดข้อผิดพลาด";
       showErrorDialog(

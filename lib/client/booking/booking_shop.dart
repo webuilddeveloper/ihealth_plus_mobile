@@ -214,7 +214,11 @@ class _BookingShopPageState extends State<BookingShopPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("ค้นหาร้านบริการ")),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        title: Text("ค้นหาร้านบริการ"),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
