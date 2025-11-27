@@ -235,12 +235,12 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                               SizedBox(height: 8),
                               Container(
-                                child: labelTextihealt('* ชื่อผู้ใช้บริการ'),
+                                child: labelTextihealt('* ชื่อ-นามสกุล'),
                               ),
                               Container(
                                 child: ihealtTextFormField(
                                   txtName,
-                                  'ชื่อผู้ใช้บริการ',
+                                  'ชื่อ-นามสกุล',
                                   true,
                                   // validator: passwordValidator,
                                 ),
