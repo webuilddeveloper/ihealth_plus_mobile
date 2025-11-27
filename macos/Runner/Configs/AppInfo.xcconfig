@@ -8,7 +8,7 @@
 PRODUCT_NAME = ihealth_2025_mobile
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = td.webuild.security
+PRODUCT_BUNDLE_IDENTIFIER = td.webuild.ihealth
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2025 com.example. All rights reserved.

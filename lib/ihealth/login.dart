@@ -241,7 +241,7 @@ class _LoginPageState extends State<LoginPage> {
                           tabController(),
                           SizedBox(height: 20.0),
                           labelTextField(
-                            'ชื่อผู้ใช้งาน',
+                            'อีเมล',
                             Icon(
                               Icons.person,
                               color: AppColors.primary,
@@ -251,7 +251,7 @@ class _LoginPageState extends State<LoginPage> {
                           SizedBox(height: 5.0),
                           ihealtTextFormField(
                             txtEmail,
-                            'ชื่อผู้ใช้งาน',
+                            'อีเมล',
                             true,
                             validator: emailValidator,
                           ),
@@ -533,7 +533,7 @@ class _LoginPageState extends State<LoginPage> {
                 await storage.write(key: 'image', value: v["image"]);
                 await storage.write(key: 'gender', value: v["gender"]);
                 await Navigator.push(
-                context, MaterialPageRoute(builder: (_) => MenuClient()));
+                    context, MaterialPageRoute(builder: (_) => MenuClient()));
               },
             );
           } else {

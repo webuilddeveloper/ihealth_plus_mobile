@@ -1,4 +1,4 @@
-package td.webuild.security
+package td.webuild.ihealth
 
 import io.flutter.embedding.android.FlutterActivity
 
