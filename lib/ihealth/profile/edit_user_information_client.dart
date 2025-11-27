@@ -26,7 +26,7 @@ class _EditUserInformationClientPageState
     extends State<EditUserInformationClientPage> {
   final storage = FlutterSecureStorage();
 
-  late String _imageUrl = '';
+  String _imageUrl = '';
   bool isImageNetwork = true;
 
   final _formKey = GlobalKey<FormState>();
@@ -85,7 +85,7 @@ class _EditUserInformationClientPageState
 
   ScrollController scrollController = ScrollController();
 
-  late XFile _image;
+  XFile? _image;
 
   int _selectedDay = 0;
   int _selectedMonth = 0;
@@ -212,16 +212,18 @@ class _EditUserInformationClientPageState
   Future<dynamic> submitUpdateUser() async {
     var customer_id = await storage.read(key: 'customer_id');
     // var user = json.decode(value!);
+    print('-=-=-=-=-=-=-=-=-=- ${_image != null}');
 
-    String mime = lookupMimeType(_image.path) ?? 'application/octet-stream';
+    String mime = _image == null ? '' : lookupMimeType(_image!.path) ?? 'application/octet-stream';
     FormData formData = FormData.fromMap({
       "fullname": txtName.text,
       "gender": selectGender,
       "nationality": txtNationality.text,
       "mobile": txtPhone.text,
       "mapLink": txtMapLink.text,
-      "image": await MultipartFile.fromFile(_image.path,
-          filename: _image.name, contentType: DioMediaType.parse(mime)),
+      // ignore: unnecessary_null_comparison
+      "image": _image == null ? '' : await MultipartFile.fromFile(_image!.path,
+          filename: _image!.name, contentType: DioMediaType.parse(mime)),
     });
 
     var response = await putUpdateProfile(
@@ -229,11 +231,6 @@ class _EditUserInformationClientPageState
 
     
     if (response.statusCode == 200) {
-      // await storage.write(
-      //   key: 'dataUserLoginOPEC',
-      //   value: jsonEncode(response['data']),
-      // );
-
       await storage.write(key: 'fullname', value: response.data['data']["fullname"]);
       await storage.write(key: 'gender', value: response.data['data']["gender"]);
       await storage.write(key: 'mobile', value: response.data['data']["mobile"]);
@@ -241,12 +238,6 @@ class _EditUserInformationClientPageState
       await storage.write(key: 'mapLink', value: response.data['data']["mapLink"]);
       await storage.write(key: 'image', value: response.data['data']["image"]);
 
-      // Navigator.pushReplacement(
-      //   context,
-      //   MaterialPageRoute(
-      //     builder: (context) => UserInformationPage(),
-      //   ),
-      // );
 
       return showDialog(
         barrierDismissible: false,
@@ -351,6 +342,7 @@ class _EditUserInformationClientPageState
         },
       );
     }
+  
   }
 
   readStorage() async {

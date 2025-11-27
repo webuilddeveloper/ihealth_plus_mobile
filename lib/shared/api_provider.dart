@@ -421,7 +421,8 @@ logout(BuildContext context) async {
 
     if (response.statusCode == 200) {
       print(json.encode(response.data));
-      await storage.delete(key: 'token'); // clear token
+      await FlutterSecureStorage().deleteAll();
+      // await storage.delete(key: 'token'); // clear token
       await DioService().cookieJar.deleteAll(); // clear cookie
       print('✅ Logout successful');
       Navigator.pushAndRemoveUntil(

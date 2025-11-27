@@ -505,18 +505,11 @@ class _LoginPageState extends State<LoginPage> {
             "password": txtPassword.text,
           },
         );
-
         // ถ้าเข้าได้ตรงนี้ = statusCode 200 แน่นอน
         var token = response.data["token"];
         var customer_id = response.data['data']["customer_id"];
 
         await storage.write(key: 'customer_id', value: customer_id);
-        await storage.write(
-            key: 'fullname', value: response.data['data']["fullname"]);
-        await storage.write(
-            key: 'mobile', value: response.data['data']["mobile"]);
-        await storage.write(
-            key: 'image', value: response.data['data']["image"]);
 
         if (token != null && token.isNotEmpty) {
           await storage.write(key: 'token', value: token);
@@ -533,11 +526,20 @@ class _LoginPageState extends State<LoginPage> {
 
           if (selectFrom == '1') {
             await storage.write(key: 'loginType', value: '1');
-            Navigator.push(
+            get(api + 'api/v1/customer/user/${customer_id}').then(
+              (v) async {
+                await storage.write(key: 'fullname', value: v["fullname"]);
+                await storage.write(key: 'mobile', value: v["mobile"]);
+                await storage.write(key: 'image', value: v["image"]);
+                await storage.write(key: 'gender', value: v["gender"]);
+                await Navigator.push(
                 context, MaterialPageRoute(builder: (_) => MenuClient()));
+              },
+            );
           } else {
             await storage.write(key: 'loginType', value: '2');
-            Navigator.push(context, MaterialPageRoute(builder: (_) => Menu()));
+            await Navigator.push(
+                context, MaterialPageRoute(builder: (_) => Menu()));
           }
         }
       } on DioException catch (e) {

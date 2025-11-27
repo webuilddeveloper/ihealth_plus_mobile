@@ -38,6 +38,7 @@ class _MenuClientState extends State<MenuClient> {
   @override
   void initState() {
     // _callRead();
+    _readProfile();
     _callReadNoti();
     pages = <Widget>[
       HomeClient(
@@ -51,6 +52,7 @@ class _MenuClientState extends State<MenuClient> {
       UserInformationClientPage(changePage: _onItemTapped),
     ];
     onSetPage();
+    
     super.initState();
   }
 
@@ -117,6 +119,23 @@ class _MenuClientState extends State<MenuClient> {
     //     pages[4] = profilePage;
     //   }
     // });
+  }
+
+  _readProfile() async {
+    await storage.read(key: 'customer_id').then((cus_id) => {
+          get(api + 'api/v1/customer/user/${cus_id}').then(
+            (v) async {
+              await storage.write(
+                  key: 'fullname', value: v["fullname"]);
+              await storage.write(
+                  key: 'mobile', value: v["mobile"]);
+              await storage.write(
+                  key: 'image', value: v["image"]);
+              await storage.write(
+                  key: 'gender', value: v["gender"]);
+            },
+          ),
+        });
   }
 
   @override

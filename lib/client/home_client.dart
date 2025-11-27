@@ -983,6 +983,7 @@ class _HomeClientState extends State<HomeClient>
           profileModel['mobile'] = v;
         }));
     await storage.read(key: 'image').then((v) => setState(() {
+          
           profileModel['image'] = v ??
               'uploads/user/image_picker_59134153-C405-4B7A-A5DB-DD097DAC3FDD-44179-000000520CA52D69-1764139168877-370813615.jpg';
         }));
