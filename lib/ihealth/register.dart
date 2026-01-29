@@ -88,6 +88,59 @@ class _RegisterPageState extends State<RegisterPage> {
         });
   }
 
+  Future dialogError(String message) {
+    return showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: () async => false,
+          child: CupertinoAlertDialog(
+            title: Text(
+              'เกิดข้อผิดพลาด',
+              style: TextStyle(
+                fontSize: 16,
+                fontFamily: 'Sarabun',
+                color: Colors.black,
+                fontWeight: FontWeight.normal,
+              ),
+            ),
+            content: Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Text(
+                message,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontFamily: 'Sarabun',
+                  color: Colors.black87,
+                  fontWeight: FontWeight.normal,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            actions: [
+              CupertinoDialogAction(
+                isDefaultAction: true,
+                child: Text(
+                  "ตกลง",
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontFamily: 'Sarabun',
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> signUpCustomer() async {
     print('-----------signUpCustomer--------------');
     print('Email: ${txtEmail.text}');
@@ -118,11 +171,30 @@ class _RegisterPageState extends State<RegisterPage> {
       }
     } on DioException catch (e) {
       print('DioException: ${e.response?.statusCode} - ${e.response?.data}');
-      // ถ้าอยากโชว์ error ให้ user
-      // dialogError(e.response?.data.toString() ?? 'เกิดข้อผิดพลาด');
+      final message = extractErrorMessage(e.response?.data);
+      dialogError(message);
+
       print(
           'Error during sign up: ${e.response?.data.toString() ?? 'เกิดข้อผิดพลาด'}');
     }
+  }
+
+  String extractErrorMessage(dynamic data) {
+    if (data == null) {
+      return 'เกิดข้อผิดพลาด';
+    }
+
+    // backend ส่งมาเป็น Map เช่น { type: ..., message: ... }
+    if (data is Map && data['message'] != null) {
+      return data['message'].toString();
+    }
+
+    // backend ส่งมาเป็น String ตรง ๆ
+    if (data is String) {
+      return data;
+    }
+
+    return 'เกิดข้อผิดพลาด';
   }
 
   Future<void> signUpTherapists() async {
@@ -155,8 +227,8 @@ class _RegisterPageState extends State<RegisterPage> {
       }
     } on DioException catch (e) {
       print('DioException: ${e.response?.statusCode} - ${e.response?.data}');
-      // ถ้าอยากโชว์ error ให้ user
-      // dialogError(e.response?.data.toString() ?? 'เกิดข้อผิดพลาด');
+      final message = extractErrorMessage(e.response?.data);
+      dialogError(message);
       print(
           'Error during sign up: ${e.response?.data.toString() ?? 'เกิดข้อผิดพลาด'}');
     }

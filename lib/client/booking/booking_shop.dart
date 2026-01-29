@@ -178,7 +178,7 @@ class _BookingShopPageState extends State<BookingShopPage> {
         '&mapLink=$latLng'
         '&booking_date=$booking_date'
         '&name_service=$encodedService';
-
+  
     get(url).then((v) {
       setState(() {
         massageLists = v['massage_lists'];
@@ -217,7 +217,7 @@ class _BookingShopPageState extends State<BookingShopPage> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
-        title: Text("ค้นหาร้านบริการ"),
+        title: Text("ค้นหาร้านบริการ "),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),

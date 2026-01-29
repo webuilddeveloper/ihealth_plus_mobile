@@ -214,7 +214,9 @@ class _EditUserInformationClientPageState
     // var user = json.decode(value!);
     print('-=-=-=-=-=-=-=-=-=- ${_image != null}');
 
-    String mime = _image == null ? '' : lookupMimeType(_image!.path) ?? 'application/octet-stream';
+    String mime = _image == null
+        ? ''
+        : lookupMimeType(_image!.path) ?? 'application/octet-stream';
     FormData formData = FormData.fromMap({
       "fullname": txtName.text,
       "gender": selectGender,
@@ -222,22 +224,27 @@ class _EditUserInformationClientPageState
       "mobile": txtPhone.text,
       "mapLink": txtMapLink.text,
       // ignore: unnecessary_null_comparison
-      "image": _image == null ? '' : await MultipartFile.fromFile(_image!.path,
-          filename: _image!.name, contentType: DioMediaType.parse(mime)),
+      "image": _image == null
+          ? ''
+          : await MultipartFile.fromFile(_image!.path,
+              filename: _image!.name, contentType: DioMediaType.parse(mime)),
     });
 
     var response = await putUpdateProfile(
         '${api}api/v1/customer/user/${customer_id}', formData);
 
-    
     if (response.statusCode == 200) {
-      await storage.write(key: 'fullname', value: response.data['data']["fullname"]);
-      await storage.write(key: 'gender', value: response.data['data']["gender"]);
-      await storage.write(key: 'mobile', value: response.data['data']["mobile"]);
-      await storage.write(key: 'nationality', value: response.data['data']["nationality"]);
-      await storage.write(key: 'mapLink', value: response.data['data']["mapLink"]);
+      await storage.write(
+          key: 'fullname', value: response.data['data']["fullname"]);
+      await storage.write(
+          key: 'gender', value: response.data['data']["gender"]);
+      await storage.write(
+          key: 'mobile', value: response.data['data']["mobile"]);
+      await storage.write(
+          key: 'nationality', value: response.data['data']["nationality"]);
+      await storage.write(
+          key: 'mapLink', value: response.data['data']["mapLink"]);
       await storage.write(key: 'image', value: response.data['data']["image"]);
-
 
       return showDialog(
         barrierDismissible: false,
@@ -279,7 +286,9 @@ class _EditUserInformationClientPageState
                     // );
                     Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(
-                        builder: (context) => MenuClient(pageIndex: 4,),
+                        builder: (context) => MenuClient(
+                          pageIndex: 4,
+                        ),
                       ),
                       (Route<dynamic> route) => false,
                     );
@@ -342,7 +351,6 @@ class _EditUserInformationClientPageState
         },
       );
     }
-  
   }
 
   readStorage() async {

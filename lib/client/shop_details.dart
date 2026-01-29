@@ -382,7 +382,8 @@ class _ShopDetailState extends State<ShopDetail> {
           print('>>>><<<<<< ${v}');
         }),
       },
-    );
+    ); 
+    
   }
 
   String toDate(DateTime date) {

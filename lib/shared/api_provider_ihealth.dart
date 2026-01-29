@@ -34,7 +34,7 @@ class ApiProviderIhealth {
     _dio.options.baseUrl = baseUrl;
     _dio.options.connectTimeout = Duration(seconds: 30);
     _dio.options.receiveTimeout = Duration(seconds: 30);
-    _dio.options.headers['Accept'] = 'application/json'; 
+    _dio.options.headers['Accept'] = 'application/json';
 
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
@@ -50,8 +50,7 @@ class ApiProviderIhealth {
         return handler.next(options);
       },
       onResponse: (response, handler) {
-        print(
-            '<-- ${response.statusCode} ${response.requestOptions.uri.path}');
+        print('<-- ${response.statusCode} ${response.requestOptions.uri.path}');
         print('Response: ${response.data}');
         return handler.next(response);
       },
@@ -62,6 +61,8 @@ class ApiProviderIhealth {
 
         // หาก Token หมดอายุ (Unauthorized)
         if (e.response?.statusCode == 401) {
+          print('Token expired or unauthorized. Logging out...');
+          // ล้างข้อมูลผู้ใช้ที่จัดเก็บไว้
           await _storage.deleteAll();
           await DioService().clearCookies();
 

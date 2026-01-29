@@ -79,7 +79,8 @@ class _BookingDetailState extends State<BookingDetail> {
     final url = '$api/api/v1/customer/detail-massage'
         '?booking_date=$booking_date'
         '&massage_info_id=$massage_info_id';
-
+    print('###############');
+    print(url);
     final v = await get(url);
 
     if (v == null) return;
@@ -502,7 +503,7 @@ class _BookingDetailState extends State<BookingDetail> {
               ),
             ),
             SizedBox(height: 30),
-            massageInfo['is_open'] == true
+            massageInfo['is_open'] == false // true: ร้านเปิด  false: ร้านปิด
                 ? SizedBox(
                     width: double.infinity,
                     height: 48,

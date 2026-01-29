@@ -633,7 +633,7 @@ Future<dynamic> get(String url) async {
   });
   if (response.statusCode == 200) {
     var data = json.decode(response.body);
-    
+
     return Future.value(data['data']);
   } else {
     return {"status": "F"};
@@ -681,13 +681,10 @@ Future<dynamic> putUpdateProfile(String url, FormData formData) async {
     data: formData,
     options: Options(
       contentType: "multipart/form-data",
-      headers: {
-      "Accept": "application/json",
-      'Cookie': cookie
-    },
+      headers: {"Accept": "application/json", 'Cookie': cookie},
     ),
   );
- return Future.value(response);
+  return Future.value(response);
 }
 
 const splashReadApi = server + 'm/splash/read';

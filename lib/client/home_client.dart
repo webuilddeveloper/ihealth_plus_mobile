@@ -620,26 +620,46 @@ class _HomeClientState extends State<HomeClient>
                       children: [
                         Stack(
                           children: [
-                            // รูปคอร์ส
-                            Container(
-                              height: MediaQuery.of(context).size.height * 0.12,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                borderRadius: const BorderRadius.only(
-                                  topLeft: Radius.circular(10),
-                                  topRight: Radius.circular(10),
-                                ),
-                                // image: DecorationImage(
-                                //   image: AssetImage(shop['imgUrl']),
-                                //   fit: BoxFit.cover,
-                                // ),
-                                image: DecorationImage(
-                                  image: NetworkImage(api + shop['image']),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-
+                            shop['image'] == null || shop['image'] == ''
+                                ? Container(
+                                    height: MediaQuery.of(context).size.height *
+                                        0.12,
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      borderRadius: const BorderRadius.only(
+                                        topLeft: Radius.circular(10),
+                                        topRight: Radius.circular(10),
+                                      ),
+                                      image: DecorationImage(
+                                        image: AssetImage(
+                                            'assets/ihealth/icon_app.png'),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  )
+                                :
+                                // รูปคอร์ส
+                                Container(
+                                    height: MediaQuery.of(context).size.height *
+                                        0.12,
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      borderRadius: const BorderRadius.only(
+                                        topLeft: Radius.circular(10),
+                                        topRight: Radius.circular(10),
+                                      ),
+                                      // image: DecorationImage(
+                                      //   image: AssetImage(shop['imgUrl']),
+                                      //   fit: BoxFit.cover,
+                                      // ),
+                                      image: DecorationImage(
+                                        image: NetworkImage(
+                                            "https://api-ihealth.spl-system.com/" +
+                                                shop['image']),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
                             if (index == 0)
                               Positioned(
                                 top: 5,
@@ -983,7 +1003,6 @@ class _HomeClientState extends State<HomeClient>
           profileModel['mobile'] = v;
         }));
     await storage.read(key: 'image').then((v) => setState(() {
-          
           profileModel['image'] = v ??
               'uploads/user/image_picker_59134153-C405-4B7A-A5DB-DD097DAC3FDD-44179-000000520CA52D69-1764139168877-370813615.jpg';
         }));
@@ -996,7 +1015,7 @@ class _HomeClientState extends State<HomeClient>
   }
 
   _read() async {
-    // print('-------------start response------------');
+    print('-------------start response------------');
     _getLocation();
     //read profile
     profileCode = (await storage.read(key: 'profileCode3'))!;

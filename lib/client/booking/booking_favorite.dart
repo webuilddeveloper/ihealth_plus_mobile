@@ -184,16 +184,13 @@ class BookingFavoritePageState extends State<BookingFavoritePage> {
     // setState(() {
     //     favoritesData = response.data['data'];
     //   });
-
     // final storage = FlutterSecureStorage();
     // final token = await storage.read(key: 'token');
     // var headers = {'Authorization': 'Bearer $token'};
-
     // final dioService = DioService();
     // await dioService.init();
     // final dio = dioService.dio;
     // final cookieJar = dioService.cookieJar;
-
     // var cookies = await cookieJar.loadForRequest(
     //   Uri.parse('https://api-ihealth.spl-system.com'),
     // );
@@ -208,7 +205,6 @@ class BookingFavoritePageState extends State<BookingFavoritePage> {
     //   ),
     //   // data: data,
     // );
-
     // if (response.statusCode == 200) {
     //   print('✅ Favorites fetched successfully:');
     //   setState(() {
