@@ -3,8 +3,10 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:ihealth_2025_mobile/component/link_url_out.dart';
 import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
 import 'package:ihealth_2025_mobile/shared/api_provider_ihealth.dart';
 import 'package:ihealth_2025_mobile/widget/text_form_field.dart';
@@ -367,6 +369,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                 ),
                               ),
                               SizedBox(height: 16),
+                              _buildprivacy(),
+                              SizedBox(height: 16),
                               Center(
                                 child: InkWell(
                                   onTap: () {
@@ -494,6 +498,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                 ),
                               ),
                               SizedBox(height: 16),
+                              _buildprivacy(),
+                              SizedBox(height: 16),
                               Center(
                                 child: InkWell(
                                   onTap: () {
@@ -511,7 +517,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                         borderRadius: BorderRadius.circular(8)),
                                     child: Center(
                                       child: Text(
-                                        'ลงทะเบียน',
+                                        'ลงทะเบียน ',
                                         style: TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.bold,
@@ -523,7 +529,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               )
                             ],
                           ),
-                        )
+                        ),
                 ],
               )),
         ),
@@ -597,6 +603,142 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
         ],
       ),
+    );
+  }
+
+  bool isChecked = false;
+  bool isChecked2 = false;
+
+  _buildprivacy() {
+    return Column(
+      children: [
+        /// checkbox นโยบาย
+        FormField<bool>(
+          validator: (value) {
+            if (!isChecked) {
+              return 'กรุณายอมรับนโยบายความเป็นส่วนตัว';
+            }
+            return null;
+          },
+          builder: (state) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Transform.scale(
+                      scale: 1.2,
+                      child: Checkbox(
+                        value: isChecked,
+                        activeColor: AppColors.primary,
+                        onChanged: (value) {
+                          setState(() {
+                            isChecked = value!;
+                          });
+                          state.didChange(value);
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      child: RichText(
+                        text: TextSpan(
+                          style: TextStyle(
+                            color: Colors.grey.shade700,
+                            fontSize: 13.5,
+                            height: 1.5,
+                          ),
+                          children: [
+                            TextSpan(text: 'ข้าพเจ้าได้อ่านและยอมรับ'),
+                            TextSpan(
+                              text: 'นโยบาย',
+                              style: TextStyle(
+                                color: AppColors.primary_gold,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  launchURL(
+                                    'https://webuild.co.th/privacy-policy/privacy_ihealth.html',
+                                  );
+                                },
+                            ),
+                            TextSpan(
+                              text:
+                                  'ความเป็นส่วนตัวของระบบi-health plus และยินยอมให้บริษัทเก็บรวบรวม ใช้ และประมวลผลข้อมูลส่วนบุคคลของข้าพเจ้าเพื่อการให้บริการตามวัตถุประสงค์ที่ระบุไว้ในนโยบายความเป็นส่วนตัว',
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                if (state.hasError)
+                  Padding(
+                    padding: EdgeInsets.only(left: 12),
+                    child: Text(
+                      state.errorText!,
+                      style: TextStyle(color: Colors.red, fontSize: 12),
+                    ),
+                  ),
+              ],
+            );
+          },
+        ),
+
+        SizedBox(height: 10),
+
+        /// checkbox ข่าวสาร
+        FormField<bool>(
+          validator: (value) {
+            if (!isChecked2) {
+              return 'กรุณายอมรับการรับข่าวสาร';
+            }
+            return null;
+          },
+          builder: (state) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Transform.scale(
+                      scale: 1.2,
+                      child: Checkbox(
+                        value: isChecked2,
+                        activeColor: AppColors.primary,
+                        onChanged: (value) {
+                          setState(() {
+                            isChecked2 = value!;
+                          });
+                          state.didChange(value);
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        "ข้าพเจ้ายินยอมให้ระบบส่งข่าวสาร โปรโมชั่นหรือข้อเสนอพิเศษผ่าน Email หรือ Notification",
+                        style: TextStyle(
+                          color: Colors.grey.shade700,
+                          fontSize: 13.5,
+                          height: 1.5,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                if (state.hasError)
+                  Padding(
+                    padding: EdgeInsets.only(left: 12),
+                    child: Text(
+                      state.errorText!,
+                      style: TextStyle(color: Colors.red, fontSize: 12),
+                    ),
+                  ),
+              ],
+            );
+          },
+        ),
+      ],
     );
   }
 }

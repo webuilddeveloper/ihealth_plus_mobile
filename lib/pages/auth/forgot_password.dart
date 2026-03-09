@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ihealth_2025_mobile/component/header.dart';
+import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
 import 'package:ihealth_2025_mobile/shared/api_provider.dart';
 import 'package:ihealth_2025_mobile/widget/text_form_field.dart';
 
@@ -42,7 +43,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           title: Text(
             'ส่งคำขอสำเร็จ',
             textAlign: TextAlign.center,
-            style: TextStyle(fontFamily: 'Sarabun', fontWeight: FontWeight.w600),
+            style:
+                TextStyle(fontFamily: 'Sarabun', fontWeight: FontWeight.w600),
           ),
           content: Text(
             'เราได้ส่งรหัสผ่านใหม่ไปที่อีเมล\n${txtEmail.text}\nเรียบร้อยแล้ว',
@@ -62,9 +64,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 child: Text(
                   "ตกลง",
                   style: TextStyle(
-                      fontFamily: 'Sarabun',
-                      color: Colors.white,
-                      fontSize: 16),
+                      fontFamily: 'Sarabun', color: Colors.white, fontSize: 16),
                 ),
                 onPressed: () {
                   Navigator.of(context).pop(); // Close the dialog
@@ -151,7 +151,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                     child: Material(
                                       elevation: 5.0,
                                       borderRadius: BorderRadius.circular(10.0),
-                                      color: Theme.of(context).primaryColor,
+                                      color: AppColors.primary,
                                       child: MaterialButton(
                                         height: 40,
                                         onPressed: () {

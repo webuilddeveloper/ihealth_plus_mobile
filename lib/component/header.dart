@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
 
 header(
   BuildContext context,
@@ -14,7 +15,7 @@ header(
     preferredSize: Size.fromHeight(50),
     child: AppBar(
       centerTitle: true,
-      backgroundColor: Theme.of(context).primaryColor,
+      backgroundColor: AppColors.primary,
       elevation: 0.0,
       titleSpacing: 5,
       automaticallyImplyLeading: false,

@@ -169,7 +169,7 @@ class _LoginPageState extends State<LoginPage> {
           _signIn();
         },
         child: Text(
-          'เข้าสู่ระบบ',
+          'เข้าสู่ระบบ ',
           style: new TextStyle(
             fontSize: 18.0,
             color: Colors.white,
@@ -184,10 +184,11 @@ class _LoginPageState extends State<LoginPage> {
       body: Stack(
         children: [
           Container(
-            height: MediaQuery.of(context).size.height / 2,
+            height: MediaQuery.of(context).size.height / 2.2,
             width: double.infinity,
             child: Image.asset(
-              'assets/bg_login.png',
+              // 'assets/bg_login.png',
+              "assets/ihealth/splash_ihealt+.jpg",
               fit: BoxFit.cover,
             ),
           ),
@@ -200,18 +201,8 @@ class _LoginPageState extends State<LoginPage> {
                 children: <Widget>[
                   Padding(
                     padding: EdgeInsets.only(
-                      top: MediaQuery.of(context).padding.top + 40,
+                      top: MediaQuery.of(context).padding.top * 5.2,
                     ),
-                  ),
-                  Center(
-                    child: Image.asset(
-                      "assets/logo/logo_main.png",
-                      fit: BoxFit.contain,
-                      height: 120.0,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 20.0,
                   ),
                   Card(
                     color: Colors.white,

@@ -478,6 +478,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "iHealth+";
 				PRODUCT_NAME = iHealth;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
@@ -501,6 +502,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 0.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = td.webuild.ihealth;
 				PRODUCT_NAME = iHealth;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -616,6 +618,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "iHealth+";
 				PRODUCT_NAME = iHealth;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -669,6 +672,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "iHealth+";
 				PRODUCT_NAME = iHealth;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
@@ -694,6 +698,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 0.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = td.webuild.ihealth;
 				PRODUCT_NAME = iHealth;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -721,6 +726,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 0.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = td.webuild.ihealth;
 				PRODUCT_NAME = iHealth;
 				PROVISIONING_PROFILE_SPECIFIER = "";
