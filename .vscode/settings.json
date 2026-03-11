@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "/Users/ratchanon.k/Documents/GitHub/massage_plus_2025_mobile/linux"
+    "cmake.sourceDirectory": "/Users/ratchanon.k/Documents/GitHub/massage_plus_2025_mobile/linux",
+    "java.configuration.updateBuildConfiguration": "interactive"
 }

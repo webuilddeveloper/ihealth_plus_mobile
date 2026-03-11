@@ -2416,6 +2416,7 @@ class _HomePageState extends State<HomePage> {
     LocationPermission permission;
 
     print('🔍 กำลังตรวจสอบสิทธิ์ GPS...');
+
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       print("❌ กรุณาเปิด GPS ก่อนใช้งาน");
@@ -2423,8 +2424,10 @@ class _HomePageState extends State<HomePage> {
     }
 
     permission = await Geolocator.checkPermission();
+
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
+
       if (permission == LocationPermission.denied) {
         print("❌ ผู้ใช้ปฏิเสธสิทธิ์ Location");
         return;
@@ -2432,8 +2435,30 @@ class _HomePageState extends State<HomePage> {
     }
 
     if (permission == LocationPermission.deniedForever) {
-      print("❌ ผู้ใช้ปฏิเสธถาวร ต้องไปเปิดที่ Settings");
-      openAppSettings();
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("ต้องเปิดตำแหน่งที่ตั้ง"),
+          content: Text(
+            "ฟีเจอร์นี้จำเป็นต้องใช้ตำแหน่งของคุณ หากต้องการใช้งาน กรุณาเปิด Location ใน Settings",
+          ),
+          actions: [
+            TextButton(
+              child: Text("ยกเลิก"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            TextButton(
+              child: Text("ไปที่ Settings"),
+              onPressed: () {
+                openAppSettings();
+              },
+            ),
+          ],
+        ),
+      );
+
       return;
     }
 
@@ -2443,6 +2468,7 @@ class _HomePageState extends State<HomePage> {
       );
 
       print("📍 พิกัดที่ได้: ${position.latitude}, ${position.longitude}");
+
       List<Placemark> placemarks = await placemarkFromCoordinates(
         position.latitude,
         position.longitude,
@@ -2450,15 +2476,13 @@ class _HomePageState extends State<HomePage> {
 
       if (placemarks.isNotEmpty) {
         Placemark place = placemarks.first;
-        print("🏙️ ตำแหน่ง: ${place.administrativeArea}, ${place.country}");
 
         setState(() {
           latLng = LatLng(position.latitude, position.longitude);
-          currentLocation = (placemarks.isNotEmpty &&
-                  placemarks.first.administrativeArea != null)
-              ? placemarks.first.administrativeArea!
-              : "ไม่ทราบที่อยู่";
+          currentLocation = place.administrativeArea ?? "ไม่ทราบที่อยู่";
         });
+
+        print("🏙️ ตำแหน่ง: ${place.administrativeArea}, ${place.country}");
       } else {
         print("❌ ไม่พบข้อมูลสถานที่จากพิกัดนี้");
       }

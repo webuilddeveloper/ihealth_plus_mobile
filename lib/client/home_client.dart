@@ -1,9 +1,7 @@
 // ignore_for_file: must_be_immutable, deprecated_member_use
 
 import 'dart:convert';
-import 'dart:ffi';
 import 'dart:ui';
-import 'package:dio/dio.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:ihealth_2025_mobile/client/booking/booking.dart';
@@ -190,18 +188,16 @@ class _HomeClientState extends State<HomeClient>
     return LayoutBuilder(
       builder: (context, constraints) {
         final screenWidth = MediaQuery.of(context).size.width;
-        final screenHeight = MediaQuery.of(context).size.height;
 
         // Responsive values based on screen size
         final isSmallScreen = screenWidth < 360;
         final isMediumScreen = screenWidth >= 360 && screenWidth < 414;
-        final isLargeScreen = screenWidth >= 414;
 
         // Dynamic sizing
         final headerHeight =
-            isSmallScreen ? 240.0 : (isMediumScreen ? 260.0 : 280.0);
+            isSmallScreen ? 240.0 : (isMediumScreen ? 260.0 : 330.0);
         final backgroundHeight =
-            isSmallScreen ? 180.0 : (isMediumScreen ? 200.0 : 220.0);
+            isSmallScreen ? 180.0 : (isMediumScreen ? 200.0 : 270.0);
         final cardTopPosition =
             isSmallScreen ? 125.0 : (isMediumScreen ? 135.0 : 145.0);
         final horizontalPadding = isSmallScreen ? 12.0 : 15.0;
@@ -267,7 +263,6 @@ class _HomeClientState extends State<HomeClient>
 
   _buildCardContent(
       double screenWidth, bool isSmallScreen, bool isMediumScreen) {
-    // Profile image size based on screen size
     final profileSize = isSmallScreen ? 70.0 : (isMediumScreen ? 80.0 : 85.0);
     final profilePadding = isSmallScreen ? 8.0 : 10.0;
     final spacing = isSmallScreen ? 15.0 : 20.0;
@@ -431,7 +426,7 @@ class _HomeClientState extends State<HomeClient>
     final titleFontSize = isSmallScreen ? 20.0 : (isMediumScreen ? 22.0 : 24.0);
     final subtitleFontSize =
         isSmallScreen ? 12.0 : (isMediumScreen ? 13.0 : 14.0);
-    final linkFontSize = isSmallScreen ? 14.0 : (isMediumScreen ? 15.0 : 16.0);
+    // final linkFontSize = isSmallScreen ? 14.0 : (isMediumScreen ? 15.0 : 16.0);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -491,9 +486,10 @@ class _HomeClientState extends State<HomeClient>
   }
 
   _buildBooking() {
-    return Center(
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
-        width: 360,
+        width: double.infinity,
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -561,6 +557,13 @@ class _HomeClientState extends State<HomeClient>
   }
 
   _buildShop() {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // Responsive values based on screen size
+    final isSmallScreen = screenWidth < 360;
+    final isMediumScreen = screenWidth >= 360 && screenWidth < 414;
+    final Height = isSmallScreen ? 160.0 : (isMediumScreen ? 190.0 : 220.0);
+
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: 15,
@@ -581,7 +584,7 @@ class _HomeClientState extends State<HomeClient>
             ),
           ),
           SizedBox(
-            height: 200,
+            height: Height,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: mockShop.length,
@@ -724,6 +727,12 @@ class _HomeClientState extends State<HomeClient>
   }
 
   _buildCourse() {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // Responsive values based on screen size
+    final isSmallScreen = screenWidth < 360;
+    final isMediumScreen = screenWidth >= 360 && screenWidth < 414;
+    final Height = isSmallScreen ? 165.0 : (isMediumScreen ? 205.0 : 245.0);
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: 15,
@@ -744,7 +753,7 @@ class _HomeClientState extends State<HomeClient>
             ),
           ),
           SizedBox(
-            height: 220,
+            height: Height,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: mockCourse.length,
@@ -1194,6 +1203,7 @@ class _HomeClientState extends State<HomeClient>
     LocationPermission permission;
 
     print('🔍 กำลังตรวจสอบสิทธิ์ GPS...');
+
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       print("❌ กรุณาเปิด GPS ก่อนใช้งาน");
@@ -1201,8 +1211,10 @@ class _HomeClientState extends State<HomeClient>
     }
 
     permission = await Geolocator.checkPermission();
+
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
+
       if (permission == LocationPermission.denied) {
         print("❌ ผู้ใช้ปฏิเสธสิทธิ์ Location");
         return;
@@ -1210,8 +1222,29 @@ class _HomeClientState extends State<HomeClient>
     }
 
     if (permission == LocationPermission.deniedForever) {
-      print("❌ ผู้ใช้ปฏิเสธถาวร ต้องไปเปิดที่ Settings");
-      openAppSettings();
+      print("❌ ผู้ใช้ปฏิเสธถาวร");
+
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("ต้องการตำแหน่งที่ตั้ง"),
+          content: Text(
+              "แอปต้องใช้ตำแหน่งของคุณเพื่อแนะนำบริการสุขภาพใกล้คุณ กรุณาเปิด Location ใน Settings"),
+          actions: [
+            TextButton(
+              child: Text("ยกเลิก"),
+              onPressed: () => Navigator.pop(context),
+            ),
+            TextButton(
+              child: Text("เปิด Settings"),
+              onPressed: () {
+                openAppSettings();
+              },
+            ),
+          ],
+        ),
+      );
+
       return;
     }
 
@@ -1221,6 +1254,7 @@ class _HomeClientState extends State<HomeClient>
       );
 
       print("📍 พิกัดที่ได้: ${position.latitude}, ${position.longitude}");
+
       List<Placemark> placemarks = await placemarkFromCoordinates(
         position.latitude,
         position.longitude,
@@ -1228,15 +1262,13 @@ class _HomeClientState extends State<HomeClient>
 
       if (placemarks.isNotEmpty) {
         Placemark place = placemarks.first;
-        print("🏙️ ตำแหน่ง: ${place.administrativeArea}, ${place.country}");
 
         setState(() {
           latLng = LatLng(position.latitude, position.longitude);
-          currentLocation = (placemarks.isNotEmpty &&
-                  placemarks.first.administrativeArea != null)
-              ? placemarks.first.administrativeArea!
-              : "ไม่ทราบที่อยู่";
+          currentLocation = place.administrativeArea ?? "ไม่ทราบที่อยู่";
         });
+
+        print("🏙️ ตำแหน่ง: ${place.administrativeArea}, ${place.country}");
       } else {
         print("❌ ไม่พบข้อมูลสถานที่จากพิกัดนี้");
       }

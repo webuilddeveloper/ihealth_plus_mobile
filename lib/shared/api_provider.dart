@@ -1,11 +1,11 @@
 import 'dart:convert';
-import 'package:geolocator/geolocator.dart';
+// import 'package:geolocator/geolocator.dart';
 import 'package:ihealth_2025_mobile/shared/dio_service.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ihealth_2025_mobile/ihealth/login.dart';
-import 'package:ihealth_2025_mobile/shared/facebook_firebase.dart';
-import 'package:ihealth_2025_mobile/shared/google.dart';
-import 'package:ihealth_2025_mobile/shared/line.dart';
+// import 'package:ihealth_2025_mobile/shared/facebook_firebase.dart';
+// import 'package:ihealth_2025_mobile/shared/google.dart';
+// import 'package:ihealth_2025_mobile/shared/line.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -16,7 +16,7 @@ import 'dart:io';
 
 const appName = 'iHealth+';
 const versionName = '0.0.1';
-const versionNumber = 2;
+const versionNumber = 3;
 
 // flutter build apk --build-name=0.0.1 --build-number=1
 

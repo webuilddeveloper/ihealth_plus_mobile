@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'dart:ui';
+import 'package:dio/dio.dart';
 import 'package:ihealth_2025_mobile/client/menu_client.dart';
 import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
+import 'package:ihealth_2025_mobile/ihealth/login.dart';
 import 'package:ihealth_2025_mobile/ihealth/profile/edit_user_information_client.dart';
 import 'package:ihealth_2025_mobile/ihealth/profile/personalskills.dart';
 import 'package:ihealth_2025_mobile/pages/blank_page/dialog_fail.dart';
@@ -9,6 +12,7 @@ import 'package:ihealth_2025_mobile/ihealth/profile/edit_user_information.dart';
 import 'package:ihealth_2025_mobile/shared/api_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:ihealth_2025_mobile/shared/dio_service.dart';
 import 'change_password.dart';
 
 class UserInformationClientPage extends StatefulWidget {
@@ -52,6 +56,27 @@ class _UserInformationClientPageState extends State<UserInformationClientPage> {
           }
         },
       ),
+      persistentFooterDecoration: BoxDecoration(),
+      persistentFooterButtons: [
+        Align(
+          alignment: Alignment.bottomRight,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 40, right: 5),
+            child: GestureDetector(
+              onTap: _showDeleteDialog,
+              child: Text(
+                "ลบบัญชี",
+                style: TextStyle(
+                  fontFamily: 'Sarabun',
+                  fontSize: 12,
+                  color: Colors.red,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -156,9 +181,9 @@ class _UserInformationClientPageState extends State<UserInformationClientPage> {
               Container(
                 padding: EdgeInsets.all(10),
                 margin: EdgeInsets.only(top: 270.0, bottom: 30.0),
-                constraints: BoxConstraints(
-                  minHeight: 200,
-                ),
+                // constraints: BoxConstraints(
+                //   minHeight: 200,
+                // ),
                 decoration: BoxDecoration(
                   color: Colors.white,
                 ),
@@ -214,7 +239,6 @@ class _UserInformationClientPageState extends State<UserInformationClientPage> {
                       //   child: buttonMenuUser(
                       //       'assets/icons/service_7.png', 'สถานประกอบการ'),
                       // ),
-
                       // InkWell(
                       //   onTap: () => Navigator.push(
                       //     context,
@@ -225,6 +249,7 @@ class _UserInformationClientPageState extends State<UserInformationClientPage> {
                       //   child: buttonMenuUser(
                       //       'assets/icons/lock.png', 'เปลี่ยนรหัสผ่าน'),
                       // ),
+
                       Container(
                         alignment: Alignment.centerRight,
                         child: Text(
@@ -234,6 +259,7 @@ class _UserInformationClientPageState extends State<UserInformationClientPage> {
                           ),
                         ),
                       ),
+
                       Container(
                         margin: EdgeInsets.only(top: 20.0),
                         child: Container(
@@ -265,7 +291,6 @@ class _UserInformationClientPageState extends State<UserInformationClientPage> {
                           ),
                         ),
                       ),
-                      SizedBox(height: 30),
                     ],
                   ),
                 ),
@@ -330,6 +355,161 @@ class _UserInformationClientPageState extends State<UserInformationClientPage> {
           ),
         ],
       ),
+    );
+  }
+
+  _deleteAcount() async {
+    print('---------------_deleteAcount----------------');
+
+    final token = await storage.read(key: 'token');
+    final cookies = await storage.read(key: 'cookie');
+    final Typerole = await storage.read(key: 'loginType');
+
+    final role = Typerole == "1" ? "customer" : "therapist";
+
+    print(Typerole);
+    print(role);
+
+    var headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+      "Cookie": '$cookies'
+    };
+
+    var dio = Dio();
+    var response = await dio.request(
+      '${api}api/v1/delete/account?role=$role',
+      options: Options(
+        method: 'PUT',
+        headers: headers,
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      print(json.encode(response.data));
+      await FlutterSecureStorage().deleteAll(); // clear token
+      await DioService().cookieJar.deleteAll(); // clear cookie
+      print('✅ deleteAcount successful');
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+        (route) => false,
+      );
+    } else {
+      print(response.statusMessage);
+    }
+  }
+
+  void _showDeleteDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black.withOpacity(0.6),
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.all(28),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.12),
+                  blurRadius: 40,
+                  offset: const Offset(0, 16),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Title
+                const Text(
+                  "ลบบัญชีผู้ใช้",
+                  style: TextStyle(
+                    fontFamily: 'Sarabun',
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF1A1A1A),
+                  ),
+                ),
+                const SizedBox(height: 10),
+
+                // Subtitle
+                const Text(
+                  "บัญชีของคุณจะถูกลบถาวร\nและไม่สามารถกู้คืนได้",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: 'Sarabun',
+                    fontSize: 15,
+                    height: 1.6,
+                    color: Color(0xFF888888),
+                  ),
+                ),
+                const SizedBox(height: 28),
+
+                // Divider
+                const Divider(height: 1, color: Color(0xFFF0F0F0)),
+                const SizedBox(height: 20),
+
+                // Buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          backgroundColor: const Color(0xFFF5F5F5),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          "ยกเลิก",
+                          style: TextStyle(
+                            fontFamily: 'Sarabun',
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF555555),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          _deleteAcount();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          backgroundColor: const Color(0xFFE53935),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          "ลบบัญชี",
+                          style: TextStyle(
+                            fontFamily: 'Sarabun',
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:ihealth_2025_mobile/client/menu_client.dart';
 import 'package:ihealth_2025_mobile/ihealth/appcolor.dart';
@@ -36,6 +35,12 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final ValueNotifier<bool> obscureNotifier = ValueNotifier(true);
 
+  bool _isTablet(BuildContext context) =>
+      MediaQuery.of(context).size.shortestSide >= 600;
+
+  bool _isSmallPhone(BuildContext context) =>
+      MediaQuery.of(context).size.height < 700;
+
   // late String _username;
   // late String _password;
   // late String _facebookID;
@@ -48,9 +53,9 @@ class _LoginPageState extends State<LoginPage> {
   // late String _prefixName;
   // late String _firstName;
   // late String _lastName;
-
+  // bool _isOnlyWebLogin = false; 
+  
   late Map userProfile;
-  // bool _isOnlyWebLogin = false;
 
   late DataUser dataUser;
   late Map<String, dynamic> profile;
@@ -158,6 +163,9 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isTablet = _isTablet(context);
+    final isSmallPhone = _isSmallPhone(context);
+
     final loginButton = Material(
       elevation: 5.0,
       borderRadius: BorderRadius.circular(10.0),
@@ -169,7 +177,7 @@ class _LoginPageState extends State<LoginPage> {
           _signIn();
         },
         child: Text(
-          'เข้าสู่ระบบ ',
+          'เข้าสู่ระบบ',
           style: new TextStyle(
             fontSize: 18.0,
             color: Colors.white,
@@ -184,10 +192,13 @@ class _LoginPageState extends State<LoginPage> {
       body: Stack(
         children: [
           Container(
-            height: MediaQuery.of(context).size.height / 2.2,
+            height: isTablet
+                ? MediaQuery.of(context).size.height * 0.55 // แท็บเล็ต
+                : isSmallPhone
+                    ? MediaQuery.of(context).size.height * 0.35 // มือถือจอเล็ก
+                    : MediaQuery.of(context).size.height * 0.45, // มือถือจอปกติ
             width: double.infinity,
             child: Image.asset(
-              // 'assets/bg_login.png',
               "assets/ihealth/splash_ihealt+.jpg",
               fit: BoxFit.cover,
             ),
@@ -201,7 +212,14 @@ class _LoginPageState extends State<LoginPage> {
                 children: <Widget>[
                   Padding(
                     padding: EdgeInsets.only(
-                      top: MediaQuery.of(context).padding.top * 5.2,
+                      top: isTablet
+                          ? MediaQuery.of(context).size.height *
+                              0.45 // แท็บเล็ต
+                          : isSmallPhone
+                              ? MediaQuery.of(context).size.height *
+                                  0.3 // มือถือจอเล็ก
+                              : MediaQuery.of(context).size.height *
+                                  0.335, // มือถือจอปกติ
                     ),
                   ),
                   Card(
@@ -554,31 +572,6 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  _readProfile({
-    required String token,
-    required String info_id,
-  }) async {
-    var headers = {'Authorization': 'Bearer $token'};
-    var dio = Dio();
-    var response = await dio.request(
-      'http://110.78.211.156:3001/api/v1/user/$info_id',
-      options: Options(
-        method: 'GET',
-        headers: headers,
-      ),
-    );
-
-    if (response.statusCode == 200) {
-      setState(() {
-        profile = response.data['data'];
-      });
-
-      print(json.encode(response.data));
-    } else {
-      print(response.statusMessage);
-    }
-  }
-
   Future<void> showErrorDialog({
     required BuildContext context,
     required String title,
@@ -640,6 +633,31 @@ class _LoginPageState extends State<LoginPage> {
       },
     );
   }
+
+  // _readProfile({
+  //   required String token,
+  //   required String info_id,
+  // }) async {
+  //   var headers = {'Authorization': 'Bearer $token'};
+  //   var dio = Dio();
+  //   var response = await dio.request(
+  //     'http://110.78.211.156:3001/api/v1/user/$info_id',
+  //     options: Options(
+  //       method: 'GET',
+  //       headers: headers,
+  //     ),
+  //   );
+
+  //   if (response.statusCode == 200) {
+  //     setState(() {
+  //       profile = response.data['data'];
+  //     });
+
+  //     print(json.encode(response.data));
+  //   } else {
+  //     print(response.statusMessage);
+  //   }
+  // }
 
   // void checkStatus() async {
   //   final storage = new FlutterSecureStorage();
