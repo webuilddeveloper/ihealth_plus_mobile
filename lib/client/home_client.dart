@@ -41,14 +41,14 @@ class _HomeClientState extends State<HomeClient>
 
   late AnimationController _controller;
 
-  late Future<dynamic> _futureBanner;
-  late Future<dynamic> _futureProfile;
-  late Future<dynamic> _futureNews;
-  late Future<dynamic> _futureMenu;
-  late Future<dynamic> _futureRotation;
-  late Future<dynamic> _futureAboutUs;
-  late Future<dynamic> _futureMainPopUp;
-  late Future<dynamic> _futureVerifyTicket;
+  // late Future<dynamic> _futureBanner;
+  // late Future<dynamic> _futureProfile;
+  // late Future<dynamic> _futureNews;
+  // late Future<dynamic> _futureMenu;
+  // late Future<dynamic> _futureRotation;
+  // late Future<dynamic> _futureAboutUs;
+  // late Future<dynamic> _futureMainPopUp;
+  // late Future<dynamic> _futureVerifyTicket;
 
   dynamic profileModel = {};
 
@@ -84,13 +84,14 @@ class _HomeClientState extends State<HomeClient>
   void initState() {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
     _newsList = [];
-    _read();
+
     currentBackPressTime = DateTime.now();
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 1), // 1 วินาทีต่อรอบ
     )..repeat(reverse: true); // กลับไปกลับมา
 
+    _read();
     _callReadShop();
     _callReadCourse();
     _readProfile();
@@ -1026,122 +1027,118 @@ class _HomeClientState extends State<HomeClient>
   _read() async {
     print('-------------start response------------');
     _getLocation();
-    //read profile
-    profileCode = (await storage.read(key: 'profileCode3'))!;
-    if (profileCode != '') {
-      setState(() {
-        _futureProfile = postDio(profileReadApi, {"code": profileCode});
-      });
-      _futureMenu = postDio('${menuApi}read', {'limit': 10});
-      _futureBanner = postDio('${mainBannerApi}read', {
-        'limit': 10,
-        'app': 'massage',
-      });
-      _futureRotation = postDio('${mainRotationApi}read', {'limit': 10});
-      _futureMainPopUp = postDio('${mainPopupHomeApi}read', {'limit': 10});
-      _futureAboutUs = postDio('${aboutUsApi}read', {});
+    // //read profile
+    // profileCode = (await storage.read(key: 'profileCode3'))!;
+    // if (profileCode != '') {
+    //   setState(() {
+    //     _futureProfile = postDio(profileReadApi, {"code": profileCode});
+    //   });
+    //   _futureMenu = postDio('${menuApi}read', {'limit': 10});
+    //   _futureBanner = postDio('${mainBannerApi}read', {
+    //     'limit': 10,
+    //     'app': 'massage',
+    //   });
+    //   _futureRotation = postDio('${mainRotationApi}read', {'limit': 10});
+    //   _futureMainPopUp = postDio('${mainPopupHomeApi}read', {'limit': 10});
+    //   _futureAboutUs = postDio('${aboutUsApi}read', {});
 
-      _currentNewsPage = 0;
-      _futureNews = postDio('${newsApi}read', {
-        'skip': _currentNewsPage * _newsLimit,
-        'limit': _newsLimit,
-        'app': 'massage',
-      });
+    //   _currentNewsPage = 0;
+    //   _futureNews = postDio('${newsApi}read', {
+    //     'skip': _currentNewsPage * _newsLimit,
+    //     'limit': _newsLimit,
+    //     'app': 'massage',
+    //   });
 
-      _futureVerifyTicket = postDio(getNotpaidTicketListApi,
-          {"createBy": "createBy", "updateBy": "updateBy"});
-      // getMainPopUp();
-      // _getLocation();
-      // print('-------------end response------------');
-    } else {
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (context) => LoginPage(),
-        ),
-        (Route<dynamic> route) => false,
-      );
-    }
+    //   _futureVerifyTicket = postDio(getNotpaidTicketListApi,
+    //       {"createBy": "createBy", "updateBy": "updateBy"});
+    //   // getMainPopUp();
+    //   // _getLocation();
+    //   // print('-------------end response------------');
+    // } else {
+    //   Navigator.of(context).pushAndRemoveUntil(
+    //     MaterialPageRoute(
+    //       builder: (context) => LoginPage(),
+    //     ),
+    //     (Route<dynamic> route) => false,
+    //   );
+    // }
   }
 
-  getMainPopUp() async {
-    var result =
-        await post('${mainPopupHomeApi}read', {'skip': 0, 'limit': 100});
-
-    if (result.length > 0) {
-      var valueStorage = await storage.read(key: 'mainPopupDDPM');
-      var dataValue;
-      if (valueStorage != null) {
-        dataValue = json.decode(valueStorage);
-      } else {
-        dataValue = null;
-      }
-
-      var now = new DateTime.now();
-      DateTime date = new DateTime(now.year, now.month, now.day);
-
-      if (dataValue != null) {
-        var index = dataValue.indexWhere(
-          (c) =>
-              // c['username'] == userData.username &&
-              c['date'].toString() ==
-                  DateFormat("ddMMyyyy").format(date).toString() &&
-              c['boolean'] == "true",
-        );
-
-        if (index == -1) {
-          this.setState(() {
-            hiddenMainPopUp = false;
-          });
-          return showDialog(
-            barrierDismissible: false, // close outside
-            context: context,
-            builder: (_) {
-              return WillPopScope(
-                onWillPop: () {
-                  return Future.value(false);
-                },
-                child: MainPopupDialog(
-                  model: _futureMainPopUp,
-                  type: 'mainPopup',
-                  key: null,
-                  url: '',
-                  urlGallery: '',
-                  username: '',
-                ),
-              );
-            },
-          );
-        } else {
-          this.setState(() {
-            hiddenMainPopUp = true;
-          });
-        }
-      } else {
-        this.setState(() {
-          hiddenMainPopUp = false;
-        });
-        return showDialog(
-          barrierDismissible: false, // close outside
-          context: context,
-          builder: (_) {
-            return WillPopScope(
-              onWillPop: () {
-                return Future.value(false);
-              },
-              child: MainPopupDialog(
-                model: _futureMainPopUp,
-                type: 'mainPopup',
-                key: null,
-                url: '',
-                urlGallery: '',
-                username: '',
-              ),
-            );
-          },
-        );
-      }
-    }
-  }
+  // getMainPopUp() async {
+  //   var result =
+  //       await post('${mainPopupHomeApi}read', {'skip': 0, 'limit': 100});
+  //   if (result.length > 0) {
+  //     var valueStorage = await storage.read(key: 'mainPopupDDPM');
+  //     var dataValue;
+  //     if (valueStorage != null) {
+  //       dataValue = json.decode(valueStorage);
+  //     } else {
+  //       dataValue = null;
+  //     }
+  //     var now = new DateTime.now();
+  //     DateTime date = new DateTime(now.year, now.month, now.day);
+  //     if (dataValue != null) {
+  //       var index = dataValue.indexWhere(
+  //         (c) =>
+  //             // c['username'] == userData.username &&
+  //             c['date'].toString() ==
+  //                 DateFormat("ddMMyyyy").format(date).toString() &&
+  //             c['boolean'] == "true",
+  //       );
+  //       if (index == -1) {
+  //         this.setState(() {
+  //           hiddenMainPopUp = false;
+  //         });
+  //         return showDialog(
+  //           barrierDismissible: false, // close outside
+  //           context: context,
+  //           builder: (_) {
+  //             return WillPopScope(
+  //               onWillPop: () {
+  //                 return Future.value(false);
+  //               },
+  //               child: MainPopupDialog(
+  //                 model: _futureMainPopUp,
+  //                 type: 'mainPopup',
+  //                 key: null,
+  //                 url: '',
+  //                 urlGallery: '',
+  //                 username: '',
+  //               ),
+  //             );
+  //           },
+  //         );
+  //       } else {
+  //         this.setState(() {
+  //           hiddenMainPopUp = true;
+  //         });
+  //       }
+  //     } else {
+  //       this.setState(() {
+  //         hiddenMainPopUp = false;
+  //       });
+  //       return showDialog(
+  //         barrierDismissible: false, // close outside
+  //         context: context,
+  //         builder: (_) {
+  //           return WillPopScope(
+  //             onWillPop: () {
+  //               return Future.value(false);
+  //             },
+  //             child: MainPopupDialog(
+  //               model: _futureMainPopUp,
+  //               type: 'mainPopup',
+  //               key: null,
+  //               url: '',
+  //               urlGallery: '',
+  //               username: '',
+  //             ),
+  //           );
+  //         },
+  //       );
+  //     }
+  //   }
+  // }
 
   void _onLoading() async {
     if (!_hasMoreNews) {
@@ -1282,6 +1279,8 @@ class _HomeClientState extends State<HomeClient>
       (v) => {
         setState(() {
           mockShop = v;
+          print('#################');
+          print(mockShop);
         }),
       },
     );
@@ -1292,6 +1291,8 @@ class _HomeClientState extends State<HomeClient>
       (v) => {
         setState(() {
           mockCourse = v;
+          print('#################');
+          print(mockCourse);
         }),
       },
     );

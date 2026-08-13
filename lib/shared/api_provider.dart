@@ -622,10 +622,14 @@ Future<String> uploadImageX(XFile file) async {
 }
 
 Future<dynamic> get(String url) async {
+  print(url);
   var cookie;
+
   await storage.read(key: 'cookie').then((v) => {
         cookie = v,
       });
+  print(' -----get url-----' + url);
+  print(cookie);
   var response = await http.get(Uri.parse(url), headers: {
     "Accept": "application/json",
     "Content-Type": "application/json",

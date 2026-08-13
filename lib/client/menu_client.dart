@@ -45,14 +45,15 @@ class MenuClientState extends State<MenuClient> {
   @override
   void initState() {
     // _callRead();
-    _readProfile();
-    callReadNoti();
+    // _readProfile();
+    // callReadNoti();
     pages = <Widget>[
       HomeClient(
         changePage: _changePage,
       ),
       BookingHistoryPage(),
-      NotificationClientList(title: 'แจ้งเตือน', key: notificationPageKey, onReadAll: readAll),
+      NotificationClientList(
+          title: 'แจ้งเตือน', key: notificationPageKey, onReadAll: readAll),
       BookingFavoritePage(key: favoritePageKey),
       UserInformationClientPage(changePage: _onItemTapped),
     ];
@@ -63,7 +64,7 @@ class MenuClientState extends State<MenuClient> {
 
   void readAll() {
     print("=========== -------- readAll() ถูกเรียกจาก NotificationPage");
-    callReadNoti();
+    // callReadNoti();
   }
 
   // MyQrCode(),

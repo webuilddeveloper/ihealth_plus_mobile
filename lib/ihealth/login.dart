@@ -53,8 +53,8 @@ class _LoginPageState extends State<LoginPage> {
   // late String _prefixName;
   // late String _firstName;
   // late String _lastName;
-  // bool _isOnlyWebLogin = false; 
-  
+  // bool _isOnlyWebLogin = false;
+
   late Map userProfile;
 
   late DataUser dataUser;
