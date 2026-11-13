@@ -16,7 +16,7 @@ import 'dart:io';
 
 const appName = 'iHealth+';
 const versionName = '0.0.1';
-const versionNumber = 3;
+const versionNumber = 13;
 
 // flutter build apk --build-name=0.0.1 --build-number=1
 

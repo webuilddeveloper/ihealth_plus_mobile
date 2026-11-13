@@ -56,7 +56,6 @@ class _UserInformationClientPageState extends State<UserInformationClientPage> {
           }
         },
       ),
-      persistentFooterDecoration: BoxDecoration(),
       persistentFooterButtons: [
         Align(
           alignment: Alignment.bottomRight,
